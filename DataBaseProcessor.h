@@ -1,6 +1,9 @@
 #pragma once
 #include"sql/DataBase.h"
 #include<filesystem>
+#include<iostream>
+#include<string>
+using namespace std;
 namespace Blink
 {
 	namespace sql = SQLite3DataBaseTools;

@@ -57,9 +57,12 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 	string req = sql::make_select_request("users");
 	auto result = db.run_get_request(req);
 
-	table user;
-	user["name"] = new sql::Text(name);
-	user["password"] = new sql::Text(password);
+	for (auto chunk : result)
+	{
+		bool eq_name     = sql::type_to_string(chunk["name"]) == name;
+		bool eq_password = sql::type_to_string(chunk["password"]) == password;
+		if (eq_name && eq_password) return true;
+	}
 
-	return find(result.begin(), result.end(), user) != result.end();
+	return false;
 }
