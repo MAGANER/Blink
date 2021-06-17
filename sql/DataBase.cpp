@@ -47,10 +47,12 @@ vector<chunk> DataBase::run_get_request(const string& request)
 int DataBase::get_request_callback(void* data, int argc, char** argv, char** azColName)
 {
 	map<string, SQLtype*> extracted_data;
+
 	for (int i = 0; i < argc; ++i)
 	{
 		function<char(char)> to_lower = tolower;
 		string name = Functools::map(string(azColName[i]), to_lower);
+		
 		if (name == "id")
 		{
 			int id_val = argv[i] ? atoi(argv[i]) : 0;
@@ -86,10 +88,9 @@ int DataBase::get_request_callback(void* data, int argc, char** argv, char** azC
 				//if there is nothing just skip it
 			}
 		}
-
-		static_cast<vector<chunk>*>(data)->push_back(extracted_data);
-		extracted_data.clear();
+		
 	}
+	static_cast<vector<chunk>*>(data)->push_back(extracted_data);
 	
 	return 0;
 }
@@ -109,8 +110,9 @@ vector<chunk> DataBase::run_get_request(const string& request, function<bool(str
 	if (error_message != nullptr)
 		this->error_message = error_message;
 
-
 	vector<chunk>* result = new vector<chunk>();
+
+
 	for (auto _chunk : *data)
 	{
 		chunk curr;
