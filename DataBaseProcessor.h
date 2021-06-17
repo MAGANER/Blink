@@ -23,6 +23,8 @@ namespace Blink
 		void create_new_room(const string& name,
 							 const string& password,
 							 const string& port);
+		bool does_room_exists(const string& name,
+							  const string& password);
 	};
 
 	extern void create_database();
