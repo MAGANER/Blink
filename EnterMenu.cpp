@@ -21,6 +21,11 @@ void EnterMenu::login()
 	cout << "enter name:"; cin >> name;
 	cout << "enter password:"; cin >> password;
 
-	if (does_user_exist(name, password)) change_menu = true;
+	if (does_user_exist(name, password))
+	{
+		system("cls");
+		cout << "welcome " << name << " to Blink!" << endl;
+		change_menu = true;
+	}
 	else cout << "can not login!" << endl;
 }
