@@ -9,9 +9,12 @@ namespace Blink
 		EnterMenu();
 		~EnterMenu(){}
 
+		bool change() { return change_menu; }
 	private:
 		void create_user();
 		void login();
+		
+		bool change_menu = false;
 	};
 };
 

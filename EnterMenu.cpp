@@ -21,5 +21,6 @@ void EnterMenu::login()
 	cout << "enter name:"; cin >> name;
 	cout << "enter password:"; cin >> password;
 
-	//TODO::check does input matches with data from database
+	if (does_user_exist(name, password)) change_menu = true;
+	else cout << "can not login!" << endl;
 }
