@@ -19,6 +19,10 @@ namespace Blink
 							 const string& password);
 		bool does_user_exist(const string& name,
 							 const string& password);
+
+		void create_new_room(const string& name,
+							 const string& password,
+							 const string& port);
 	};
 
 	extern void create_database();

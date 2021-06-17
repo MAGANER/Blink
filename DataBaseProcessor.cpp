@@ -66,3 +66,17 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 
 	return false;
 }
+void DataBaseProcessor::create_new_room(const string& name,
+										const string& password,
+										const string& port)
+{
+	sql::DataBase db("data.db");
+
+	table room;
+	room["name"]	 = new sql::Text(name);
+	room["password"] = new sql::Text(password);
+	room["port"]	 = new sql::Text(port);
+
+	string req = sql::make_insert_request(room, "rooms");
+	db.run_set_request();
+}
