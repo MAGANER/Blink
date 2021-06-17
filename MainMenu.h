@@ -16,7 +16,7 @@ namespace Blink
 
         void create();
         void enter();
-        
+        void connect();
     };
 };
 

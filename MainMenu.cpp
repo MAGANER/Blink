@@ -4,7 +4,8 @@ using namespace Blink;
 
 MainMenu::MainMenu()
 {
-	commands["exit"] = function<void()>([&]() {_exit = true; });
+	commands["exit"]   = function<void()>([&]() { _exit = true; });
+	commands["create"] = function<void()>([&]() { create();     });
 }
 void MainMenu::create()
 {
@@ -13,5 +14,6 @@ void MainMenu::create()
 	cout << "enter room passworod:"; cin >> password;
 	cout << "enter room port:";      cin >> port;
 
-	create_new_room(name, password, port);
+	if (!does_room_exists(name, password))create_new_room(name, password, port);
+	else cout << "room" << " `" + name + "`" << " already exists!" << endl;
 }
