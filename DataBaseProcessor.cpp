@@ -97,5 +97,40 @@ bool DataBaseProcessor::does_room_exists(const string& name,
 	}
 
 	return false;
+}
+void DataBaseProcessor::add_message(const string& room_name,
+									const string& user_name,
+									const string& message)
+{
+	sql::DataBase db("data.db");
 
+	table chats;
+	chats["room_name"] = new sql::Text(room_name);
+	chats["user_name"] = new sql::Text(user_name);
+	chats["message"] = new sql::Text(message);
+
+	string req = sql::make_insert_request(chats, "chats");
+	db.run_set_request(req);
+}
+vector<message> DataBaseProcessor::get_messages(const string& room_name,
+												const string& user_name)
+{
+	sql::DataBase db("data.db");
+
+	string req = sql::make_select_request("chats");
+	auto result = db.run_get_request(req);
+
+	vector<message> messages;
+	for (auto chunk : result)
+	{
+		bool eq_room = room_name == sql::type_to_string(chunk["room_name"]);
+		bool eq_name = user_name == sql::type_to_string(chunk["user_name"]);
+		if (eq_room && eq_name)
+		{
+			string message = sql::type_to_string(chunk["message"]);
+			messages.push_back(make_pair(user_name, message));
+		}
+	}
+
+	return messages;
 }
