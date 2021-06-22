@@ -150,3 +150,33 @@ vector<message> DataBaseProcessor::get_messages(const string& room_name,
 
 	return messages;
 }
+int Blink::get_room_port(const string& room_name)
+{
+	sql::DataBase db("data.db");
+
+	string req  = sql::make_select_request("rooms");
+	auto result = db.run_get_request(req);
+
+	//if you call this function, then room should exist
+	for (auto chunk : result)
+	{
+		if (sql::type_to_string(chunk["name"]) == room_name)
+		{
+			auto val = chunk["port"];
+
+			//sqlite3 has dynamic type casting
+			//so integer number can become Primary key
+			//and when room is created it can not get port as not number
+			if (val->type == sql::SQL_TYPES::PRIMARY_KEY)
+			{
+				auto result = static_cast<sql::PrimaryKey*>(val)->key;
+				return result;
+			}
+			else if (val->type == sql::SQL_TYPES::INTEGER)
+			{
+				auto result = static_cast<sql::Integer*>(val)->value;
+				return result;
+			}
+		}
+	}
+}

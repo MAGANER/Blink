@@ -35,9 +35,10 @@ namespace Blink
 		vector<message> get_messages(const string& room_name,
 									 const string& user_name);
 		
-		int get_room_port(const string& room_name);
+		
 	};
 
+	extern int get_room_port(const string& room_name);
 	extern void create_database();
 };
 
