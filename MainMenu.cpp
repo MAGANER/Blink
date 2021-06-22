@@ -19,7 +19,7 @@ void MainMenu::create()
 		cout << "can not create room! incorrect port >>" << port << endl;
 		return;
 	}
-	if (!does_room_exists(name, password))create_new_room(name, password, port);
+	if (!does_room_exists(name))create_new_room(name, password, port);
 	else cout << "room" << " `" + name + "`" << " already exists!" << endl;
 }
 void MainMenu::enter()
@@ -28,7 +28,7 @@ void MainMenu::enter()
 	cout << "enter room name:";      cin >> name;
 	cout << "enter room password:"; cin >> password;
 
-	if (!does_room_exists(name, password)) cout << "can not enter to " << "`" + name + "`" << " room";
+	if (!is_password_correct(name,password)) cout << "can not enter to " << "`" + name + "`" << " room";
 	else
 	{
 		room_to_enter = name;
