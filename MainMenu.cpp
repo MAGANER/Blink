@@ -14,7 +14,11 @@ void MainMenu::create()
 	cout << "enter room name:";      cin >> name;
 	cout << "enter room password:"; cin >> password;
 	cout << "enter room port:";      cin >> port;
-
+	if (!sql::is_integer(port))
+	{
+		cout << "can not create room! incorrect port >>" << port << endl;
+		return;
+	}
 	if (!does_room_exists(name, password))create_new_room(name, password, port);
 	else cout << "room" << " `" + name + "`" << " already exists!" << endl;
 }
