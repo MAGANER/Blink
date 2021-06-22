@@ -15,7 +15,7 @@ namespace Blink
         string get_room_to_enter() { return room_to_enter; }
         string get_password_to_enter() { return password; };
     private:
-        bool _exit = false;
+        bool _exit          = false;
         bool can_enter_room = false;
         string room_to_enter;
         string password;
