@@ -25,5 +25,9 @@ void MainMenu::enter()
 	cout << "enter room password:"; cin >> password;
 
 	if (!does_room_exists(name, password)) cout << "can not enter to " << "`" + name + "`" << " room";
-	else room_to_enter = name;
+	else
+	{
+		room_to_enter = name;
+		this->password = password;
+	}
 }
