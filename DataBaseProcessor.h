@@ -25,14 +25,17 @@ namespace Blink
 		void create_new_room(const string& name,
 							 const string& password,
 							 const string& port);
-		bool does_room_exists(const string& name,
-							  const string& password);
+		bool does_room_exists(const string& name);
+		bool is_password_correct(const string& room_name,
+								 const string& password);
 
 		void add_message(const string& room_name,
 						 const string& user_name,
 						 const string& message);
 		vector<message> get_messages(const string& room_name,
 									 const string& user_name);
+		
+		int get_room_port(const string& room_name);
 	};
 
 	extern void create_database();

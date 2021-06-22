@@ -80,8 +80,7 @@ void DataBaseProcessor::create_new_room(const string& name,
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
 }
-bool DataBaseProcessor::does_room_exists(const string& name,
-										 const string& password)
+bool DataBaseProcessor::does_room_exists(const string& name)
 {
 	sql::DataBase db("data.db");
 	
@@ -90,10 +89,27 @@ bool DataBaseProcessor::does_room_exists(const string& name,
 
 	for (auto chunk : result)
 	{
-		bool eq_name = sql::type_to_string(chunk["name"]) == name;
-		bool eq_password = sql::type_to_string(chunk["password"]) == password;
+		bool eq_name     = sql::type_to_string(chunk["name"]) == name;
 		
-		if (eq_name && eq_password) return true;
+		if (eq_name) return true;
+	}
+
+	return false;
+}
+bool DataBaseProcessor::is_password_correct(const string& room_name,
+										    const string& password)
+{
+	sql::DataBase db("data.db");
+
+	string req = sql::make_select_request("rooms");
+	auto result = db.run_get_request(req);
+
+	for (auto chunk : result)
+	{
+		bool eq_name = sql::type_to_string(chunk["name"])     == room_name;
+		bool eq_pass = sql::type_to_string(chunk["password"]) == password;
+
+		if (eq_name && eq_pass) return true;
 	}
 
 	return false;
