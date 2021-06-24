@@ -34,5 +34,7 @@ void MainMenu::enter()
 		room_to_enter = name;
 		this->password = password;
 		can_enter_room = true;
+		system("cls");
+		cout << "welcome to " << name << " room!" << endl;
 	}
 }
