@@ -10,12 +10,18 @@ namespace Blink
 	private:
 		string result;
 		bool ready = false;
+		bool clear_result = false;
 	public:
 		AsyncInput() {}
 		~AsyncInput() {}
 
 		void read()
 		{
+			if (clear_result)
+			{
+				result.clear();
+				clear_result = false;
+			}
 			if (_kbhit())
 			{
 				char ch = _getch();
@@ -36,6 +42,7 @@ namespace Blink
 		string get_result()
 		{
 			ready = false;
+			clear_result = true;
 			return result;
 		}
 	};
