@@ -6,14 +6,18 @@
 #include<map>
 #include<string>
 #include<iostream>
+#include"AsyncInput.hpp"
 namespace Blink
 {
 	using namespace std;
 
 	class Interface
 	{
+	private:
+		AsyncInput input;
+		bool dollar_printed = false;
 	protected:
-		Interface(){}
+		Interface() {}
 		~Interface(){}
 
 		map<string, function<void()>> commands;
@@ -33,10 +37,17 @@ namespace Blink
 	public:
 		void run()
 		{
-			cout << "$";
-			string command;
-			cin >> command;
-			run_command(command);
+			if (!dollar_printed)
+			{
+				cout << "$";
+				dollar_printed = true;
+			}
+			input.read();
+			if (input.can_get_result())
+			{
+				run_command(input.get_result());
+				dollar_printed = false;
+			}
 		}
 	};
 };
