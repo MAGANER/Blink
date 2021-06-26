@@ -33,6 +33,7 @@ void MainMenu::enter()
 	{
 		room_to_enter = name;
 		this->password = password;
+		port = to_string(get_room_port(name));
 		can_enter_room = true;
 		system("cls");
 		cout << "welcome to " << name << " room!" << endl;
