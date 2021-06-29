@@ -17,7 +17,13 @@ namespace Blink
 		AsyncInput input;
 		bool dollar_printed = false;
 	protected:
-		Interface() {}
+		Interface() 
+		{
+			commands["exit!"] = function<void()>
+				(
+					[&]() {exit(0); }
+				);
+		}
 		~Interface(){}
 
 		map<string, function<void()>> commands;
