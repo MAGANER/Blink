@@ -84,6 +84,7 @@ void MainMenu::connect()
 		this->password = password;
 		this->port     = to_string(port);
 		room_to_enter  = room_name;
+		can_connect_to_room = true;
 	}
 	else
 	{
