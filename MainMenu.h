@@ -1,6 +1,10 @@
 #pragma once
 #include "Interface.h"
 #include"DataBaseProcessor.h"
+#include "SFML/Network.hpp"
+#include"json.hpp"
+using namespace sf;
+using namespace nlohmann;
 
 namespace Blink
 {
@@ -34,6 +38,10 @@ namespace Blink
         void create();
         void enter();
         void connect();
+        bool can_connect(const string& ip,
+                         const string& password,
+                         const string& name,
+                         unsigned int port);
 
 
     };

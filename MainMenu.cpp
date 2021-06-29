@@ -39,3 +39,26 @@ void MainMenu::enter()
 		cout << "welcome to " << name << " room!" << endl;
 	}
 }
+bool MainMenu::can_connect(const string& ip,
+						   const string& password,
+						   const string& name,
+						   unsigned int port)
+{
+	TcpSocket socket;
+	socket.connect(IpAddress(ip), port);
+
+	json wanna_come_in_message;
+	wanna_come_in_message["type"]     = false; //if it's true, it's regular message
+	wanna_come_in_message["room"]     = name;
+	wanna_come_in_message["password"] = password;
+
+	string message = wanna_come_in_message.dump();
+
+	socket.send(message.c_str(), message.size() + 1);
+
+	char buffer[2];
+	size_t received = 0;
+	socket.receive(buffer, sizeof(buffer), received);
+	if (string(buffer) == "1") return true;
+	else return false;
+}
