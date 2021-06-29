@@ -41,7 +41,7 @@ namespace Blink
 			}
 		}
 	public:
-		void run()
+		virtual void run()
 		{
 			if (!dollar_printed)
 			{
