@@ -3,7 +3,6 @@
 #include "DataBaseProcessor.h"
 #include "SFML/Network.hpp"
 #include"json.hpp"
-#include<future>
 using namespace sf;
 using namespace nlohmann;
 namespace Blink

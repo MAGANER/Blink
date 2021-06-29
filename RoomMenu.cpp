@@ -50,7 +50,20 @@ void RoomMenu::process_as_master(unsigned int port)
 	{
 		string message = buffer;
 		json result = json::parse(message);
-		cout << result["name"] << ":" << result["text"]<<endl;
+		if(result["type"] == true)
+			cout << result["name"] << ":" << result["text"]<<endl;
+		else
+		{
+			//get right to be connected
+			bool eq_name     = data["name"]     == result["room"];
+			bool eq_password = data["password"] == result["password"];
+
+			string right;
+			if (eq_name && eq_password) right = "1";
+			else right = "0";
+
+			current_connection->send(right.c_str(), right.size() + 1);
+		}
 	}
 }
 void RoomMenu::print_state()
