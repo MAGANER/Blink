@@ -50,8 +50,11 @@ void RoomMenu::process_as_master(unsigned int port)
 	{
 		string message = buffer;
 		json result = json::parse(message);
-		if(result["type"] == true)
-			cout << result["name"] << ":" << result["text"]<<endl;
+		if (result["type"] == true)
+		{
+			cout << result["name"] << ":" << result["text"] << endl;
+			add_message(data["name"], "slave", result["text"]);
+		}
 		else
 		{
 			//get right to be connected
@@ -66,6 +69,11 @@ void RoomMenu::process_as_master(unsigned int port)
 		}
 	}
 }
+void RoomMenu::process_as_slave()
+{
+
+}
+
 void RoomMenu::print_state()
 {
 	cout << "name:" << data["name"] << endl
@@ -86,6 +94,16 @@ void RoomMenu::set_room_data(const string& name,
 	data["password"] = password;
 	data["port"]     = port;
 }
+void RoomMenu::set_room_data(const string& name,
+						     const string& password,
+							 const string& port,
+							 const string& ip)
+{
+	data["name"]     = name;
+	data["password"] = password;
+	data["port"]     = port;
+	data["ip"]       = ip;
+}
 void RoomMenu::send_message(const string& message, TcpSocket* target)
 {
 	//create json file
@@ -97,7 +115,14 @@ void RoomMenu::send_message(const string& message, TcpSocket* target)
 	string json_file = message_json.dump();
 	
 	//send it
-	current_connection->send(json_file.c_str(), json_file.size() + 1);
+	if (current_connection->send(json_file.c_str(), json_file.size() + 1) == TcpSocket::Done)
+	{
+		add_message(data["name"], "master", message);
+	}
+	else
+	{
+		cout << "can not send message!" << endl;
+	}
 }
 void RoomMenu::send()
 {

@@ -29,6 +29,10 @@ namespace Blink
         void set_room_data(const string& name,
                            const string& password,
                            const string& port);
+        void set_room_data(const string& name,
+                           const string& password,
+                           const string& port,
+                           const string& ip);
 
         void start_as_master();
         void start_as_slave();
@@ -36,6 +40,7 @@ namespace Blink
         bool should_exit() { return exit; }
 
         void process_as_master(unsigned int port);
+        void process_as_slave();
 
         void disconnect()
         {
