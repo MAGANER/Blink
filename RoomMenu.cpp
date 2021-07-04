@@ -9,138 +9,43 @@ RoomMenu::RoomMenu()
 		);
 	commands["status"] = function<void()>
 		(
-			[&]() { print_state(); }
+			[&]() { /*print_state();*/ return; }
 		);
 	commands["send"] = function<void()>
 		(
 			[&]() 
 			{ 
-				read_sending_input = true;
-				send(); 
+				/*read_sending_input = true;
+				send();*/ 
+				return;
 			}
 		);
+
 }
-void RoomMenu::start_as_master()
+void RoomMenu::set_room_data(const string& port,
+							 const string& ip)
 {
-	listner = new TcpListener();
-	listner->setBlocking(false);
-
-	current_connection = new TcpSocket();
-	current_connection->setBlocking(false);
-
-
-	started = true;
-	exit = false;
+	data["port"] = port;
+	data["ip"]   = ip;
 }
-void RoomMenu::start_as_slave()
+void RoomMenu::run(mode flag)
 {
-	socket = new TcpSocket();
-	started = true;
-	exit    = false;
-}
-void RoomMenu::process_as_master(unsigned int port)
-{
-	listner->listen(port);
-	listner->accept(*current_connection);
+	auto port = atoi(data["port"].c_str());
+	if (flag == mode::SERVER) server = new Server();
+	else client = new Client(data["ip"], port,"test");
 
-
-	char buffer[1024];
-	std::size_t received = 0;
-	if (current_connection->receive(buffer, sizeof(buffer), received) == sf::TcpSocket::Done)
+	while (true)
 	{
-		string message = buffer;
-		json result = json::parse(message);
-		if (result["type"] == true)
+		if (server != nullptr)
 		{
-			cout << result["name"] << ":" << result["text"] << endl;
-			add_message(data["name"], "slave", result["text"]);
+			server->run("test",port);
 		}
 		else
 		{
-			//get right to be connected
-			bool eq_name     = data["name"]     == result["room"];
-			bool eq_password = data["password"] == result["password"];
-
-			string right;
-			if (eq_name && eq_password) right = "1";
-			else right = "0";
-
-			current_connection->send(right.c_str(), right.size() + 1);
-		}
-	}
-}
-void RoomMenu::process_as_slave()
-{
-
-}
-
-void RoomMenu::print_state()
-{
-	cout << "name:" << data["name"] << endl
-		<< "password:" << data["password"] << endl
-		<< "port:" << data["port"] << endl;
-	cout << endl;
-
-	auto ip = current_connection->getRemoteAddress();
-	if (ip.toInteger() == 0) cout << "no connection to room..." << endl;
-	else cout << "connected ip:" << ip.toString() << endl;
-	
-}
-void RoomMenu::set_room_data(const string& name,
-							 const string& password,
-							 const string& port)
-{
-	data["name"]     = name;
-	data["password"] = password;
-	data["port"]     = port;
-}
-void RoomMenu::set_room_data(const string& name,
-						     const string& password,
-							 const string& port,
-							 const string& ip)
-{
-	data["name"]     = name;
-	data["password"] = password;
-	data["port"]     = port;
-	data["ip"]       = ip;
-}
-void RoomMenu::send_message(const string& message, TcpSocket* target)
-{
-	//create json file
-	json message_json;
-	message_json["name"] = "master";//master of room, sure
-	message_json["text"] = message;
-
-	//save it as string
-	string json_file = message_json.dump();
-	
-	//send it
-	if (current_connection->send(json_file.c_str(), json_file.size() + 1) == TcpSocket::Done)
-	{
-		add_message(data["name"], "master", message);
-	}
-	else
-	{
-		cout << "can not send message!" << endl;
-	}
-}
-void RoomMenu::send()
-{
-	//just say add message to type message
-	cout << "type message:";
-}
-void RoomMenu::run()
-{
-	//if it's type to get message, then it can't read commands
-	//but still  it's not blocking the main thread
-	if (!read_sending_input) Interface::run();
-	else
-	{
-		sending_input.read();
-		if (sending_input.can_get_result())
-		{
-			send_message(sending_input.get_result(), current_connection);
-			read_sending_input = false;
+			string buffer;
+			cout << "type text:";
+			cin >> buffer;
+			client->send_message(buffer);
 		}
 	}
 }
