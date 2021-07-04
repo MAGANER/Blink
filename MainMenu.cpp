@@ -45,24 +45,31 @@ bool MainMenu::can_connect(const string& ip,
 						   const string& name,
 						   unsigned int port)
 {
-	TcpSocket socket;
-	socket.connect(IpAddress(ip), port);
-
-	json wanna_come_in_message;
+	/*TcpSocket socket;
+	if (socket.connect(IpAddress(ip), port) != TcpSocket::Done)
+	{
+		cout << "can not connect to " << ip << "!" << endl;
+		return false;
+	}*/
+	return true;
+	/*json wanna_come_in_message;
 	wanna_come_in_message["type"]     = false; //if it's true, it's regular message
 	wanna_come_in_message["room"]     = name;
 	wanna_come_in_message["password"] = password;
 
 	string message = wanna_come_in_message.dump();
 
-	socket.send(message.c_str(), message.size() + 1);
+	if (socket.send(message.c_str(), message.size() + 1) != TcpSocket::Done)
+	{
+		cout << "can not send!" << endl;
+	}
 
 	char buffer[2];
 	size_t received = 0;
 	auto result = socket.receive(buffer, sizeof(buffer), received);
 	if (string(buffer) == "1") return true;
 	else if (result != TcpSocket::Done) return false;
-	else return false;
+	else return false;*/
 }
 void MainMenu::connect()
 {
@@ -85,10 +92,6 @@ void MainMenu::connect()
 		this->port     = to_string(port);
 		room_to_enter  = room_name;
 		can_connect_to_room = true;
-	}
-	else
-	{
-		cout << "can not connect!";
 	}
 
 

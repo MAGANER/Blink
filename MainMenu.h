@@ -1,9 +1,7 @@
 #pragma once
 #include "Interface.h"
 #include"DataBaseProcessor.h"
-#include "SFML/Network.hpp"
 #include"json.hpp"
-using namespace sf;
 using namespace nlohmann;
 
 namespace Blink
