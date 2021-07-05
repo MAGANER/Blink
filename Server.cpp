@@ -13,7 +13,9 @@ bool Server::run(const string& channel_name,
 {
 	auto callback = [&](const string& data)
 	{
-		cout << "#" << data << endl;
+		json message = json::parse(data);
+		if (connected_ip.empty()) connected_ip = message["ip"];
+		cout << message["name"] << ":" << message["text"]<<endl;
 	};
 	
 	auto listen_to_socket = [&]() {manager.socketListen(channel_name, port, callback); };
@@ -28,7 +30,6 @@ bool Server::run(const string& channel_name,
 	//process input 
 	while (true)
 	{
-		process_input(input, dollar_printed, process);
 	}
 	result.get(); //don't need it
 	return false;

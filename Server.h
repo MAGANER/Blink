@@ -5,15 +5,19 @@
 #include<string>
 #include<iostream>
 #include<future>
+#include"json.hpp"
 
 namespace Blink
 {
 	using namespace std;
 	using namespace masesk;
+	using namespace nlohmann;
+
 	class Server
 	{
 	private:
 		EasySocket manager;
+		string connected_ip;
 	public:
 		Server();
 		~Server();
