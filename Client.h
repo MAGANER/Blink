@@ -1,6 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-#include"masesk/EasySocket.hpp"
+#include"SocketRunner.h"
 #include<string>
 #include<iostream>
 namespace Blink

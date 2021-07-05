@@ -1,6 +1,6 @@
 #ifndef SERVER_H
 #define SERVER_H
-#include"masesk/EasySocket.hpp"
+#include"SocketRunner.h"
 #include<string>
 #include<iostream>
 
@@ -16,7 +16,7 @@ namespace Blink
 		Server();
 		~Server();
 
-		void run(const string& channel_name,
+		bool run(const string& channel_name,
 				 int port);
 	};
 };
