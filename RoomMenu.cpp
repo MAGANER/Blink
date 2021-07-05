@@ -23,22 +23,31 @@ RoomMenu::RoomMenu()
 
 }
 void RoomMenu::set_room_data(const string& port,
-							 const string& ip)
+							 const string& ip,
+							 const string& user_name)
 {
 	data["port"] = port;
 	data["ip"]   = ip;
+	data["name"] = user_name;
 }
 void RoomMenu::run(mode flag)
 {
 	auto port = atoi(data["port"].c_str());
 	if (flag == mode::SERVER) server = new Server();
-	else client = new Client(data["ip"], port,"test");
+	else client = new Client(data["ip"], port,"test", data["name"]);
 
+	
+	bool run_server = true;
 	while (true)
 	{
 		if (server != nullptr)
 		{
-			server->run("test",port);
+			if (run_server)
+			{
+				bool result = server->run("test", port);
+				run_server = result;
+				cout << "gonna do nothing...";
+			}
 		}
 		else
 		{

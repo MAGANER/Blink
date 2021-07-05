@@ -3,9 +3,8 @@
 #include"Client.h"
 #include "Interface.h"
 #include"DataBaseProcessor.h"
-#include"json.hpp"
+#include<future>
 
-using namespace nlohmann;
 namespace Blink
 {
     class RoomMenu : public Interface, public DataBaseProcessor
@@ -28,7 +27,8 @@ namespace Blink
 
         void run(mode flag);
         void set_room_data(const string& port,
-                           const string& ip);
+                           const string& ip,
+                           const string& user_name);
 
         bool should_exit() { return exit; }    
     };
