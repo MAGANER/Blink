@@ -26,6 +26,7 @@ void EnterMenu::login()
 		system("cls");
 		cout << "welcome " << name << " to Blink!" << endl;
 		change_menu = true;
+		user_name = name;
 	}
 	else cout << "can not login!" << endl;
 }
