@@ -66,7 +66,7 @@ namespace SQLite3DataBaseTools
 
 	static bool is_integer(const string& value)
 	{
-		function<bool(char)> is_digit = isdigit;
+		function<bool(char)> is_digit = [&](char c) { return isdigit(c); };
 		auto check = Functools::filter(value, is_digit);
 		return check.size() == value.size();
 	}
