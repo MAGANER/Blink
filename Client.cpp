@@ -6,34 +6,42 @@ Client::Client(const string& ip,
 			   const string& channel_name,
 			   const string& user_name)
 {
-	local_ip        = get_ip();
 	this->user_name = user_name;
-
-	this->ip   = ip;
 	this->port = port;
-	this->channel_name = channel_name;
 
-	auto connect = [&]() {manager.socketConnect(channel_name, ip, port);};
-	run_socket(connect);
+	socket.connect(ip, port);
 }
 Client::~Client()
 {
-	auto close = [&]() {manager.closeConnection(channel_name); };
-	run_socket(close);
+	if (getter != nullptr) delete getter;
 }
 
 void Client::send_message(const string& message)
 {
-	auto send = [&]() { manager.socketSend(channel_name, 
-					    convert_message_to_json(message)); 
-					  };
-	run_socket(send);
+	Packet pack;
+	pack << message;
+	socket.send(pack);
+}
+json Client::send_connection_data()
+{
+	json data;
+	data["ip"]   = get_ip();
+	data["port"] = 55002;
+	send_message(data.dump());
+	return data;
 }
 string Client::convert_message_to_json(const string& text)
 {
 	json message;
 	message["text"] = text;
-	message["ip"]   = local_ip;
 	message["name"] = user_name;
 	return message.dump();
+}
+void Client::get_message()
+{
+	Packet pack;
+	socket.receive(pack);
+	string data;
+	pack >> data;
+	cout << "got:" << data << endl;
 }

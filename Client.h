@@ -1,27 +1,29 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-#include"SocketRunner.h"
 #include<string>
 #include<iostream>
 #include"json.hpp"
 #include"getIP.h"
+#include"SFML/Network.hpp"
+#include<future>
+#include"Server.h"
 
 namespace Blink
 {
 	using namespace std;
-	using namespace masesk;
+	using namespace sf;
 	using namespace nlohmann;
 
 	class Client
 	{
 	private:
 		int port;
-		string ip, channel_name;
-		EasySocket manager;
+		TcpSocket socket;
+		Server* getter = nullptr;
 
 		string user_name;
-		string local_ip;
 		string convert_message_to_json(const string& text);
+		Packet data;
 	public:
 		Client(const string& ip,
 			   int port,
@@ -30,6 +32,9 @@ namespace Blink
 		~Client();
 
 		void send_message(const string& message);
+		void get_message();
+		json send_connection_data();
+		
 	};
 };
 #endif //CLIENT_H
