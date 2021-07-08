@@ -15,36 +15,12 @@ bool Server::run(const string& channel_name,
 	listener.listen(port);
 	sf::TcpSocket socket;
 	listener.accept(socket);
-
-
+	
+	socket.setBlocking(false);
 	while (true)
 	{
-		Packet pack;
-		string data;
-		socket.receive(pack);
-		/*if (!is_first_message_received)
-		{
-			string connection_data;
-			pack >> connection_data;
-			json data = json::parse(connection_data);
-			
-			connected_ip = fp::slice(_s(data["ip"]), 1, _s((data["ip"])).size());
-			connected_port = data["port"];
-
-			is_first_message_received = true;
-		}
-		else
-		{*/
-		pack >> data;
-		cout << "got:" << data << endl;
-		//}
-
-		data.clear();
-		cout << "enter:";
-		cin >> data;
-		pack.clear();
-		pack << data;
-		socket.send(pack);
+		get_and_show_message(socket);
+		receive_input_and_send_message(socket);
 	}
 	return true;
 }

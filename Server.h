@@ -2,10 +2,10 @@
 #define SERVER_H
 #define _s(str) string(str)
 
-#include"SFML/Network.hpp"
 #include<string>
 #include<iostream>
 #include<future>
+#include"NetBase.h"
 #include"json.hpp"
 #include"sql/Functools.hpp"
 
@@ -16,14 +16,13 @@ namespace Blink
 	using namespace sf;
 	namespace fp = Functools;
 
-	class Server
+	class Server:public NetBase
 	{
 	private:
 		string connected_ip;
 		int connected_port;
 
 		TcpListener listener;
-		bool is_first_message_received = false;
 	public:
 		Server();
 		~Server();

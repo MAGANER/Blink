@@ -10,6 +10,7 @@ Client::Client(const string& ip,
 	this->port = port;
 
 	sender.connect(ip, port);
+	sender.setBlocking(false);
 }
 Client::~Client()
 {
@@ -17,9 +18,7 @@ Client::~Client()
 
 void Client::send_message(const string& message)
 {
-	Packet pack;
-	pack << message;
-	sender.send(pack);
+	NetBase::send_message(sender, message);
 }
 json Client::send_connection_data()
 {
@@ -36,11 +35,9 @@ string Client::convert_message_to_json(const string& text)
 	message["name"] = user_name;
 	return message.dump();
 }
-void Client::get_message()
+
+void Client::run()
 {
-	Packet pack;
-	sender.receive(pack);
-	string data;
-	pack >> data;
-	cout << "got:" << data << endl;
+	receive_input_and_send_message(sender);
+	get_and_show_message(sender);
 }
