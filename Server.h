@@ -19,9 +19,6 @@ namespace Blink
 	class Server:public NetBase
 	{
 	private:
-		string connected_ip;
-		int connected_port;
-
 		TcpListener listener;
 	public:
 		Server();
@@ -29,8 +26,6 @@ namespace Blink
 
 		bool run(const string& channel_name,
 				 int port);
-		string get_connected_ip() { return connected_ip; }
-		int get_connected_port() { return connected_port; }
 	private:
 		void process_commands(const string& command);
 	};
