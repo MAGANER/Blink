@@ -9,18 +9,17 @@ Client::Client(const string& ip,
 	this->user_name = user_name;
 	this->port = port;
 
-	socket.connect(ip, port);
+	sender.connect(ip, port);
 }
 Client::~Client()
 {
-	if (getter != nullptr) delete getter;
 }
 
 void Client::send_message(const string& message)
 {
 	Packet pack;
 	pack << message;
-	socket.send(pack);
+	sender.send(pack);
 }
 json Client::send_connection_data()
 {
@@ -40,7 +39,7 @@ string Client::convert_message_to_json(const string& text)
 void Client::get_message()
 {
 	Packet pack;
-	socket.receive(pack);
+	sender.receive(pack);
 	string data;
 	pack >> data;
 	cout << "got:" << data << endl;

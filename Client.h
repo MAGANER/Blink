@@ -6,7 +6,6 @@
 #include"getIP.h"
 #include"SFML/Network.hpp"
 #include<future>
-#include"Server.h"
 
 namespace Blink
 {
@@ -18,12 +17,10 @@ namespace Blink
 	{
 	private:
 		int port;
-		TcpSocket socket;
-		Server* getter = nullptr;
+		TcpSocket sender;
 
 		string user_name;
 		string convert_message_to_json(const string& text);
-		Packet data;
 	public:
 		Client(const string& ip,
 			   int port,
