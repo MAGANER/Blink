@@ -28,7 +28,7 @@ public:
 
 	bool run_set_request(const string& request);
 	vector<chunk> run_get_request(const string& request);
-	vector<chunk> run_get_request(const string& request,function<bool(string, SQLtype*)>& predicat);
+	vector<chunk> run_get_request(const string& request,function<bool(string, SQLtype*)> predicat);
 private:
 	static int get_request_callback(void* data, int argc, char** argv, char** azColName);
 };
