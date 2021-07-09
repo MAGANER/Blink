@@ -5,6 +5,7 @@
 */
 #ifndef NET_BASE_H
 #define NET_BASE_H
+
 #include<string>
 #include<iostream>
 #include"SFML/Network.hpp"
@@ -44,7 +45,12 @@ protected:
 	void get_and_show_message(TcpSocket& socket)
 	{
 		string data = NetBase::get_message(socket);
-		if (data.size() > 0)cout << "got:" << data << endl;
+		if (data.size() > 0)
+		{
+			//move it down, print received message and return
+			cout <<"got:" << data << endl;
+			dollar_printed = false;
+		}
 	}
 	void receive_input_and_send_message(TcpSocket& socket)
 	{
