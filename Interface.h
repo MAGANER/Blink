@@ -42,6 +42,8 @@ namespace Blink
 			}
 		}
 	};
+
+	typedef map<string, function<void()>> command_hash;
 	class Interface
 	{
 	private:
@@ -57,7 +59,7 @@ namespace Blink
 		}
 		~Interface(){}
 
-		map<string, function<void()>> commands;
+		command_hash commands;
 	private:
 		void run_command(const string& command)
 		{
