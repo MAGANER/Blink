@@ -15,6 +15,8 @@ namespace Blink
 
         Server* server = nullptr;
         Client* client = nullptr;
+
+        void print_state();
     public:
         enum class mode { SERVER, CLIENT };
 
@@ -28,7 +30,9 @@ namespace Blink
         void run(mode flag);
         void set_room_data(const string& port,
                            const string& ip,
-                           const string& user_name);
+                           const string& user_name,
+                           const string& room_name,
+                           const string& room_password);
 
         bool should_exit() { return exit; }    
     };
