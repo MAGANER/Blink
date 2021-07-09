@@ -21,7 +21,7 @@ namespace Blink
 	private:
 		TcpListener listener;
 	public:
-		Server();
+		Server(const command_hash& commands);
 		~Server();
 
 		bool run(const string& channel_name,

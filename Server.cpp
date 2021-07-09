@@ -1,7 +1,7 @@
 #include "Server.h"
 using namespace Blink;
 
-Server::Server()
+Server::Server(const command_hash& commands):NetBase(commands)
 {
 }
 Server::~Server()

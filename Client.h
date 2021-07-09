@@ -24,8 +24,7 @@ namespace Blink
 	public:
 		Client(const string& ip,
 			   int port,
-			   const string& channel_name,
-			   const string& user_name);
+			   const command_hash& commands);
 		~Client();
 
 

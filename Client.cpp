@@ -3,8 +3,7 @@ using namespace Blink;
 
 Client::Client(const string& ip, 
 			   int port, 
-			   const string& channel_name,
-			   const string& user_name)
+			   const command_hash& commands):NetBase(commands)
 {
 	this->user_name = user_name;
 	this->port = port;

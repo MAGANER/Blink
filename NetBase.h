@@ -10,10 +10,12 @@
 #include<iostream>
 #include"SFML/Network.hpp"
 #include"Interface.h"
+#include"sql/Functools.hpp"
 namespace Blink
 {
 using namespace std;
 using namespace sf;
+namespace fp = Functools;
 
 class NetBase
 {
@@ -24,14 +26,17 @@ private:
 	string input_buffer;
 	bool ready_to_send_message = false;
 	bool dollar_printed = false;
+
+	command_hash commands;
 protected:
-	NetBase()
+	NetBase(const command_hash& commands)
 	{
 		input_callback = [&](const string& str)
 		{
 			input_buffer = str;
 			ready_to_send_message = true;
 		};
+		this->commands = commands;
 	}
 	~NetBase(){}
 	
@@ -55,7 +60,17 @@ protected:
 	void receive_input_and_send_message(TcpSocket& socket)
 	{
 		process_input(input, dollar_printed, input_callback);
-		if (ready_to_send_message)send_message(socket,input_buffer);
+		if (input_buffer[0] == '$')
+		{
+			//process command
+			string command = fp::slice(input_buffer, 1, input_buffer.size());
+			if (commands.find(command) != commands.end())
+				commands[command]();
+			else
+				cout <<"command "<< "`" + command + "`" << " doesn't exist!";
+			cout << endl;
+		}
+		else if (ready_to_send_message)send_message(socket,input_buffer);
 		input_buffer.clear();
 	}
 private:
