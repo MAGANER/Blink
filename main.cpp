@@ -46,7 +46,9 @@ int main()
 				room_menu = new RoomMenu();
 				room_menu->set_room_data(main_menu->get_port(),
 										 main_menu->get_room_ip(),
-										 *current_user_name);
+										 *current_user_name,
+										 main_menu->get_room_to_enter(),
+										 main_menu->get_password_to_enter());
 
 				delete current_user_name;
 				delete main_menu;
@@ -59,8 +61,10 @@ int main()
 				room_menu = new RoomMenu();
 				room_menu->set_room_data(main_menu->get_port(),
 										 main_menu->get_room_ip(),
-										 *current_user_name);
-				
+										 *current_user_name,
+										 main_menu->get_room_to_enter(),
+										 main_menu->get_password_to_enter());
+
 				delete current_user_name;
 				delete main_menu;
 
