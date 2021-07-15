@@ -6,13 +6,11 @@
 #include<iostream>
 #include<future>
 #include"NetBase.h"
-#include"json.hpp"
 #include"sql/Functools.hpp"
 
 namespace Blink
 {
 	using namespace std;
-	using namespace nlohmann;
 	using namespace sf;
 	namespace fp = Functools;
 

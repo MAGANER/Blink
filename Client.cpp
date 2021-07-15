@@ -19,21 +19,6 @@ void Client::send_message(const string& message)
 {
 	NetBase::send_message(sender, message);
 }
-json Client::send_connection_data()
-{
-	json data;
-	data["ip"]   = get_ip();
-	data["port"] = 55002;
-	send_message(data.dump());
-	return data;
-}
-string Client::convert_message_to_json(const string& text)
-{
-	json message;
-	message["text"] = text;
-	message["name"] = user_name;
-	return message.dump();
-}
 
 void Client::run()
 {
