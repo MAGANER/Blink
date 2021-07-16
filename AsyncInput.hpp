@@ -31,22 +31,26 @@ namespace Blink
 			{
 				char ch = _getch();
 
-				if (ch == 8)
+				if (ch == 8 && !result.empty())
 				{
 					result = Functools::slice(result, 0, result.size() - 1);
 					printf("\033[D");
 					printf(" ");
 					printf("\033[D");
+					cout << result.size();
 				}
-				else if (ch != 13)
+				else if (ch != 13 && ch != 8)
 				{
 					result += ch;
 					cout << ch;
 				}
 				else
 				{
-					ready = true;
-					cout << endl;
+					if (ch != 8)
+					{
+						ready = true;
+						cout << endl;
+					}
 				}
 			}
 		}
