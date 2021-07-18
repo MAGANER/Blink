@@ -1,8 +1,4 @@
 #pragma once
-namespace w
-{
-#include<windows.h>
-};
 #include<string>
 #include <conio.h>
 #include <stdio.h>
@@ -37,7 +33,6 @@ namespace Blink
 					printf("\033[D");
 					printf(" ");
 					printf("\033[D");
-					cout << result.size();
 				}
 				else if (ch != 13 && ch != 8)
 				{
