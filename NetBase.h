@@ -5,12 +5,12 @@
 */
 #ifndef NET_BASE_H
 #define NET_BASE_H
-
 #include<string>
 #include<iostream>
 #include"SFML/Network.hpp"
 #include"Interface.h"
 #include"sql/Functools.hpp"
+#include"MessageCreator.h"
 namespace Blink
 {
 using namespace std;
@@ -53,6 +53,7 @@ protected:
 		if (data.size() > 0)
 		{
 			//move it down, print received message and return
+			cout << endl;
 			cout <<"got:" << data << endl;
 			dollar_printed = false;
 		}
@@ -73,7 +74,6 @@ protected:
 		else if (ready_to_send_message)send_message(socket,input_buffer);
 		input_buffer.clear();
 	}
-private:
 	virtual string get_message(TcpSocket& socket)
 	{
 		Packet pack;
