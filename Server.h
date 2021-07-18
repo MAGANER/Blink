@@ -7,6 +7,7 @@
 #include<future>
 #include"NetBase.h"
 #include"sql/Functools.hpp"
+#include"MessageCreator.h"
 
 namespace Blink
 {
@@ -18,8 +19,11 @@ namespace Blink
 	{
 	private:
 		TcpListener listener;
+		string password, room_name;
 	public:
-		Server(const command_hash& commands);
+		Server(const command_hash& commands,
+			   const string& password,
+			   const string& room_name);
 		~Server();
 
 		bool run(const string& channel_name,
