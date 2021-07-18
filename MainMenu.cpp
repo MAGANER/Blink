@@ -45,31 +45,34 @@ bool MainMenu::can_connect(const string& ip,
 						   const string& name,
 						   unsigned int port)
 {
-	/*TcpSocket socket;
+	//connect to server
+	TcpSocket socket;
 	if (socket.connect(IpAddress(ip), port) != TcpSocket::Done)
 	{
 		cout << "can not connect to " << ip << "!" << endl;
 		return false;
-	}*/
-	return true;
-	/*json wanna_come_in_message;
-	wanna_come_in_message["type"]     = false; //if it's true, it's regular message
-	wanna_come_in_message["room"]     = name;
-	wanna_come_in_message["password"] = password;
-
-	string message = wanna_come_in_message.dump();
-
-	if (socket.send(message.c_str(), message.size() + 1) != TcpSocket::Done)
+	}
+	//return true;
+	
+	//send data to get right to be connected
+	string message = convert_message_to_json(password, name, MessageType::ComeInRequest);
+	Packet p; p << message;
+	if (socket.send(p) != TcpSocket::Done)
 	{
 		cout << "can not send!" << endl;
+		return false;
 	}
-
-	char buffer[2];
-	size_t received = 0;
-	auto result = socket.receive(buffer, sizeof(buffer), received);
-	if (string(buffer) == "1") return true;
-	else if (result != TcpSocket::Done) return false;
-	else return false;*/
+	p.clear();
+	
+	//get the answer
+	socket.receive(p);
+	string received_result;
+	p >> received_result;
+	bool ability = false;
+	if (received_result == "1") ability =  true;
+	
+	if (!ability)cout << "can not come in!" << endl;
+	return ability;
 }
 void MainMenu::connect()
 {

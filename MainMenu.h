@@ -1,11 +1,11 @@
 #pragma once
+#include"SFML/Network.hpp"
 #include "Interface.h"
 #include"DataBaseProcessor.h"
-#include"json.hpp"
-using namespace nlohmann;
-
+#include"MessageCreator.h"
 namespace Blink
 {
+    using namespace sf;
     class MainMenu : public Interface, public DataBaseProcessor
     {
     public:
