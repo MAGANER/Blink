@@ -31,6 +31,10 @@ bool Server::run(const string& channel_name,
 		p << "0";
 		socket.send(p);
 	}
+	socket.disconnect();
+
+	listener.listen(port);
+	listener.accept(socket);
 
 	socket.setBlocking(false);
 	while (true)
