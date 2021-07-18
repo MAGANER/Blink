@@ -42,7 +42,7 @@ void RoomMenu::run(mode flag)
 	auto port = atoi(data["port"].c_str());
 
 	if (flag == mode::SERVER)
-		server = new Server(commands);
+		server = new Server(commands,data["room_password"], data["room_name"]);
 	else
 	{
 		client = new Client(data["ip"], port, commands);
