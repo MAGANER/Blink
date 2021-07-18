@@ -1,3 +1,10 @@
+/*
+	It is custom input, i use instead of std::cin
+	or scanf from C-standart library, because those
+	functions block main thread.
+	The root idea is to fetch input, when any key is hit.
+*/
+
 #pragma once
 #include<string>
 #include <conio.h>
