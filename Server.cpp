@@ -3,7 +3,8 @@ using namespace Blink;
 
 Server::Server(const command_hash& commands,
 			   const string& password,
-			   const string& room_name):NetBase(commands)
+			   const string& room_name,
+			   const string& user_name):NetBase(commands,user_name)
 {
 	this->password  = password;
 	this->room_name = room_name;
@@ -20,6 +21,7 @@ bool Server::run(const string& channel_name,
 	sf::TcpSocket socket;
 	listener.accept(socket);
 	//first we should accept ability to connect
+
 	string check = get_message(socket);
 	Packet p;
 	if (can_come_in(check, password, room_name))

@@ -23,7 +23,8 @@ namespace Blink
 	public:
 		Server(const command_hash& commands,
 			   const string& password,
-			   const string& room_name);
+			   const string& room_name,
+			   const string& user_name);
 		~Server();
 
 		bool run(const string& channel_name,

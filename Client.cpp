@@ -3,9 +3,9 @@ using namespace Blink;
 
 Client::Client(const string& ip, 
 			   int port, 
-			   const command_hash& commands):NetBase(commands)
+			   const command_hash& commands,
+			   const string& user_name):NetBase(commands,user_name)
 {
-	this->user_name = user_name;
 	this->port = port;
 
 	sender.connect(ip, port);

@@ -52,7 +52,6 @@ bool MainMenu::can_connect(const string& ip,
 		cout << "can not connect to " << ip << "!" << endl;
 		return false;
 	}
-	//return true;
 	
 	//send data to get right to be connected
 	string message = convert_message_to_json(password, name, MessageType::ComeInRequest);

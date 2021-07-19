@@ -16,13 +16,12 @@ namespace Blink
 	{
 	private:
 		int port;
-		string user_name;
-
 		TcpSocket sender;
 	public:
 		Client(const string& ip,
 			   int port,
-			   const command_hash& commands);
+			   const command_hash& commands,
+			   const string& user_name);
 		~Client();
 
 
