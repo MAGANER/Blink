@@ -28,15 +28,19 @@ private:
 	bool dollar_printed = false;
 
 	command_hash commands;
+	
+	string user_name;
 protected:
-	NetBase(const command_hash& commands)
+	NetBase(const command_hash& commands,
+			const string& user_name)
 	{
 		input_callback = [&](const string& str)
 		{
 			input_buffer = str;
 			ready_to_send_message = true;
 		};
-		this->commands = commands;
+		this->commands  = commands;
+		this->user_name = user_name;
 	}
 	~NetBase(){}
 	
@@ -44,7 +48,7 @@ protected:
 							  const string& message)
 	{
 		Packet pack;
-		pack << message;
+		pack << convert_message_to_json(message, user_name,MessageType::Text);
 		socket.send(pack);
 	}
 	void get_and_show_message(TcpSocket& socket)
@@ -54,7 +58,9 @@ protected:
 		{
 			//move it down, print received message and return
 			cout << endl;
-			cout <<"got:" << data << endl;
+			json parsed = json::parse(data);
+			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			cout << cut(parsed["name"])<<'|'<<cut(parsed["data"]) << endl;
 			dollar_printed = false;
 		}
 	}
@@ -71,10 +77,11 @@ protected:
 				cout <<"command "<< "`" + command + "`" << " doesn't exist!";
 			cout << endl;
 		}
-		else if (ready_to_send_message)send_message(socket,input_buffer);
+		else if (ready_to_send_message && !dollar_printed)send_message(socket,input_buffer);
 		input_buffer.clear();
 	}
-	virtual string get_message(TcpSocket& socket)
+
+	string get_message(TcpSocket& socket)
 	{
 		Packet pack;
 		socket.receive(pack);
