@@ -9,7 +9,7 @@ namespace Blink
     class MainMenu : public Interface, public DataBaseProcessor
     {
     public:
-        MainMenu();
+        MainMenu(const string& encr_key);
         ~MainMenu(){}
 
         bool exit()       { return _exit;          }

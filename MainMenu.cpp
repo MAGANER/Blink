@@ -2,7 +2,7 @@
 using namespace Blink;
 
 
-MainMenu::MainMenu()
+MainMenu::MainMenu(const string& encr_key):DataBaseProcessor(encr_key)
 {
 	commands["exit"]    = function<void()>([&]() { _exit = true; });
 	commands["create"]  = function<void()>([&]() { create();     });
@@ -34,7 +34,7 @@ void MainMenu::enter()
 	{
 		room_to_enter = name;
 		this->password = password;
-		port = to_string(get_room_port(name));
+		port = to_string(get_room_port(name, get_encr_key()));
 		can_enter_room = true;
 		system("cls");
 		cout << "welcome to " << name << " room!" << endl;

@@ -20,7 +20,7 @@ namespace Blink
     public:
         enum class mode { SERVER, CLIENT };
 
-        RoomMenu();
+        RoomMenu(const string& encr_key);
         ~RoomMenu()
         {
             if (server != nullptr) delete server;

@@ -1,7 +1,7 @@
 #include "RoomMenu.h"
 using namespace Blink;
 
-RoomMenu::RoomMenu()
+RoomMenu::RoomMenu(const string& encr_key):DataBaseProcessor(encr_key)
 {
 	commands["status"] = function<void()>
 		(

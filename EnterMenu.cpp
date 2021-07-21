@@ -1,7 +1,7 @@
 #include "EnterMenu.h"
 using namespace Blink;
 
-EnterMenu::EnterMenu()
+EnterMenu::EnterMenu(const string& encr_key):DataBaseProcessor(encr_key)
 {
 	commands["new"]   = function<void()>([&]() {create_user(); });
 	commands["login"] = function<void()>([&]() {login(); });

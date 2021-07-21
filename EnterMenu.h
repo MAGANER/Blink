@@ -6,7 +6,7 @@ namespace Blink
 	class EnterMenu : public Interface, public DataBaseProcessor
 	{
 	public:
-		EnterMenu();
+		EnterMenu(const string& encr_key);
 		~EnterMenu() {}
 
 		bool change() { return change_menu; }
