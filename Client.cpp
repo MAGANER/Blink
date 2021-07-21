@@ -10,6 +10,15 @@ Client::Client(const string& ip,
 
 	sender.connect(ip, port);
 	sender.setBlocking(false);
+
+	string key, iv;
+	cout << "enter AES encryption key:";
+	cin >> key;
+
+	cout << "enter AES encryption IV:";
+	cin >> iv;
+	key_iv = make_pair(encr::convert_to_bytes(key), encr::convert_to_bytes(iv));
+	auto d = encr::encrypt(key_iv, "hey");
 }
 Client::~Client()
 {

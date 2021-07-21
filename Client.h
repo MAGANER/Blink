@@ -6,7 +6,7 @@
 #include"getIP.h"
 #include"NetBase.h"
 #include"Interface.h" // process_input
-
+#include"encryption/Encryption.h"
 namespace Blink
 {
 	using namespace std;

@@ -11,14 +11,18 @@
 #include"Interface.h"
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
+#include"encryption/Encryption.h"
 namespace Blink
 {
 using namespace std;
 using namespace sf;
 namespace fp = Functools;
+namespace encr = Encryption;
 
 class NetBase
 {
+protected:
+	encr::key_iv key_iv;
 private:
 	function<void(string)> input_callback;
 
@@ -48,7 +52,8 @@ protected:
 							  const string& message)
 	{
 		Packet pack;
-		pack << convert_message_to_json(message, user_name,MessageType::Text);
+		string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
+		pack << encr::encrypt(key_iv,jmessage);
 		socket.send(pack);
 	}
 	void get_and_show_message(TcpSocket& socket)
@@ -77,11 +82,19 @@ protected:
 				cout <<"command "<< "`" + command + "`" << " doesn't exist!";
 			cout << endl;
 		}
-		else if (ready_to_send_message && !dollar_printed)send_message(socket,input_buffer);
+		else if (ready_to_send_message && !dollar_printed)send_message(socket, input_buffer);
 		input_buffer.clear();
 	}
 
 	string get_message(TcpSocket& socket)
+	{
+		Packet pack;
+		socket.receive(pack);
+		string data;
+		pack >> data;
+		return encr::decrypt(key_iv,data);
+	}
+	string get_raw_message(TcpSocket& socket)
 	{
 		Packet pack;
 		socket.receive(pack);

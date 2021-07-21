@@ -8,21 +8,32 @@ Server::Server(const command_hash& commands,
 {
 	this->password  = password;
 	this->room_name = room_name;
+
+	key_iv = encr::get_random_key();
 }
 Server::~Server()
 {
 }
-
+void Server::show_key_iv()
+{
+	string key = encr::convert_bytes(key_iv.first);
+	string iv  = encr::convert_bytes(key_iv.second);
+	cout << "Next key and IV will be used to encrypt data with AES:";
+	cout << endl;
+	cout << key << endl << iv << endl;
+	cout << ".";
+}
 bool Server::run(const string& channel_name,
 				 int port)
 {
 
+	show_key_iv();
 	listener.listen(port);
 	sf::TcpSocket socket;
 	listener.accept(socket);
 	//first we should accept ability to connect
 
-	string check = get_message(socket);
+	string check = get_raw_message(socket);
 	Packet p;
 	if (can_come_in(check, password, room_name))
 	{

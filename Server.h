@@ -9,11 +9,11 @@
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
 
+
 namespace Blink
 {
 	using namespace std;
 	using namespace sf;
-	namespace fp = Functools;
 
 	class Server:public NetBase
 	{
@@ -31,6 +31,7 @@ namespace Blink
 				 int port);
 	private:
 		void process_commands(const string& command);
+		void show_key_iv();
 	};
 };
 #endif //SERVER_H
