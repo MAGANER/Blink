@@ -1,8 +1,9 @@
 #pragma once
-#include<sqlite3.h>
+#include"../sqleet/sqleet.h"
 #include<map>
 #include<vector>
 #include<algorithm>
+#include<iostream>
 #include <iterator>
 #define MAP_FUNCTOOLS
 #include"Types.h"
@@ -20,7 +21,7 @@ private:
 
 	int ok; //put here value from sqlite library
 public:
-	DataBase(const string& path);
+	DataBase(const string& path, const string& key, bool first_time);
 	~DataBase();
 
 	bool is_ok();

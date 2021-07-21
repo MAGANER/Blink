@@ -1,9 +1,20 @@
 #include "DataBase.h"
 using namespace SQLite3DataBaseTools;
 
-DataBase::DataBase(const string& path)
+DataBase::DataBase(const string& path, const string& key,bool first_time)
 {
 	ok = sqlite3_open(path.c_str(), &db);
+	const void* _key = key.c_str();
+
+	if (first_time)
+		sqlite3_rekey(db, _key, sizeof(_key));
+	if(!first_time)
+		if (sqlite3_key(db, _key, sizeof(_key)) != SQLITE_OK)
+		{
+			system("cls");
+			cout << "incorrect password!" << endl;
+			exit(-1);
+		}
 	if (!ok) error_message = sqlite3_errmsg(db);
 }
 DataBase::~DataBase()
