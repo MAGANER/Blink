@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<variant>
 using namespace std;
 namespace Blink
 {
@@ -13,8 +14,10 @@ namespace Blink
 	typedef pair<string, string> message; //first is user name, second is message
 	class DataBaseProcessor
 	{
+	private:
+		string encryption_key;
 	protected:
-		DataBaseProcessor()  {};
+		DataBaseProcessor(const string& encr_key):encryption_key(encr_key) {};
 		~DataBaseProcessor() {};
 
 		void create_new_user(const string& name,
@@ -35,10 +38,11 @@ namespace Blink
 		vector<message> get_messages(const string& room_name,
 									 const string& user_name);
 		
-		
+		string get_encr_key() { return encryption_key; };
 	};
 
-	extern int get_room_port(const string& room_name);
-	extern void create_database();
+	extern int get_room_port(const string& room_name,
+							 const string& db_key);
+	extern string create_database();
 };
 
