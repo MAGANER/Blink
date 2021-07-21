@@ -6,9 +6,9 @@ using namespace Blink;
 int main()
 {
 	system("cls");
-	create_database(); //if it doesn't exist
+	string key = create_database(); //if it doesn't exist
 
-	EnterMenu* enter_menu= new EnterMenu();
+	EnterMenu* enter_menu= new EnterMenu(key);
 	MainMenu*  main_menu = nullptr;
 	RoomMenu* room_menu = nullptr;
 
@@ -28,7 +28,7 @@ int main()
 				current = state::MAIN;
 				current_user_name = new string(enter_menu->get_user_name());
 				delete enter_menu;
-				main_menu = new MainMenu();
+				main_menu = new MainMenu(key);
 			}
 		}
 		if (current == state::MAIN)
@@ -39,11 +39,11 @@ int main()
 				cout << "farewell!" << endl;
 				current = state::ENTER;
 				delete main_menu;
-				enter_menu = new EnterMenu();
+				enter_menu = new EnterMenu(key);
 			}
 			else if (main_menu->enter_room())
 			{
-				room_menu = new RoomMenu();
+				room_menu = new RoomMenu(key);
 				room_menu->set_room_data(main_menu->get_port(),
 										 main_menu->get_room_ip(),
 										 *current_user_name,
@@ -58,7 +58,7 @@ int main()
 			}
 			else if (main_menu->_connect())
 			{
-				room_menu = new RoomMenu();
+				room_menu = new RoomMenu(key);
 				room_menu->set_room_data(main_menu->get_port(),
 										 main_menu->get_room_ip(),
 										 *current_user_name,
