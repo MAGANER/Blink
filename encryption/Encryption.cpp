@@ -89,3 +89,25 @@ std::string Encryption::decrypt(const key_iv& key_iv, const string& cipher)
 		cout << e.what();
 	}
 }
+std::string Encryption::sha256(const string& data)
+{
+	string result;
+
+	SHA256 hash;
+	hash.Update((const CryptoPP::byte*)data.data(), data.size());
+	result.resize(hash.DigestSize());
+	hash.Final((CryptoPP::byte*)&result[0]);
+
+	string hex_result;
+	HexEncoder encoder;
+	encoder.Put((const CryptoPP::byte*)result.data(), result.size());
+	encoder.MessageEnd();
+
+	word64 size = encoder.MaxRetrievable();
+	if (size)
+	{
+		hex_result.resize(size);
+		encoder.Get((CryptoPP::byte*)&hex_result[0], hex_result.size());
+	}
+	return hex_result;
+}

@@ -3,6 +3,9 @@
 #include"osrng.h"
 #include"modes.h"
 #include "filters.h"
+#include "cryptlib.h"
+#include"sha.h"
+#include"hex.h"
 #include<utility>
 #include<string>
 
@@ -18,5 +21,7 @@ namespace Encryption
 
 	string encrypt(const key_iv& key_iv, const string& text);
 	string decrypt(const key_iv& key_iv, const string& cipher);
+
+	string sha256(const string& data);
 
 };
