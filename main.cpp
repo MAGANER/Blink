@@ -1,6 +1,7 @@
 #include"RoomMenu.h"
 #include"EnterMenu.h"
 #include"MainMenu.h"
+#include"encryption/Encryption.h"
 using namespace Blink;
 
 int main()
