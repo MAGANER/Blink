@@ -7,8 +7,10 @@
 #include"sha.h"
 #include "rsa.h"
 #include"hex.h"
+#include"../sql/Functools.hpp"
 #include<utility>
 #include<string>
+#include<vector>
 
 namespace Encryption
 {
@@ -38,11 +40,12 @@ namespace Encryption
 
 		spair get_random_keys();
 		keys spair_to_keys(const spair& k);
+		RSA::PrivateKey str_to_priv_key(const string& data);
 
-		string encrypt(const RSA::PublicKey& key,
-					   const string& data);
+		vector<string> encrypt(const RSA::PublicKey& key,
+							   const string& data);
 		string decrypt(const RSA::PrivateKey& key,
-					   const string& cipher);
+					   const vector<string>& cipher);
 	};
 
 	string str_to_hex(const string& str) ;

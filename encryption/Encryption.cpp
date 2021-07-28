@@ -173,33 +173,84 @@ rsa::keys rsa::spair_to_keys(const rsa::spair& k)
 
 	return make_pair(pkey,pukey);
 }
-string rsa::encrypt(const RSA::PublicKey& key,
-				    const string& data)
+vector<string> rsa::encrypt(const RSA::PublicKey& key,
+							const string& data)
 {
 	RSAES_OAEP_SHA_Encryptor e(key);
 	AutoSeededRandomPool rng;
 
-	string cipher;
-	StringSource ss1(data, true,
-		new PK_EncryptorFilter(rng, e,
-			new StringSink(cipher)
-		) // PK_EncryptorFilter
-	); // StringSource
-	return cipher;
+	vector<string> encrypted_strs;
+	auto encrypt = [&](const string& chunk)
+	{
+		string cipher;
+		StringSource ss1(chunk, true,
+			new PK_EncryptorFilter(rng, e,
+				new StringSink(cipher)
+			) // PK_EncryptorFilter
+		); // StringSource
+		return cipher;
+	};
+
+	if (data.size() < 10)
+	{
+		string cipher = encrypt(data);
+		encrypted_strs.push_back(cipher);
+	}
+	else
+	{
+		auto copied_data = data;
+		while ((copied_data.size() % 10) == 0)copied_data.push_back(' ');
+
+		int end = 10;
+		int begin = 0;
+		for (size_t i = 0; i < copied_data.size() / 10; i++)
+		{
+			string slice     = Functools::slice(copied_data, begin, end);
+			string encrypted = encrypt(slice);
+			encrypted_strs.push_back(encrypted);
+			end   += 10;
+			begin += 10;
+		}
+	}
+
+	return encrypted_strs;
 }
 string rsa::decrypt(const RSA::PrivateKey& key,
-					const string& cipher)
+					const vector<string>& _cipher)
 {
 	RSAES_OAEP_SHA_Decryptor d(key);
 	AutoSeededRandomPool rng;
-	string decoded;
 
-	StringSource ss(cipher, true,
-		new PK_DecryptorFilter(rng, d,
-			new StringSink(decoded)
-		) // PK_DecryptorFilter
-	); // StringSource
-	return decoded;
+	auto decrypt = [&](const string& chunk)
+	{
+		string decoded;
+		StringSource ss(chunk, true,
+			new PK_DecryptorFilter(rng, d,
+				new StringSink(decoded)
+			) // PK_DecryptorFilter
+		); // StringSource
+		return decoded;
+	};
+
+	string whole_string;
+	for (auto& chunk : _cipher)whole_string += decrypt(chunk);
+
+	return whole_string;
+}
+RSA::PrivateKey rsa::str_to_priv_key(const string& data)
+{
+	string decoded_priv_key;
+	StringSource ss_pub_key(data, true,
+		new HexDecoder(
+			new StringSink(decoded_priv_key)
+		)
+	);
+
+	StringSource ss_priv(decoded_priv_key, true);
+	RSA::PrivateKey pkey;
+	pkey.Load(ss_priv);
+	
+	return pkey;
 }
 string Encryption::str_to_hex(const string& str)
 {
