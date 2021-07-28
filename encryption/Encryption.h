@@ -5,6 +5,7 @@
 #include "filters.h"
 #include "cryptlib.h"
 #include"sha.h"
+#include "rsa.h"
 #include"hex.h"
 #include<utility>
 #include<string>
@@ -13,15 +14,34 @@ namespace Encryption
 {
 	using namespace CryptoPP;
 	using namespace std;
-	typedef pair<SecByteBlock, SecByteBlock> key_iv;
 
-	key_iv get_random_key();
-	string convert_bytes(const SecByteBlock& bytes);
-	SecByteBlock convert_to_bytes(const string& key);
+	namespace AES
+	{
+		typedef pair<SecByteBlock, SecByteBlock> key_iv;
 
-	string encrypt(const key_iv& key_iv, const string& text);
-	string decrypt(const key_iv& key_iv, const string& cipher);
+		key_iv get_random_key();
+		string convert_bytes(const SecByteBlock& bytes);
+		SecByteBlock convert_to_bytes(const string& key);
 
-	string sha256(const string& data);
+		string encrypt(const key_iv& key_iv, const string& text);
+		string decrypt(const key_iv& key_iv, const string& cipher);
+	};
+	namespace SHA
+	{
+		string sha256(const string& data);
+	};
 
+	namespace rsa
+	{
+		typedef pair<RSA::PrivateKey, RSA::PublicKey> keys;
+		typedef pair<string, string> spair;
+
+		spair get_random_keys();
+		keys spair_to_keys(const spair& k);
+
+		string encrypt(const RSA::PublicKey& key,
+					   const string& data);
+		string decrypt(const RSA::PrivateKey& key,
+					   const string& cipher);
+	};
 };
