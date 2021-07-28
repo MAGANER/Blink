@@ -9,15 +9,15 @@ Server::Server(const command_hash& commands,
 	this->password  = password;
 	this->room_name = room_name;
 
-	key_iv = encr::get_random_key();
+	key_iv = encr::AES::get_random_key();
 }
 Server::~Server()
 {
 }
 void Server::show_key_iv()
 {
-	string key = encr::convert_bytes(key_iv.first);
-	string iv  = encr::convert_bytes(key_iv.second);
+	string key = encr::AES::convert_bytes(key_iv.first);
+	string iv  = encr::AES::convert_bytes(key_iv.second);
 	cout << "Next key and IV will be used to encrypt data with AES:";
 	cout << endl;
 	cout << key << endl << iv << endl;

@@ -17,8 +17,8 @@ Client::Client(const string& ip,
 
 	cout << "enter AES encryption IV:";
 	cin >> iv;
-	key_iv = make_pair(encr::convert_to_bytes(key), encr::convert_to_bytes(iv));
-	auto d = encr::encrypt(key_iv, "hey");
+	key_iv = make_pair(encr::AES::convert_to_bytes(key), encr::AES::convert_to_bytes(iv));
+	auto d = encr::AES::encrypt(key_iv, "hey");
 }
 Client::~Client()
 {

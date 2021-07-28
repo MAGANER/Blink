@@ -22,7 +22,7 @@ namespace encr = Encryption;
 class NetBase
 {
 protected:
-	encr::key_iv key_iv;
+	encr::AES::key_iv key_iv;
 private:
 	function<void(string)> input_callback;
 
@@ -53,7 +53,7 @@ protected:
 	{
 		Packet pack;
 		string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
-		pack << encr::encrypt(key_iv,jmessage);
+		pack << encr::AES::encrypt(key_iv,jmessage);
 		socket.send(pack);
 	}
 	void get_and_show_message(TcpSocket& socket)
@@ -92,7 +92,7 @@ protected:
 		socket.receive(pack);
 		string data;
 		pack >> data;
-		return encr::decrypt(key_iv,data);
+		return encr::AES::decrypt(key_iv,data);
 	}
 	string get_raw_message(TcpSocket& socket)
 	{
