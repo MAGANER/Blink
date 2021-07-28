@@ -201,3 +201,25 @@ string rsa::decrypt(const RSA::PrivateKey& key,
 	); // StringSource
 	return decoded;
 }
+string Encryption::str_to_hex(const string& str)
+{
+	string result;
+	StringSource ss(str, true,
+		new HexEncoder(
+			new StringSink(result)
+		) // HexEncoder
+	); // StringSource
+
+	return result;
+}
+string Encryption::hex_to_str(const string& hex)
+{
+	string result;
+	StringSource ss(hex, true,
+		new HexDecoder(
+			new StringSink(result)
+		) // HexEncoder
+	); // StringSource
+
+	return result;
+}

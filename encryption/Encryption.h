@@ -44,4 +44,7 @@ namespace Encryption
 		string decrypt(const RSA::PrivateKey& key,
 					   const string& cipher);
 	};
+
+	string str_to_hex(const string& str) ;
+	string hex_to_str(const string& hex);
 };
