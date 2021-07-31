@@ -86,7 +86,6 @@ namespace Functools
 		}
 		return result;
 	}
-
 	template<class T>
 	T slice(const T& seq, size_t begin, size_t end)
 	{

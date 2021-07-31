@@ -1,12 +1,10 @@
 #include"RoomMenu.h"
 #include"EnterMenu.h"
 #include"MainMenu.h"
-#include"encryption/Encryption.h"
 using namespace Blink;
 
 int main()
 {
-	system("cls");
 	string key = create_database(); //if it doesn't exist
 
 	EnterMenu* enter_menu= new EnterMenu(key);
