@@ -3,8 +3,6 @@
 
 std::string Blink::create_invite_link(const string& ip,
 									  const string& port,
-									  const string& key,
-									  const string& iv,
 									  const string& room,
 									  const string& password)
 {
@@ -24,7 +22,6 @@ std::string Blink::create_invite_link(const string& ip,
 }
 std::string Blink::encrypt_invite_link(const string& link)
 {
-
 	namespace e = encr::rsa;
 
 	//get RSA keys
@@ -33,7 +30,6 @@ std::string Blink::encrypt_invite_link(const string& link)
 
 	//get encrypted RSA chunks
 	auto encrypted = e::encrypt(keys.second,link);
-
 	//get random noise chunks
 	const auto charset = get_ascii_charset();
 	vector<string> noise_chunks;
@@ -52,7 +48,7 @@ std::string Blink::encrypt_invite_link(const string& link)
 	}
 
 	//add separator
-	cipher += encr::str_to_hex(SEPARATOR);
+	cipher += SEPARATOR;
 
 	//add data about noise
 	string noise_size_data;
@@ -62,24 +58,83 @@ std::string Blink::encrypt_invite_link(const string& link)
 	}
 	cipher += noise_size_data;
 
-	//XOR it
-	string random_bits = to_binary(generate_noise_string(1, charset));
+	//save data about key
+	string key_size = to_string(str_keys.first.size());
+	string key_data = key_size + str_keys.first;
+	cipher = key_data + key_size + cipher;
+	//
 
-	string xored_cipher;
-	for (auto ch : cipher)
-	{
-		string s; s += ch;
-		s = to_binary(s);
-		xored_cipher += from_binary(XOR(s, random_bits));
-		s.clear();
-	}
-	xored_cipher += from_binary(random_bits);
+	cipher = encr::str_to_hex(cipher);
 
 	//compress it
-	string compressed = inner::compress(xored_cipher);
+	string compressed = inner::compress(cipher);
 	return compressed;
 }
+string Blink::decrypt_invite_link(const string& link)
+{
+	//decompress it
+	string decompressed = inner::decompress(link);
+	string cipher = encr::hex_to_str(decompressed);
 
+	//get data about key
+	int key_size = atoi(Functools::slice(cipher, 0, 4).c_str());
+	string key = Functools::slice(cipher, 4, key_size+4);
+	//exlude key data
+	cipher = Functools::slice(cipher, key_size + 6, cipher.size());
+
+	//find separator
+	string sep = SEPARATOR;
+	auto sep_pos = cipher.find(sep);
+
+	//get noise data
+	if (sep_pos == string::npos)
+	{
+		cout << "can not retrieve link!" << endl;
+		return "";
+	}
+	size_t sep_end = sep_pos + sep.size();
+	string noise_data = Functools::slice(cipher, sep_end, cipher.size());
+	cipher = Functools::slice(cipher, 0, sep_pos);
+
+	//get sizes of noise strings
+	size_t noise_str_number = noise_data.size() / 2;
+	vector<size_t> sizes;
+
+	int begin = 0, end = 2;
+	for (size_t i = 0; i < noise_str_number; ++i)
+	{
+		string val = Functools::slice(noise_data, begin, end);
+		begin += 2;
+		end   += 2;
+		size_t size = atoi(val.c_str());
+		sizes.push_back(size);
+	}
+
+	//get cipher chunks
+	vector<string> chunks;
+	const int chunk_size = 384;
+	
+	size_t junk_len = 0;
+	const size_t dx = 2;
+	int counter = 1;
+
+	//take first chunk
+	string first = Functools::slice(cipher, dx, chunk_size + dx);
+	chunks.push_back(first);
+
+	for (auto s : Functools::slice(sizes, 0, sizes.size()-1))
+	{
+		junk_len += s;
+		int begin = dx + junk_len + counter       * chunk_size;
+		int end   = dx + junk_len + (counter + 1) * chunk_size;
+		string chunk = Functools::slice(cipher, begin, end);
+		chunks.push_back(chunk);
+		counter++;
+	}
+	//decrypt it
+	auto _key = encr::rsa::str_to_priv_key(key);
+	return encr::rsa::decrypt(_key, chunks);
+}
 
 string Blink::inner::compress(const string& data)
 {
