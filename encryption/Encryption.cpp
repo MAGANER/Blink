@@ -205,6 +205,7 @@ vector<string> rsa::encrypt(const RSA::PublicKey& key,
 		int begin = 0;
 		for (size_t i = 0; i < copied_data.size() / 10; i++)
 		{
+			if (i + 1 == copied_data.size() / 10)end = copied_data.size();
 			string slice     = Functools::slice(copied_data, begin, end);
 			string encrypted = encrypt(slice);
 			encrypted_strs.push_back(encrypted);
