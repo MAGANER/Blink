@@ -7,15 +7,6 @@ RoomMenu::RoomMenu(const string& encr_key):DataBaseProcessor(encr_key)
 		(
 			[&]() { print_state(); return; }
 		);
-	commands["send"] = function<void()>
-		(
-			[&]() 
-			{ 
-				/*read_sending_input = true;
-				send();*/ 
-				return;
-			}
-		);
 
 }
 void RoomMenu::print_state()
