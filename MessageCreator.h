@@ -31,8 +31,8 @@ namespace
 					 const string& name)
 	{
 		json jdata = json::parse(message);
-		return jdata["data"] == password &&
-			   jdata["name"] == name;
+		return string(jdata["data"]) == password &&
+			   string(jdata["name"]) == name;
 	}
 	
 };
