@@ -1,5 +1,6 @@
 /*
 * Base class for all console menu interfaces
+* It provides common mechanism of command handling
 */
 #pragma once
 #include<functional>

@@ -1,3 +1,29 @@
+/*
+* BlinkConsole
+* stage:pre-alpha
+
+	$main.cpp is entry point to application. that's obvious
+	
+		How does it work?
+	If application is executed first time, then before all
+	there will be created data base encrypted with special key.
+
+	When you start new Blink session you should enter this key.
+
+	On top there are 3 menu: Room, Enter and Main
+	EnterMenu provides an abilities to create new user/login.
+
+	If you get access you get to MainMenu.
+
+	MainMenu provides abilities to enter room(start your own server)
+	or connect to the room manually or with special invite link.
+	Invite link is created when you enter room.
+
+	And there is third menu. RoomMenu. Users moves to this one after
+	he/she/it enters room or connect to the one.
+	
+*/
+
 #include"RoomMenu.h"
 #include"EnterMenu.h"
 #include"MainMenu.h"
@@ -83,7 +109,6 @@ int main()
 				current = state::ROOM;		
 			}
 		}
-		
 		if (current == state::ROOM)
 		{
 			if (keys != nullptr)
@@ -99,5 +124,6 @@ int main()
 	if (main_menu  != nullptr) delete main_menu;
 	if (room_menu  != nullptr) delete room_menu;
 	if (keys != nullptr) delete keys;
+
 	return 0;
 }

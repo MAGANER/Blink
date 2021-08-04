@@ -1,3 +1,8 @@
+/*
+	EnterMenu provides an ability to create new user
+	or login as already existing one
+*/
+
 #pragma once
 #include "Interface.h"
 #include"DataBaseProcessor.h"
