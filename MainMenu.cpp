@@ -8,6 +8,8 @@ MainMenu::MainMenu(const string& encr_key):DataBaseProcessor(encr_key)
 	commands["create"]  = function<void()>([&]() { create();     });
 	commands["enter"]   = function<void()>([&]() { enter();      });
 	commands["connect"] = function<void()>([&]() { connect();   });
+	commands["conflink"] = function<void()>([&]() { connect_with_filelink();   });
+	//commands["conflink"] = function<void()>([&]() { connect_with_link();   });
 }
 void MainMenu::create()
 {
@@ -32,9 +34,9 @@ void MainMenu::enter()
 	if (!is_password_correct(name,password)) cout << "can not enter to " << "`" + name + "`" << " room";
 	else
 	{
-		room_to_enter = name;
-		this->password = password;
-		port = to_string(get_room_port(name, get_encr_key()));
+		data.room     = name;
+		data.password = password;
+		data.port = to_string(get_room_port(name, get_encr_key()));
 		can_enter_room = true;
 		system("cls");
 		cout << "welcome to " << name << " room!" << endl;
@@ -89,12 +91,45 @@ void MainMenu::connect()
 	if (can_connect(ip, password, room_name, port))
 	{
 		cout << "connecting to " << room_name << endl;
-		room_ip        = ip;
-		this->password = password;
-		this->port     = to_string(port);
-		room_to_enter  = room_name;
+		data.ip        = ip;
+		data.password  = password;
+		data.port      = to_string(port);
+		data.room      = room_name;
 		can_connect_to_room = true;
+		con_regime = CONNECTION_REGIME::Manually;
+	}
+}
+void MainMenu::connect_with_filelink()
+{
+	string path;
+	ifstream link_file;
+	while (true)
+	{
+		cout << "enter path to link:";
+		cin >> path;
+		link_file.open(path, ios::binary);
+		if (!link_file)
+		{
+			cout << "can not open " << path << "!" << endl;
+			path.clear();
+		}
+		else break;
 	}
 
+	
+	string link;
+	istreambuf_iterator<char> inputIt(link_file), emptyInputIt;
+	back_insert_iterator<string> stringInsert(link);
 
+	copy(inputIt, emptyInputIt, stringInsert);
+
+	link = decrypt_invite_link(link);
+
+	json jlink = json::parse(link);
+	data.ip   = jlink["ip"];
+	data.port = jlink["port"];
+	data.room = jlink["room"];
+	data.password = jlink["password"];
+	
+	encr_data = new EncryptionData(jlink["key"],jlink["iv"]);
 }

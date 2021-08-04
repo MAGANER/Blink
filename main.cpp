@@ -5,6 +5,7 @@ using namespace Blink;
 
 int main()
 {
+	system("cls");
 	string key = create_database(); //if it doesn't exist
 
 	EnterMenu* enter_menu= new EnterMenu(key);
@@ -43,11 +44,13 @@ int main()
 			else if (main_menu->enter_room())
 			{
 				room_menu = new RoomMenu(key);
-				room_menu->set_room_data(main_menu->get_port(),
-										 main_menu->get_room_ip(),
+
+				ConnectionData data = main_menu->get_connection_data();
+				room_menu->set_room_data(data.port,
+										 data.ip,
 										 *current_user_name,
-										 main_menu->get_room_to_enter(),
-										 main_menu->get_password_to_enter());
+										 data.room,
+										 data.password);
 
 				delete current_user_name;
 				delete main_menu;
@@ -58,11 +61,13 @@ int main()
 			else if (main_menu->_connect())
 			{
 				room_menu = new RoomMenu(key);
-				room_menu->set_room_data(main_menu->get_port(),
-										 main_menu->get_room_ip(),
+
+				ConnectionData data = main_menu->get_connection_data();
+				room_menu->set_room_data(data.port,
+										 data.ip,
 										 *current_user_name,
-										 main_menu->get_room_to_enter(),
-										 main_menu->get_password_to_enter());
+										 data.room,
+										 data.password);
 
 				delete current_user_name;
 				delete main_menu;
