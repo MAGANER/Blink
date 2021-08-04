@@ -55,7 +55,7 @@ void RoomMenu::run(mode flag)
 
 	auto run = [&]()
 	{
-		server->run("test", port);
+		server->run(data["room_name"],data["room_password"],port);
 		return true;
 	};
 	while (true)
