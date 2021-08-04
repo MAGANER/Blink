@@ -18,6 +18,7 @@ int main()
 	RoomMenu::mode app_mode;
 	
 	string* current_user_name = nullptr;
+	encr::AES::key_iv* keys = nullptr;
 	while (true)
 	{
 		if (current == state::ENTER)
@@ -69,6 +70,12 @@ int main()
 										 data.room,
 										 data.password);
 
+				if (main_menu->get_connection_regime() == MainMenu::CONNECTION_REGIME::WithLink)
+				{
+					keys = new encr::AES::key_iv();
+					keys->first = main_menu->get_encryption_data()->data.first;
+					keys->second = main_menu->get_encryption_data()->data.second;
+				}
 				delete current_user_name;
 				delete main_menu;
 
@@ -76,9 +83,13 @@ int main()
 				current = state::ROOM;		
 			}
 		}
+		
 		if (current == state::ROOM)
 		{
-			room_menu->run(app_mode);
+			if (keys != nullptr)
+				room_menu->run(app_mode, *keys);
+			else
+				room_menu->run(app_mode);
 		}
 	}
 
@@ -87,6 +98,6 @@ int main()
 	if (enter_menu != nullptr) delete enter_menu;
 	if (main_menu  != nullptr) delete main_menu;
 	if (room_menu  != nullptr) delete room_menu;
-
+	if (keys != nullptr) delete keys;
 	return 0;
 }
