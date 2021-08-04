@@ -28,13 +28,16 @@ namespace Blink
         }
 
         void run(mode flag);
+        void run(mode flag, const encr::AES::key_iv& key);
         void set_room_data(const string& port,
                            const string& ip,
                            const string& user_name,
                            const string& room_name,
                            const string& room_password);
 
-        bool should_exit() { return exit; }    
+        bool should_exit() { return exit; }   
+    private:
+        void execute(int port);
     };
 };
 

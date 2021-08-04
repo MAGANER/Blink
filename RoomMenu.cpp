@@ -49,13 +49,31 @@ void RoomMenu::run(mode flag)
 	{
 		client = new Client(data["ip"], port, commands, data["user_name"]);
 	}
-	
 
+	execute(port);
+}
+void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
+{
+	auto port = atoi(data["port"].c_str());
+
+	if (flag == mode::SERVER)
+		server = new Server(commands, data["room_password"],
+			data["room_name"],
+			data["user_name"]);
+	else
+	{
+		client = new Client(data["ip"], port, commands, data["user_name"],key);
+	}
+
+	execute(port);
+}
+void RoomMenu::execute(int port)
+{
 	bool run_server = true;
 
 	auto run = [&]()
 	{
-		server->run(data["room_name"],data["room_password"],port);
+		server->run(data["room_name"], data["room_password"], port);
 		return true;
 	};
 	while (true)
