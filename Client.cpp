@@ -18,7 +18,18 @@ Client::Client(const string& ip,
 	cout << "enter AES encryption IV:";
 	cin >> iv;
 	key_iv = make_pair(encr::AES::convert_to_bytes(key), encr::AES::convert_to_bytes(iv));
-	auto d = encr::AES::encrypt(key_iv, "hey");
+}
+Client::Client(const string& ip,
+			   int port,
+			   const command_hash& commands,
+			   const string& user_name,
+			   const encr::AES::key_iv& keys) :NetBase(commands, user_name)
+{
+	this->port = port;
+
+	sender.connect(ip, port);
+	sender.setBlocking(false);
+	key_iv = keys;
 }
 Client::~Client()
 {

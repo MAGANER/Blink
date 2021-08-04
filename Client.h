@@ -22,6 +22,11 @@ namespace Blink
 			   int port,
 			   const command_hash& commands,
 			   const string& user_name);
+		Client(const string& ip,
+			int port,
+			const command_hash& commands,
+			const string& user_name,
+			const encr::AES::key_iv& keys);
 		~Client();
 
 
