@@ -24,7 +24,7 @@ std::string Blink::create_invite_link(const string& ip,
 	link["room"]     = Encryption::SHA::sha256(room);
 	link["password"] = Encryption::SHA::sha256(password);
 
-	link["time"] = Encryption::SHA::sha256(get_curr_time());
+	link["time"] = get_curr_time();
 
 	return link.dump();
 }
