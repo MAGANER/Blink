@@ -4,13 +4,17 @@
 std::string Blink::create_invite_link(const string& ip,
 									  const string& port,
 									  const string& room,
+									  const string& IV,
+									  const string& KEY,
 									  const string& password)
 {
 	//link data will be encrypted
 	json link;
 	link["ip"]   = ip;
 	link["port"] = port;
-	link["room"] = Encryption::SHA::sha256(room);
+	link["iv"]   = IV;
+	link["key"]  = KEY;
+	link["room"]     = Encryption::SHA::sha256(room);
 	link["password"] = Encryption::SHA::sha256(password);
 
 	auto curr_time   = chrono::system_clock::now();

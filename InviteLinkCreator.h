@@ -18,6 +18,8 @@ namespace encr = Encryption;
 string create_invite_link(const string& ip,
 						  const string& port,
 						  const string& room,
+						  const string& IV,
+						  const string& KEY,
 						  const string& password);
 
 string encrypt_invite_link(const string& link);
