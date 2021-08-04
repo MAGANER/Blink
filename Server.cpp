@@ -14,20 +14,64 @@ Server::Server(const command_hash& commands,
 Server::~Server()
 {
 }
-void Server::show_key_iv()
+
+void Server::create_invite_link(int port,
+								const string& room_name,
+								const string& room_password)
 {
-	string key = encr::AES::convert_bytes(key_iv.first);
-	string iv  = encr::AES::convert_bytes(key_iv.second);
-	cout << "Next key and IV will be used to encrypt data with AES:";
-	cout << endl;
-	cout << key << endl << iv << endl;
-	cout << ".";
+	cout << "before server starts...";
+	string inv_link;
+	while (true)
+	{
+		int mode = -1;
+		cout << "save invite link or send it to special e-mail?(1,2):";
+		cin >> mode;
+		
+		if (mode != -1)
+		{
+			string key = encr::AES::convert_bytes(key_iv.first);
+			string iv = encr::AES::convert_bytes(key_iv.second);
+			inv_link = ::create_invite_link(get_ip(),
+											to_string(port),
+											room_name,
+											iv,
+											key,
+											room_password);
+			inv_link = ::encrypt_invite_link(inv_link);
+			cout << inv_link.size() << endl;
+		}
+		if (mode == 1)
+		{
+			ofstream file;
+			string path;
+			cout << "enter path to save link:";
+			cin >> path;
+			file.open(path,ios::binary);
+			file << inv_link;
+			file.close();
+			cout << "link saved!";
+			break;
+		}
+		else if (mode == 2)
+		{
+
+			break;
+		}
+		else
+		{
+			cout << "error occured!" << endl;
+		}
+	}
+	
 }
-bool Server::run(const string& channel_name,
+bool Server::run(const string& room_name,
+				 const string& room_password,
 				 int port)
 {
 
-	show_key_iv();
+	//show_key_iv();
+	create_invite_link(port,room_name,room_password);
+	cout << "waiting for connection..." << endl;
 	listener.listen(port);
 	sf::TcpSocket socket;
 	listener.accept(socket);

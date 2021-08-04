@@ -5,11 +5,12 @@
 #include<string>
 #include<iostream>
 #include<future>
+#include<fstream>
 #include"NetBase.h"
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
-
-
+#include"InviteLinkCreator.h"
+#include"getIP.h"
 namespace Blink
 {
 	using namespace std;
@@ -27,11 +28,14 @@ namespace Blink
 			   const string& user_name);
 		~Server();
 
-		bool run(const string& channel_name,
+		bool run(const string& room_name,
+				 const string& room_password,
 				 int port);
 	private:
 		void process_commands(const string& command);
-		void show_key_iv();
+		void create_invite_link(int port,
+								const string& room_name,
+								const string& room_password);
 	};
 };
 #endif //SERVER_H
