@@ -16,6 +16,13 @@ namespace Blink
         }
         ~ConnectionData(){}
         string room, password, ip, port;
+        void clear()
+        {
+            room.clear();
+            password.clear();
+            ip.clear();
+            port.clear();
+        }
     };
     struct EncryptionData
     {
@@ -50,6 +57,7 @@ namespace Blink
         bool _connect() { return can_connect_to_room; };
 
         ConnectionData get_connection_data(){ return data; }
+        EncryptionData* get_encryption_data() { return encr_data; }
         CONNECTION_REGIME get_connection_regime() { return con_regime; }
         void finish()
         {
@@ -76,10 +84,13 @@ namespace Blink
         void connect();
         //void connect_with_link();
         void connect_with_filelink();
-        bool can_connect(const string& ip,
-                         const string& password,
-                         const string& name,
-                         unsigned int port);
+        bool can_connect();
+
+        vector<string> parse_time(const string& time);
+        vector<string> split(const string& s, char delim);
+        string convert_time_string_to_seconds(const string& str);
+        string convert_secs_to_regular_time_view(int seconds);
+        int get_seconds(const string& time);
     };
 };
 
