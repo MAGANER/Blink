@@ -38,7 +38,6 @@ void Server::create_invite_link(int port,
 											key,
 											room_password);
 			inv_link = ::encrypt_invite_link(inv_link);
-			cout << inv_link.size() << endl;
 		}
 		if (mode == 1)
 		{
@@ -79,7 +78,7 @@ bool Server::run(const string& room_name,
 
 	string check = get_raw_message(socket);
 	Packet p;
-	if (can_come_in(check, password, room_name))
+	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
 	{
 		p << "1";
 		socket.send(p);
