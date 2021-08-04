@@ -1,6 +1,13 @@
 #include "InviteLinkCreator.h"
 
 
+std::string Blink::get_curr_time()
+{
+	auto curr_time = chrono::system_clock::now();
+	auto c_curr_time = chrono::system_clock::to_time_t(curr_time);
+	auto time_str = ctime(&c_curr_time);
+	return time_str;
+}
 std::string Blink::create_invite_link(const string& ip,
 									  const string& port,
 									  const string& room,
@@ -17,10 +24,7 @@ std::string Blink::create_invite_link(const string& ip,
 	link["room"]     = Encryption::SHA::sha256(room);
 	link["password"] = Encryption::SHA::sha256(password);
 
-	auto curr_time   = chrono::system_clock::now();
-	auto c_curr_time = chrono::system_clock::to_time_t(curr_time);
-	auto time_str = ctime(&c_curr_time);
-	link["time"] = Encryption::SHA::sha256(time_str);
+	link["time"] = Encryption::SHA::sha256(get_curr_time());
 
 	return link.dump();
 }
