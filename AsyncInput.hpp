@@ -21,6 +21,7 @@ namespace Blink
 		bool clear_result = false;
 
 		bool counter = false;
+		bool clear_finally = false;
 	public:
 		AsyncInput() {}
 		~AsyncInput() {}
@@ -53,6 +54,14 @@ namespace Blink
 					printf("\033[D");
 					printf(" ");
 					printf("\033[D");
+				}
+				else if (ch == 8 && result.empty() && !clear_finally)
+				{
+					printf("\033[D");
+					printf(" ");
+					printf("\033[D");
+					clear_finally = true;
+					printf(" ");
 				}
 				else if (ch != 13 && ch != 8)
 				{
