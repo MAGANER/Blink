@@ -64,6 +64,10 @@ namespace Blink
 				(
 					[&]() {exit(0); }
 				);
+			commands["cls"] = function<void()>
+				(
+					[&]() {system("cls"); }
+			);
 		}
 		~Interface(){}
 
