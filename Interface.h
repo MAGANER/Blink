@@ -42,6 +42,13 @@ namespace Blink
 				dollar_printed = false;
 			}
 		}
+
+		string get_secret_data()
+		{
+			AsyncInput input;
+			while (!input.can_get_result())input.read(true);
+			return input.get_result();
+		}
 	};
 
 	typedef map<string, function<void()>> command_hash;

@@ -19,11 +19,13 @@ namespace Blink
 		string result;
 		bool ready = false;
 		bool clear_result = false;
+
+		bool counter = false;
 	public:
 		AsyncInput() {}
 		~AsyncInput() {}
 
-		void read()
+		void read(bool secret_info=false)
 		{
 			if (clear_result)
 			{
@@ -33,6 +35,16 @@ namespace Blink
 			if (_kbhit())
 			{
 				char ch = _getch();
+				if (secret_info && ch != 13 && ch != 8)
+				{
+					if (!counter)
+					{
+						printf(" ");
+						counter = true;
+					}
+					printf("\033[D");
+					printf("* ");
+				}
 
 				if (ch == 8 && !result.empty())
 				{
@@ -45,12 +57,13 @@ namespace Blink
 				else if (ch != 13 && ch != 8)
 				{
 					result += ch;
-					cout << ch;
+					if (!secret_info)cout << ch;
 				}
 				else
 				{
 					if (ch != 8)
 					{
+						if (secret_info)counter = false;
 						ready = true;
 						cout << endl;
 					}
