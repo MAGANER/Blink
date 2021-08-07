@@ -64,10 +64,18 @@ namespace Blink
 				(
 					[&]() {exit(0); }
 				);
+#ifdef WIN32
 			commands["cls"] = function<void()>
 				(
 					[&]() {system("cls"); }
 			);
+#endif
+#ifdef unix
+			commands["cls"] = function<void()>
+				(
+					[&]() {system("clear"); }
+			);
+#endif
 		}
 		~Interface(){}
 
