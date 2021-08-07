@@ -8,6 +8,9 @@
 */
 #ifndef GET_IP_H
 #define GET_IP_H
+#ifndef _WIN32
+#error "getIP modules works for windows only"
+#endif
 #include<fstream>
 #include<string>
 #include<iostream>
