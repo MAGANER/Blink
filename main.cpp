@@ -43,7 +43,7 @@ int main()
 	state current = state::ENTER;
 	RoomMenu::mode app_mode;
 	
-	string* current_user_name = nullptr;
+	string current_user_name;
 	encr::AES::key_iv* keys = nullptr;
 	while (true)
 	{
@@ -53,7 +53,7 @@ int main()
 			if (enter_menu->change())
 			{
 				current = state::MAIN;
-				current_user_name = new string(enter_menu->get_user_name());
+				current_user_name = enter_menu->get_user_name();
 				delete enter_menu;
 				main_menu = new MainMenu(key);
 			}
@@ -75,11 +75,10 @@ int main()
 				ConnectionData data = main_menu->get_connection_data();
 				room_menu->set_room_data(data.port,
 										 data.ip,
-										 *current_user_name,
+										 current_user_name,
 										 data.room,
 										 data.password);
 
-				delete current_user_name;
 				delete main_menu;
 
 				app_mode = RoomMenu::mode::SERVER;
@@ -92,7 +91,7 @@ int main()
 				ConnectionData data = main_menu->get_connection_data();
 				room_menu->set_room_data(data.port,
 										 data.ip,
-										 *current_user_name,
+										 current_user_name,
 										 data.room,
 										 data.password);
 
@@ -102,7 +101,6 @@ int main()
 					keys->first = main_menu->get_encryption_data()->data.first;
 					keys->second = main_menu->get_encryption_data()->data.second;
 				}
-				delete current_user_name;
 				delete main_menu;
 
 				app_mode = RoomMenu::mode::CLIENT;
@@ -115,6 +113,13 @@ int main()
 				room_menu->run(app_mode, *keys);
 			else
 				room_menu->run(app_mode);
+
+			if (room_menu->should_exit())
+			{
+				current = state::MAIN;
+				main_menu = new MainMenu(key);
+				delete room_menu;
+			}
 		}
 	}
 

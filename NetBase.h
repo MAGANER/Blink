@@ -31,6 +31,7 @@ private:
 	string input_buffer;
 	bool ready_to_send_message = false;
 	bool dollar_printed = false;
+	bool disconnect = false;
 
 	command_hash commands;
 	
@@ -81,7 +82,8 @@ protected:
 		{
 			//process command
 			string command = fp::slice(input_buffer, 1, input_buffer.size());
-			if (commands.find(command) != commands.end())
+			if (command == "disconnect") disconnect = true;
+			else if (commands.find(command) != commands.end())
 				commands[command]();
 			else
 				cout <<"command "<< "`" + command + "`" << " doesn't exist!";
@@ -94,7 +96,10 @@ protected:
 	string get_message(TcpSocket& socket)
 	{
 		Packet pack;
-		socket.receive(pack);
+		if (socket.receive(pack) == TcpSocket::Disconnected)
+		{
+			disconnect = true;
+		}
 		string data;
 		pack >> data;
 		return encr::AES::decrypt(key_iv,data);
@@ -107,6 +112,9 @@ protected:
 		pack >> data;
 		return data;
 	}
+
+public:
+	bool should_disconnect() { return disconnect; }
 };
 };
 #endif //NET_BASE_H

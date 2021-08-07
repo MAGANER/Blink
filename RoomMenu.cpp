@@ -97,15 +97,26 @@ void RoomMenu::execute(int port)
 		{
 			if (run_server)
 			{
-				auto result = run();
-
-				run_server = result;
-				cout << "gonna do nothing...";
+				run();
+				if (server->should_disconnect())
+				{
+					system("cls");
+					cout << "you have been disconnected from room..." << endl;
+					exit = true;
+					break;
+				}
 			}
 		}
 		else
 		{
 			client->run();
+			if (client->should_disconnect())
+			{
+				system("cls");
+				cout << "you have been disconnected from room..." << endl;
+				exit = true;
+				break;
+			}
 		}
 	}
 }

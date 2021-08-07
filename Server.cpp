@@ -98,6 +98,7 @@ bool Server::run(const string& room_name,
 	{
 		get_and_show_message(socket);
 		receive_input_and_send_message(socket);
+		if (should_disconnect())return false;
 	}
 	return true;
 }
