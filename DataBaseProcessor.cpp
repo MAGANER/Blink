@@ -146,7 +146,6 @@ vector<message> DataBaseProcessor::get_messages(const string& room_name,
 
 	string req = sql::make_select_request("chats");
 	auto result = db.run_get_request(req);
-
 	vector<message> messages;
 	for (auto chunk : result)
 	{
