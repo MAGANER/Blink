@@ -29,7 +29,8 @@ void MainMenu::enter()
 {
 	string name, password;
 	cout << "enter room name:";      cin >> name;
-	cout << "enter room password:"; cin >> password;
+	cout << "enter room password:"; 
+	password = get_secret_data();
 
 	if (!is_password_correct(name,password)) cout << "can not enter to " << "`" + name + "`" << " room";
 	else
@@ -83,7 +84,7 @@ void MainMenu::connect()
 	cout << "enter room name:";
 	cin >> data.room;
 	cout << "enter password:";
-	cin >> data.password;
+	data.password = get_secret_data();
 
 	if (can_connect())
 	{

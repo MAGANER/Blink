@@ -8,7 +8,7 @@ string Blink::create_database()
 
 	string key;
 	cout << "enter key:";
-	cin >> key;
+	key = get_secret_data();
 
 	auto curr_path_str = fs::current_path().string() + fs::path{ "/data.db" }.string();
 	auto db_path = fs::path{ curr_path_str };

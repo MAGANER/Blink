@@ -11,7 +11,8 @@ void EnterMenu::create_user()
 {
 	string name, password;
 	cout << "enter name:"; cin >> name;
-	cout << "enter password:"; cin >> password;
+	cout << "enter password:"; 
+	password = get_secret_data();
 
 	if(!does_user_exist(name,password)) create_new_user(name, password);
 }
@@ -19,7 +20,8 @@ void EnterMenu::login()
 {
 	string name, password;
 	cout << "enter name:"; cin >> name;
-	cout << "enter password:"; cin >> password;
+	cout << "enter password:"; 
+	password = get_secret_data();
 
 	if (does_user_exist(name, password))
 	{
