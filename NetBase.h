@@ -12,6 +12,7 @@
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
 #include"encryption/Encryption.h"
+#include"DataBaseProcessor.h"
 namespace Blink
 {
 using namespace std;
@@ -19,7 +20,7 @@ using namespace sf;
 namespace fp = Functools;
 namespace encr = Encryption;
 
-class NetBase
+class NetBase:public DataBaseProcessor
 {
 protected:
 	encr::AES::key_iv key_iv;
@@ -33,10 +34,12 @@ private:
 
 	command_hash commands;
 	
-	string user_name;
+	string user_name,room_name;
 protected:
 	NetBase(const command_hash& commands,
-			const string& user_name)
+			const string& user_name,
+			const string& room_name,
+		    const string& db_key):DataBaseProcessor(db_key)
 	{
 		input_callback = [&](const string& str)
 		{
@@ -45,6 +48,7 @@ protected:
 		};
 		this->commands  = commands;
 		this->user_name = user_name;
+		this->room_name = room_name;
 	}
 	~NetBase(){}
 	
@@ -55,6 +59,7 @@ protected:
 		string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
 		pack << encr::AES::encrypt(key_iv,jmessage);
 		socket.send(pack);
+		add_message(room_name, user_name, message);
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{

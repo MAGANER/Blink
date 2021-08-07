@@ -9,6 +9,7 @@
 #include"NetBase.h"
 #include"Interface.h" // process_input
 #include"encryption/Encryption.h"
+#include"DataBaseProcessor.h"
 namespace Blink
 {
 	using namespace std;
@@ -19,22 +20,25 @@ namespace Blink
 	private:
 		int port;
 		TcpSocket sender;
+
+		string name, room;
 	public:
 		Client(const string& ip,
 			   int port,
 			   const command_hash& commands,
-			   const string& user_name);
+			   const string& user_name,
+			   const string& room_name,
+			   const string& db_key);
 		Client(const string& ip,
 			int port,
 			const command_hash& commands,
 			const string& user_name,
-			const encr::AES::key_iv& keys);
+			const string& room_name,
+			const encr::AES::key_iv& keys,
+			const string& db_key);
 		~Client();
 
-
 		void run();
-	private:
-		void send_message(const string& message);
 	};
 };
 #endif //CLIENT_H

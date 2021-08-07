@@ -20,6 +20,9 @@ namespace Blink
         Client* client = nullptr;
 
         void print_state();
+        void list_all_messages();
+
+        string db_key;
     public:
         enum class mode { SERVER, CLIENT };
 

@@ -3,11 +3,33 @@ using namespace Blink;
 
 RoomMenu::RoomMenu(const string& encr_key):DataBaseProcessor(encr_key)
 {
+	db_key = encr_key;
 	commands["status"] = function<void()>
 		(
 			[&]() { print_state(); return; }
 		);
+	commands["ls"] = function<void()>
+		(
+			[&]() {list_all_messages(); return; }
+	    );
+}
+void RoomMenu::list_all_messages()
+{
+	auto messages = get_messages(data["room_name"], data["user_name"]);
 
+	int counter = 0;
+	for (auto& m : messages)
+	{
+		cout << m.first << ":" << m.second << endl;
+		if (counter == 4)
+		{
+			char ch = _getch();
+			if (ch == 'q')break;
+
+			counter = 0;
+		}
+		counter++;
+	}
 }
 void RoomMenu::print_state()
 {
@@ -35,10 +57,11 @@ void RoomMenu::run(mode flag)
 	if (flag == mode::SERVER)
 		server = new Server(commands,data["room_password"], 
 									 data["room_name"],
-									 data["user_name"]);
+									 data["user_name"],
+								     db_key);
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"]);
+		client = new Client(data["ip"], port, commands, data["user_name"],data["room_name"],db_key);
 	}
 
 	execute(port);
@@ -50,10 +73,11 @@ void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
 	if (flag == mode::SERVER)
 		server = new Server(commands, data["room_password"],
 			data["room_name"],
-			data["user_name"]);
+			data["user_name"],
+			db_key);
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"],key);
+		client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"],key, db_key);
 	}
 
 	execute(port);
