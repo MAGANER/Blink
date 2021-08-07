@@ -1,3 +1,6 @@
+/*
+	Module provides abilities to generate rarndom strings.
+*/
 #pragma once
 #include<string>
 #include<vector>

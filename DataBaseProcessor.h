@@ -1,3 +1,7 @@
+/*
+	Base class for menu, which needs to operate with data base.
+*/
+
 #pragma once
 #include"sql/DataBase.h"
 #include<filesystem>

@@ -1,8 +1,10 @@
+/*
+	class that has ability to connect to another server.
+*/
 #ifndef CLIENT_H
 #define CLIENT_H
 #include<string>
 #include<iostream>
-#include<future>
 #include"getIP.h"
 #include"NetBase.h"
 #include"Interface.h" // process_input

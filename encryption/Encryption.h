@@ -1,3 +1,7 @@
+/*
+	special module to provide easy AES/RSA encrypting, SHA-256 
+	and convertation between hex and decimal numbers
+*/
 #pragma once
 #include"rijndael.h"
 #include"osrng.h"

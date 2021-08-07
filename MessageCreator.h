@@ -1,3 +1,7 @@
+/*
+	Module provides ability to pack message into json.
+*/
+
 #ifndef MESSAGE_CREATOR_H
 #define MESSAGE_CREATOR_H
 #include"json.hpp"

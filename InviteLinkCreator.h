@@ -1,3 +1,7 @@
+/*
+	Module implements special algorithm to encrypt inviting link.
+*/
+
 #pragma once
 #include<chrono>
 #include<string>

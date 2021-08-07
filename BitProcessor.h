@@ -1,3 +1,6 @@
+/*
+	Simple module to process binary numbers.
+*/
 #pragma once
 #include <sstream>
 #include <bitset>

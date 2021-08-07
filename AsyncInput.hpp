@@ -37,6 +37,7 @@ namespace Blink
 				if (ch == 8 && !result.empty())
 				{
 					result = Functools::slice(result, 0, result.size() - 1);
+					//move cursor left, change character with space and move cursor left again
 					printf("\033[D");
 					printf(" ");
 					printf("\033[D");

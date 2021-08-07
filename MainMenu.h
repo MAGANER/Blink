@@ -1,3 +1,6 @@
+/*
+    Entry point to connect or enter room.
+*/
 #pragma once
 #include"SFML/Network.hpp"
 #include "Interface.h"
@@ -88,8 +91,10 @@ namespace Blink
 
         vector<string> parse_time(const string& time);
         vector<string> split(const string& s, char delim);
+
         string convert_time_string_to_seconds(const string& str);
         string convert_secs_to_regular_time_view(int seconds);
+
         int get_seconds(const string& time);
     };
 };

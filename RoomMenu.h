@@ -1,3 +1,7 @@
+/*
+    Menu can be running in server or client mode.
+*/
+
 #pragma once
 #include"Server.h"
 #include"Client.h"

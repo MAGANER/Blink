@@ -1,10 +1,13 @@
+/*
+	Regular TCP server with ability to get/send messages.
+	Also it checks an ability to be connected.
+*/
 #ifndef SERVER_H
 #define SERVER_H
 #define _s(str) string(str)
 
 #include<string>
 #include<iostream>
-#include<future>
 #include<fstream>
 #include"NetBase.h"
 #include"sql/Functools.hpp"
