@@ -8,13 +8,12 @@ DataBase::DataBase(const string& path, const string& key,bool first_time)
 
 	if (first_time)
 		sqlite3_rekey(db, _key, sizeof(_key));
-	if(!first_time)
+	if (!first_time)
 		if (sqlite3_key(db, _key, sizeof(_key)) != SQLITE_OK)
 		{
-			system("cls");
-			cout << "incorrect password!" << endl;
-			exit(-1);
+			correct_password = false;
 		}
+		else correct_password = true;
 	if (!ok) error_message = sqlite3_errmsg(db);
 }
 DataBase::~DataBase()

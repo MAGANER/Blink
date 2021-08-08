@@ -20,11 +20,15 @@ private:
 	string error_message;
 
 	int ok; //put here value from sqlite library
+	bool correct_password = false;
 public:
 	DataBase(const string& path, const string& key, bool first_time);
 	~DataBase();
 
 	bool is_ok();
+	bool is_password_correct() {
+		return correct_password;
+	};
 	string get_error_message();
 
 	bool run_set_request(const string& request);

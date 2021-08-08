@@ -54,7 +54,11 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 	if (fs::exists(db_path))
 	{
 		sql::DataBase db(curr_path_str, password, false);
-
+		if (!db.is_password_correct())
+		{
+			cout << "password is incorrect!"<<endl;
+			return false;
+		}
 		string req = sql::make_select_request("owner");
 		auto result = db.run_get_request(req);
 		for (auto chunk : result)
@@ -86,7 +90,12 @@ void DataBaseProcessor::create_new_room(const string& name,
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
 	sql::DataBase db(db_name, encryption_key, false);
-	
+	if (!db.is_password_correct())
+	{
+		cout << "password is incorrect!" << endl;
+		return false;
+	}
+
 	string req = sql::make_select_request("rooms");
 	auto result = db.run_get_request(req);
 	for (auto chunk : result)
