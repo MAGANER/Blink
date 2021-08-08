@@ -29,7 +29,8 @@ namespace Blink
 			   const string& password,
 			   const string& room_name,
 			   const string& user_name,
-			   const string& db_key);
+			   const string& db_key,
+			   const string& db_name);
 		~Server();
 
 		bool run(const string& room_name,

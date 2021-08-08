@@ -5,7 +5,8 @@ Server::Server(const command_hash& commands,
 			   const string& password,
 			   const string& room_name,
 			   const string& user_name,
-			   const string& db_key):NetBase(commands,user_name, room_name, db_key)
+			   const string& db_key,
+			   const string& db_name):NetBase(commands,user_name, room_name, db_key,db_name)
 {
 	this->password  = password;
 	this->room_name = room_name;

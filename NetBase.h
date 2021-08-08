@@ -40,7 +40,8 @@ protected:
 	NetBase(const command_hash& commands,
 			const string& user_name,
 			const string& room_name,
-		    const string& db_key):DataBaseProcessor(db_key)
+		    const string& db_key,
+			const string& db_name):DataBaseProcessor(db_key,db_name)
 	{
 		input_callback = [&](const string& str)
 		{

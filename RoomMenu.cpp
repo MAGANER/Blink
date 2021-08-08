@@ -1,7 +1,8 @@
 #include "RoomMenu.h"
 using namespace Blink;
 
-RoomMenu::RoomMenu(const string& encr_key):DataBaseProcessor(encr_key)
+RoomMenu::RoomMenu(const string& encr_key,
+				   const string& db_name):DataBaseProcessor(encr_key,db_name)
 {
 	db_key = encr_key;
 	commands["status"] = function<void()>
@@ -58,10 +59,11 @@ void RoomMenu::run(mode flag)
 		server = new Server(commands,data["room_password"], 
 									 data["room_name"],
 									 data["user_name"],
-								     db_key);
+								     db_key,
+									 get_db_name());
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"],data["room_name"],db_key);
+		client = new Client(data["ip"], port, commands, data["user_name"],data["room_name"],db_key, get_db_name());
 	}
 
 	execute(port);
@@ -74,10 +76,11 @@ void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
 		server = new Server(commands, data["room_password"],
 			data["room_name"],
 			data["user_name"],
-			db_key);
+			db_key,
+			get_db_name());
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"],key, db_key);
+		client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"],key, db_key, get_db_name());
 	}
 
 	execute(port);

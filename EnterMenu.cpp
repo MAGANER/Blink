@@ -1,7 +1,8 @@
 #include "EnterMenu.h"
 using namespace Blink;
 
-EnterMenu::EnterMenu(const string& encr_key):DataBaseProcessor(encr_key)
+EnterMenu::EnterMenu(const string& encr_key,
+					 const string& db_name):DataBaseProcessor(encr_key,db_name)
 {
 	commands["new"]   = function<void()>([&]() {create_user(); });
 	commands["login"] = function<void()>([&]() {login(); });
@@ -14,7 +15,8 @@ void EnterMenu::create_user()
 	cout << "enter password:"; 
 	password = get_secret_data();
 
-	if(!does_user_exist(name,password)) create_new_user(name, password);
+	if (!does_user_exist(name, password)) create_new_user(name, password);
+	else cout << "can not create user!" << endl;
 }
 void EnterMenu::login()
 {
@@ -29,6 +31,7 @@ void EnterMenu::login()
 		cout << "welcome " << name << " to Blink!" << endl;
 		change_menu = true;
 		user_name = name;
+		this->password = password;
 	}
 	else cout << "can not login!" << endl;
 }

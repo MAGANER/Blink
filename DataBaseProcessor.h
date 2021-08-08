@@ -20,8 +20,13 @@ namespace Blink
 	{
 	private:
 		string encryption_key;
+		string db_name;
 	protected:
-		DataBaseProcessor(const string& encr_key):encryption_key(encr_key) {};
+		DataBaseProcessor(const string& encr_key,
+						  const string& db_name):encryption_key(encr_key),
+												 db_name(db_name)
+		{
+		};
 		~DataBaseProcessor() {};
 
 		void create_new_user(const string& name,
@@ -43,10 +48,12 @@ namespace Blink
 									 const string& user_name);
 		
 		string get_encr_key() { return encryption_key; };
+	public:
+		string get_db_name() { return db_name; }
 	};
 
 	extern int get_room_port(const string& room_name,
-							 const string& db_key);
-	extern string create_database();
+							 const string& db_key,
+							 const string& db_name);
 };
 

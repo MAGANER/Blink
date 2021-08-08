@@ -28,14 +28,16 @@ namespace Blink
 			   const command_hash& commands,
 			   const string& user_name,
 			   const string& room_name,
-			   const string& db_key);
+			   const string& db_key,
+			   const string& db_name);
 		Client(const string& ip,
 			int port,
 			const command_hash& commands,
 			const string& user_name,
 			const string& room_name,
 			const encr::AES::key_iv& keys,
-			const string& db_key);
+			const string& db_key,
+			const string& db_name);
 		~Client();
 
 		void run();

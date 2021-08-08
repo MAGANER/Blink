@@ -49,7 +49,8 @@ namespace Blink
             Manually
         };
 
-        MainMenu(const string& encr_key);
+        MainMenu(const string& encr_key,
+                 const string& db_name);
         ~MainMenu()
         {
             if (encr_data != nullptr) delete encr_data;

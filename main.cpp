@@ -32,9 +32,9 @@ using namespace Blink;
 int main()
 {
 	system("cls");
-	string key = create_database(); //if it doesn't exist
+	string key,db_name;
 
-	EnterMenu* enter_menu= new EnterMenu(key);
+	EnterMenu* enter_menu= new EnterMenu(key,db_name);
 	MainMenu*  main_menu = nullptr;
 	RoomMenu* room_menu = nullptr;
 
@@ -54,8 +54,10 @@ int main()
 			{
 				current = state::MAIN;
 				current_user_name = enter_menu->get_user_name();
+				key = enter_menu->get_correct_user_password();
+				db_name = enter_menu->get_db_name();
 				delete enter_menu;
-				main_menu = new MainMenu(key);
+				main_menu = new MainMenu(key,db_name);
 			}
 		}
 		if (current == state::MAIN)
@@ -66,11 +68,11 @@ int main()
 				cout << "farewell!" << endl;
 				current = state::ENTER;
 				delete main_menu;
-				enter_menu = new EnterMenu(key);
+				enter_menu = new EnterMenu(key, db_name);
 			}
 			else if (main_menu->enter_room())
 			{
-				room_menu = new RoomMenu(key);
+				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
 				room_menu->set_room_data(data.port,
@@ -86,7 +88,7 @@ int main()
 			}
 			else if (main_menu->_connect())
 			{
-				room_menu = new RoomMenu(key);
+				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
 				room_menu->set_room_data(data.port,
@@ -117,7 +119,7 @@ int main()
 			if (room_menu->should_exit())
 			{
 				current = state::MAIN;
-				main_menu = new MainMenu(key);
+				main_menu = new MainMenu(key, db_name);
 				delete room_menu;
 			}
 		}

@@ -6,7 +6,8 @@ Client::Client(const string& ip,
 			   const command_hash& commands,
 			   const string& user_name,
 			   const string& room_name,
-			   const string& db_key):NetBase(commands,user_name,room_name,db_key)
+			   const string& db_key,
+			   const string& db_name):NetBase(commands,user_name,room_name,db_key,db_name)
 {
 	this->port = port;
 	name = user_name;
@@ -30,7 +31,8 @@ Client::Client(const string& ip,
 			   const string& user_name,
 			   const string& room_name,
 			   const encr::AES::key_iv& keys,
-			   const string& db_key) :NetBase(commands, user_name, room_name, db_key)
+			   const string& db_key,
+			   const string& db_name) :NetBase(commands, user_name, room_name, db_key,db_name)
 {
 	this->port = port;
 	name = user_name;
