@@ -11,24 +11,18 @@ void DataBaseProcessor::create_new_user(const string& name,
 	{
 		this->db_name = name + ".db";
 		sql::DataBase db(curr_path_str, password, true);
-		table users, rooms, chats;
+		table rooms, chats;
 
-		users["name"] = new sql::Text("");
-		users["password"] = new sql::Text("");
 
 		rooms["name"] = new sql::Text("");
 		rooms["password"] = new sql::Text("");
-		rooms["ip"] = new sql::Text("");
 		rooms["port"] = new sql::Text("");
 
 		chats["room_name"] = new sql::Text("");
 		chats["user_name"] = new sql::Text("");
 		chats["message"] = new sql::Text("");
 
-		string req = sql::make_create_request(users, "users");
-		db.run_set_request(req);
-
-		req = sql::make_create_request(rooms, "rooms");
+		string req = sql::make_create_request(rooms, "rooms");
 		db.run_set_request(req);
 
 		req = sql::make_create_request(chats, "chats");
@@ -194,4 +188,36 @@ int Blink::get_room_port(const string& room_name,
 			}
 		}
 	}
+}
+vector<str3> DataBaseProcessor::get_rooms(const string& password)
+{
+	vector<str3> rooms;
+
+	sql::DataBase db(db_name, encryption_key, false);
+	string req = sql::make_select_request("rooms");
+	auto result = db.run_get_request(req);
+
+	for (auto& chunk : result)
+	{
+		auto to_str = [](sql::SQLtype* type) 
+		{
+			if (type->type == sql::SQL_TYPES::TEXT)
+			{
+				auto v = static_cast<sql::Text*>(type);
+				return v->value;
+			}
+			else
+			{
+				auto v = static_cast<sql::Integer*>(type);
+				return to_string(v->value);
+			}
+		};
+		
+		str3 room = { to_str(chunk["name"]),
+					  to_str(chunk["password"]),
+					  to_str(chunk["port"]) 
+					};
+		rooms.push_back(room);
+	}
+	return rooms;
 }

@@ -89,6 +89,7 @@ namespace Blink
         //void connect_with_link();
         void connect_with_filelink();
         bool can_connect();
+        void show_rooms();
 
         vector<string> parse_time(const string& time);
         vector<string> split(const string& s, char delim);

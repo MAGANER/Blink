@@ -8,6 +8,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<tuple>
 #include"Interface.h"
 using namespace std;
 namespace Blink
@@ -16,6 +17,7 @@ namespace Blink
 	namespace fs  = std::filesystem;
 	typedef map<string, sql::SQLtype*> table;
 	typedef pair<string, string> message; //first is user name, second is message
+	typedef tuple<string, string, string> str3;
 	class DataBaseProcessor
 	{
 	private:
@@ -41,6 +43,7 @@ namespace Blink
 		bool is_password_correct(const string& room_name,
 								 const string& password);
 
+		vector<str3> get_rooms(const string& password);
 		void add_message(const string& room_name,
 						 const string& user_name,
 						 const string& message);

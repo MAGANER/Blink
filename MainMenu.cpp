@@ -10,6 +10,7 @@ MainMenu::MainMenu(const string& encr_key,
 	commands["enter"]   = function<void()>([&]() { enter();      });
 	commands["connect"] = function<void()>([&]() { connect();   });
 	commands["conflink"] = function<void()>([&]() { connect_with_filelink();   });
+	commands["rooms"] = function<void()>([&]() {show_rooms(); });;
 	//commands["conflink"] = function<void()>([&]() { connect_with_link();   });
 }
 void MainMenu::create()
@@ -216,4 +217,25 @@ int MainMenu::get_seconds(const string& time)
 		exit();
 	}
 	return atoi(seconds_str.c_str());
+}
+void MainMenu::show_rooms()
+{
+	cout << "password:";
+	string password = get_secret_data();
+
+	if (password == get_encr_key())
+	{
+		auto rooms = get_rooms(password);
+		for (auto& r : rooms)
+		{
+			cout << "name:"     << get<0>(r)<<endl;
+			cout << "password:" << get<1>(r)<<endl;
+			cout << "port:"     << get<2>(r)<<endl;
+			cout << "----"<<endl;
+		}
+	}
+	else
+	{
+		cout << "inccorect password!" << endl;
+	}
 }
