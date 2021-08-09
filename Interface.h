@@ -60,10 +60,6 @@ namespace Blink
 	protected:
 		Interface() 
 		{
-			commands["exit!"] = function<void()>
-				(
-					[&]() {exit(0); }
-				);
 #ifdef WIN32
 			commands["cls"] = function<void()>
 				(
@@ -76,6 +72,13 @@ namespace Blink
 					[&]() {system("clear"); }
 			);
 #endif
+			commands["exit!"] = function<void()>
+				(
+					[&]() {
+						commands["cls"]();
+						exit(0); 
+							}
+			);
 		}
 		~Interface(){}
 
