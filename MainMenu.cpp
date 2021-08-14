@@ -17,7 +17,7 @@ void MainMenu::create()
 {
 	string name, password, port;
 	cout << "enter room name:";      cin >> name;
-	cout << "enter room password:"; cin >> password;
+	cout << "enter room password:"; password = get_secret_data();
 	cout << "enter room port:";      cin >> port;
 	if (!sql::is_integer(port))
 	{
