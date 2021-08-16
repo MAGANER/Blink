@@ -63,7 +63,7 @@ void Server::create_invite_link(int port,
 			cout << "enter recepient:";
 			cin >> recepient;
 			write_link_to_file("link");
-			string command = "@echo off\n p sender.py " + recepient;
+			string command = "@echo off\n sender.exe " + recepient;
 			system(command.c_str());
 			system("@echo off\n erase link");
 			break;
