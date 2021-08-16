@@ -5,7 +5,6 @@
 #ifndef SERVER_H
 #define SERVER_H
 #define _s(str) string(str)
-
 #include<string>
 #include<iostream>
 #include<fstream>
@@ -14,6 +13,8 @@
 #include"MessageCreator.h"
 #include"InviteLinkCreator.h"
 #include"getIP.h"
+
+
 namespace Blink
 {
 	using namespace std;
