@@ -29,6 +29,13 @@ void Server::create_invite_link(int port,
 		cout << "save invite link or send it to special e-mail?(1,2):";
 		cin >> mode;
 		
+		auto write_link_to_file = [&](const string& path)
+		{
+			ofstream file;
+			file.open(path, ios::binary);
+			file << inv_link;
+			file.close();
+		};
 		if (mode != -1)
 		{
 			string key = encr::AES::convert_bytes(key_iv.first);
@@ -43,19 +50,21 @@ void Server::create_invite_link(int port,
 		}
 		if (mode == 1)
 		{
-			ofstream file;
 			string path;
 			cout << "enter path to save link:";
 			cin >> path;
-			file.open(path,ios::binary);
-			file << inv_link;
-			file.close();
+			write_link_to_file(path);
 			cout << "link saved!";
 			break;
 		}
 		else if (mode == 2)
 		{
-
+			string recepient;
+			cout << "enter recepient:";
+			cin >> recepient;
+			write_link_to_file("link");
+			string command = "p sender.py " + recepient;
+			system(command.c_str());
 			break;
 		}
 		else
