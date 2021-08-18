@@ -40,6 +40,7 @@ Client::Client(const string& ip,
 
 	sender.connect(ip, port);
 	sender.setBlocking(false);
+
 	key_iv = keys;
 }
 Client::~Client()
