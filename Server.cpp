@@ -83,7 +83,10 @@ bool Server::run(const string& room_name,
 	//show_key_iv();
 	create_invite_link(port,room_name,room_password);
 	cout << "waiting for connection..." << endl;
-	listener.listen(port);
+	if (listener.listen(port)== TcpSocket::Done)
+	{
+		cout << "someone connected..." << endl;
+	}
 	sf::TcpSocket socket;
 	listener.accept(socket);
 	//first we should accept ability to connect
@@ -109,7 +112,6 @@ bool Server::run(const string& room_name,
 	{
 		get_and_show_message(socket);
 		receive_input_and_send_message(socket);
-		if (should_disconnect())return false;
 	}
 	return true;
 }

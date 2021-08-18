@@ -49,4 +49,5 @@ void Client::run()
 {
 	receive_input_and_send_message(sender);
 	get_and_show_message(sender);
+	if (should_disconnect())return;
 }
