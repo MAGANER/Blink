@@ -24,12 +24,14 @@ namespace Blink
         }
         ~ConnectionData(){}
         string room, password, ip, port;
+        RoomNetworkMode mode;
         void clear()
         {
             room.clear();
             password.clear();
             ip.clear();
             port.clear();
+            mode = (RoomNetworkMode)-1;
         }
     };
     struct EncryptionData

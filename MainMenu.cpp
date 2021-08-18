@@ -11,7 +11,6 @@ MainMenu::MainMenu(const string& encr_key,
 	commands["connect"] = function<void()>([&]() { connect();   });
 	commands["conflink"] = function<void()>([&]() { connect_with_filelink();   });
 	commands["rooms"] = function<void()>([&]() {show_rooms(); });;
-	//commands["conflink"] = function<void()>([&]() { connect_with_link();   });
 }
 void MainMenu::create()
 {
@@ -19,13 +18,34 @@ void MainMenu::create()
 	cout << "enter room name:";      cin >> name;
 	cout << "enter room password:"; password = get_secret_data();
 	cout << "enter room port:";      cin >> port;
-	if (!sql::is_integer(port))
+	cout << "enter room network mode:"<< endl;
+	cout << "One to One(0)"    << endl;
+	cout << "One to ones(1)"   << endl;
+	cout << "Decentralysed(2)" << endl;
+	cout << "to see help enter 3" << endl;
+	cout << ">";
+	int mode;
+	cin >> mode;
+	if (mode < 0 || mode > 3)
 	{
-		cout << "can not create room! incorrect port >>" << port << endl;
-		return;
+		cout << "error occured! inccorect mode!" << endl;
 	}
-	if (!does_room_exists(name))create_new_room(name, password, port);
-	else cout << "room" << " `" + name + "`" << " already exists!" << endl;
+	else 
+	{
+		if (mode == 3)
+		{
+			cout << get_room_help() << endl;
+		}
+		cin >> mode;
+
+		if (!sql::is_integer(port))
+		{
+			cout << "can not create room! incorrect port >>" << port << endl;
+			return;
+		}
+		if (!does_room_exists(name))create_new_room(name, password, port,(RoomNetworkMode)mode);
+		else cout << "room" << " `" + name + "`" << " already exists!" << endl;
+	}
 }
 void MainMenu::enter()
 {
@@ -40,6 +60,7 @@ void MainMenu::enter()
 		data.room     = name;
 		data.password = password;
 		data.port = to_string(get_room_port(name, get_encr_key(),get_db_name()));
+		data.mode = get_room_mode(name, get_encr_key(), get_db_name());
 		can_enter_room = true;
 		system("cls");
 		cout << "welcome to " << name << " room!" << endl;
