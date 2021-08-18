@@ -35,8 +35,8 @@ void MainMenu::create()
 		if (mode == 3)
 		{
 			cout << get_room_help() << endl;
+			cin >> mode;
 		}
-		cin >> mode;
 
 		if (!sql::is_integer(port))
 		{
@@ -174,6 +174,7 @@ void MainMenu::connect_with_filelink()
 	{
 		if (can_connect())
 		{
+			cout << "link is accepted!" << endl;
 			can_connect_to_room = true;
 			con_regime = CONNECTION_REGIME::WithLink;
 		}else cout << "link is denyied!" << endl;
@@ -182,7 +183,6 @@ void MainMenu::connect_with_filelink()
 	{
 		cout << "link is denyied!" << endl;
 	}
-	
 }
 vector<string> MainMenu::split(const string& s, char delim)
 {
