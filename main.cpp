@@ -79,7 +79,8 @@ int main()
 										 data.ip,
 										 current_user_name,
 										 data.room,
-										 data.password);
+										 data.password,
+										 data.mode);
 
 				delete main_menu;
 
@@ -95,7 +96,8 @@ int main()
 										 data.ip,
 										 current_user_name,
 										 data.room,
-										 data.password);
+										 data.password,
+										 data.mode);
 
 				if (main_menu->get_connection_regime() == MainMenu::CONNECTION_REGIME::WithLink)
 				{

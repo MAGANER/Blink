@@ -23,6 +23,7 @@ namespace Blink
         void list_all_messages();
 
         string db_key;
+        RoomNetworkMode room_mode;
     public:
         enum class mode { SERVER, CLIENT };
 
@@ -40,7 +41,8 @@ namespace Blink
                            const string& ip,
                            const string& user_name,
                            const string& room_name,
-                           const string& room_password);
+                           const string& room_password,
+                           RoomNetworkMode mode);
 
         bool should_exit() { return exit; }   
     private:
