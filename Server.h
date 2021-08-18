@@ -8,6 +8,7 @@
 #include<string>
 #include<iostream>
 #include<fstream>
+#include<list>
 #include"NetBase.h"
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
@@ -19,7 +20,6 @@ namespace Blink
 {
 	using namespace std;
 	using namespace sf;
-
 	class Server:public NetBase
 	{
 	private:
@@ -36,12 +36,21 @@ namespace Blink
 
 		bool run(const string& room_name,
 				 const string& room_password,
-				 int port);
+				 int port,
+				 RoomNetworkMode mode);
 	private:
-		void process_commands(const string& command);
 		void create_invite_link(int port,
 								const string& room_name,
 								const string& room_password);
+
+		void run_one2one_mode(const string& room_name,
+							  const string& room_password,
+							  int port);
+		void run_one2ones_mode(const string& room_name,
+							   const string& room_password,
+							   int port);
+
+		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 	};
 };
 #endif //SERVER_H
