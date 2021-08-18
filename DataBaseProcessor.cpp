@@ -17,6 +17,7 @@ void DataBaseProcessor::create_new_user(const string& name,
 		rooms["name"] = new sql::Text("");
 		rooms["password"] = new sql::Text("");
 		rooms["port"] = new sql::Text("");
+		rooms["mode"] = new sql::Integer(0);
 
 		chats["room_name"] = new sql::Text("");
 		chats["user_name"] = new sql::Text("");
@@ -69,7 +70,8 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 }
 void DataBaseProcessor::create_new_room(const string& name,
 										const string& password,
-										const string& port)
+										const string& port,
+										RoomNetworkMode mode)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
@@ -77,6 +79,7 @@ void DataBaseProcessor::create_new_room(const string& name,
 	room["name"]	 = new sql::Text(name);
 	room["password"] = new sql::Text(password);
 	room["port"]	 = new sql::Text(port);
+	room["mode"]	 = new sql::Integer((int)mode);
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
@@ -116,7 +119,6 @@ bool DataBaseProcessor::is_password_correct(const string& room_name,
 	{
 		bool eq_name = sql::type_to_string(chunk["name"])     == room_name;
 		bool eq_pass = sql::type_to_string(chunk["password"]) == password;
-
 		if (eq_name && eq_pass) return true;
 	}
 
@@ -185,6 +187,32 @@ int Blink::get_room_port(const string& room_name,
 			{
 				auto result = static_cast<sql::Integer*>(val)->value;
 				return result;
+			}
+		}
+	}
+}
+RoomNetworkMode Blink::get_room_mode(const string& room_name,
+									 const string& db_key,
+									 const string& db_name)
+{
+	sql::DataBase db(db_name, db_key, false);
+
+	string req = sql::make_select_request("rooms");
+	auto result = db.run_get_request(req);
+
+	for (auto chunk : result)
+	{
+		if (sql::type_to_string(chunk["name"]) == room_name)
+		{
+			auto val = chunk["mode"];
+
+			//sqlite3 has dynamic type casting
+			//so integer number can become Primary key
+			//and when room is created it can not get port as not number
+			if (val->type == sql::SQL_TYPES::INTEGER)
+			{
+				auto result = static_cast<sql::Integer*>(val)->value;
+				return (RoomNetworkMode)result;
 			}
 		}
 	}

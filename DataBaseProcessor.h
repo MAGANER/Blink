@@ -10,6 +10,7 @@
 #include<vector>
 #include<tuple>
 #include"Interface.h"
+#include"RoomNetworkMode.h"
 using namespace std;
 namespace Blink
 {
@@ -38,7 +39,8 @@ namespace Blink
 
 		void create_new_room(const string& name,
 							 const string& password,
-							 const string& port);
+							 const string& port,
+							 RoomNetworkMode mode);
 		bool does_room_exists(const string& name);
 		bool is_password_correct(const string& room_name,
 								 const string& password);
@@ -58,5 +60,8 @@ namespace Blink
 	extern int get_room_port(const string& room_name,
 							 const string& db_key,
 							 const string& db_name);
+	extern RoomNetworkMode get_room_mode(const string& room_name,
+										 const string& db_key,
+										 const string& db_name);
 };
 
