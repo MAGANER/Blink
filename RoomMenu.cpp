@@ -93,7 +93,7 @@ void RoomMenu::execute(int port)
 
 	auto run = [&]()
 	{
-		server->run(data["room_name"], data["room_password"], port);
+		server->run(data["room_name"], data["room_password"], port,room_mode);
 		return true;
 	};
 	while (true)
