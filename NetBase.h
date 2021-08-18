@@ -63,6 +63,16 @@ protected:
 		socket.send(pack);
 		add_message(room_name, user_name, message);
 	}
+	virtual void send_message(TcpSocket& socket,
+							  const string& message,
+							  MessageType msg)
+	{
+		Packet pack;
+		string jmessage = convert_message_to_json(message, user_name, msg);
+		pack << encr::AES::encrypt(key_iv, jmessage);
+		socket.send(pack);
+		add_message(room_name, user_name, message);
+	}
 	void get_and_show_message(TcpSocket& socket)
 	{
 		string data = NetBase::get_message(socket);
