@@ -106,19 +106,7 @@ void Server::run_one2one_mode(const string& room_name,
 		cout << "someone tries to connect.." << endl;
 	}
 	//first we should accept ability to connect
-
-	string check = get_raw_message(socket);
-	Packet p;
-	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
-	{
-		p << "1";
-		socket.send(p);
-	}
-	{
-		p << "0";
-		socket.send(p);
-	}
-	socket.disconnect();
+	check_access(socket);
 
 	listener.listen(port);
 	listener.accept(socket);
@@ -143,10 +131,6 @@ void Server::run_one2ones_mode(const string& room_name,
 	list<TcpSocket*> clients;
 	vector<IpAddress> allowed;
 
-	SocketSelector selector;
-	selector.add(listener);
-
-
 	TcpSocket* entering_socket = new TcpSocket;
 	while (true)
 	{
@@ -154,49 +138,29 @@ void Server::run_one2ones_mode(const string& room_name,
 
 		// The listener is ready: there is a pending connection
 		if (listener.accept(*entering_socket) == sf::Socket::Done)
+		{
+			bool check1 = is_addres_allowed(allowed, entering_socket->getRemoteAddress());
+			if (check1 && true)
+			{
+				TcpSocket* client = move(entering_socket);
+				client->setBlocking(false);
+
+				clients.push_back(client);
+				for (size_t i = 0; i < allowed.size(); i++)
 				{
-					bool check1 = is_addres_allowed(allowed, entering_socket->getRemoteAddress());
-					if (check1 && true)
+					auto curr = allowed[i];
+					if (curr.toString() == entering_socket->getRemoteAddress().toString())
 					{
-						TcpSocket* client = move(entering_socket);
-						client->setBlocking(false);
-
-						clients.push_back(client);
-						for (size_t i = 0; i < allowed.size(); i++)
-						{
-							auto curr = allowed[i];
-							if (curr.toString() == entering_socket->getRemoteAddress().toString())
-							{
-								allowed.erase(allowed.begin() + i);
-							}
-						}
-
-						selector.add(*client);
-						entering_socket = new TcpSocket();
-					}
-					else
-					{
-						string check = get_raw_message(*entering_socket);
-						Packet p;
-						if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
-						{
-							auto address = entering_socket->getRemoteAddress();
-							if (address != IpAddress::None)
-								allowed.push_back(address);
-							p << "1";
-
-							if (entering_socket->send(p) == TcpSocket::Done) entering_socket->disconnect();
-						}
-						{
-							p << "0";
-							if (entering_socket->send(p) == TcpSocket::Done) entering_socket->disconnect();
-						}
+						allowed.erase(allowed.begin() + i);
 					}
 				}
-		for (auto& client : clients)
-		{
-			NetBase::return_and_show_message(*client, clients);
+				entering_socket = new TcpSocket();
+			}
+			else check_access(*entering_socket, allowed);
 		}
+
+		for (auto& client : clients)
+			NetBase::return_and_show_message(*client, clients);
 	}
 
 	if (entering_socket != nullptr) delete entering_socket;
@@ -208,4 +172,38 @@ bool Server::is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip)
 		if (ip.toString() == ip.toString()) return true;
 	}
 	return false;
+}
+void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
+{
+	string check = get_raw_message(socket);
+	Packet p;
+	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
+	{
+		auto address = socket.getRemoteAddress();
+		if (address != IpAddress::None)
+			allowed.push_back(address);
+
+		p << "1";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
+	else
+	{
+		p << "0";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
+}
+void Server::check_access(TcpSocket& socket)
+{
+	string check = get_raw_message(socket);
+	Packet p;
+	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
+	{
+		p << "1";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
+	else
+	{
+		p << "0";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
 }

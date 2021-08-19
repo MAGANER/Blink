@@ -51,6 +51,8 @@ namespace Blink
 							   int port);
 
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
+		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
+		void check_access(TcpSocket& socket);
 	};
 };
 #endif //SERVER_H
