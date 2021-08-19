@@ -20,7 +20,7 @@ using namespace sf;
 namespace fp = Functools;
 namespace encr = Encryption;
 
-class NetBase:public DataBaseProcessor
+class NetBase :public DataBaseProcessor
 {
 protected:
 	encr::AES::key_iv key_iv;
@@ -34,32 +34,32 @@ private:
 	bool disconnect = false;
 
 	command_hash commands;
-	
-	string user_name,room_name;
+
+	string user_name, room_name;
 protected:
 	NetBase(const command_hash& commands,
-			const string& user_name,
-			const string& room_name,
-		    const string& db_key,
-			const string& db_name):DataBaseProcessor(db_key,db_name)
+		const string& user_name,
+		const string& room_name,
+		const string& db_key,
+		const string& db_name) :DataBaseProcessor(db_key, db_name)
 	{
 		input_callback = [&](const string& str)
 		{
 			input_buffer = str;
 			ready_to_send_message = true;
 		};
-		this->commands  = commands;
+		this->commands = commands;
 		this->user_name = user_name;
 		this->room_name = room_name;
 	}
-	~NetBase(){}
-	
+	~NetBase() {}
+
 	virtual void send_message(TcpSocket& socket,
 							  const string& message)
 	{
 		Packet pack;
 		string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
-		pack << encr::AES::encrypt(key_iv,jmessage);
+		pack << encr::AES::encrypt(key_iv, jmessage);
 		socket.send(pack);
 		add_message(room_name, user_name, message);
 	}
@@ -72,6 +72,20 @@ protected:
 		pack << encr::AES::encrypt(key_iv, jmessage);
 		socket.send(pack);
 		add_message(room_name, user_name, message);
+	}
+	void resend_messages_from_server(list<TcpSocket*>& clients,
+									 TcpSocket* exlude,
+									 const string& message)
+	{
+		for (auto& client : clients)
+		{
+			if (client != exlude)
+			{
+				Packet pack;
+				pack << encr::AES::encrypt(key_iv, message);
+				client->send(pack);
+			}
+		}
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{
@@ -86,9 +100,24 @@ protected:
 			dollar_printed = false;
 		}
 	}
-	void receive_input_and_send_message(TcpSocket& socket)
+	void return_and_show_message(TcpSocket& socket, 
+								 list<TcpSocket*>& clients)
 	{
-		process_input(input, dollar_printed, input_callback);
+		string data = NetBase::get_message(socket);
+		if (data.size() > 0)
+		{
+			//move it down, print received message and return
+			cout << endl;
+			json parsed = json::parse(data);
+			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			cout << cut(parsed["name"]) << '|' << cut(parsed["data"]) << endl;
+			dollar_printed = false;
+			resend_messages_from_server(clients, &socket, data);
+		}
+	}
+
+	void send_input(TcpSocket& socket)
+	{
 		if (input_buffer[0] == '$')
 		{
 			//process command
@@ -97,10 +126,21 @@ protected:
 			else if (commands.find(command) != commands.end())
 				commands[command]();
 			else
-				cout <<"command "<< "`" + command + "`" << " doesn't exist!";
+				cout << "command " << "`" + command + "`" << " doesn't exist!";
 			cout << endl;
 		}
-		else if (ready_to_send_message && !dollar_printed)send_message(socket, input_buffer);
+		else if (ready_to_send_message && !dollar_printed)send_message(socket, input_buffer);		
+	}
+	void receive_input_and_send_message(TcpSocket& socket)
+	{
+		process_input(input, dollar_printed, input_callback);
+		send_input(socket);
+		input_buffer.clear();
+	}
+	void receive_input_and_send_message_to_all(list<TcpSocket*>& clients)
+	{
+		process_input(input, dollar_printed, input_callback);
+		for (auto& client : clients) send_input(*client);
 		input_buffer.clear();
 	}
 
