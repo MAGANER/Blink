@@ -31,11 +31,13 @@ void DataBaseProcessor::create_new_user(const string& name,
 
 		table owner;
 		owner["owner"] = new sql::Text("");
+		owner["password"] = new sql::Text("");
 		req = sql::make_create_request(owner, "owner");
 		db.run_set_request(req);
 
 		table _owner;
 		_owner["owner"] = new sql::Text(name);
+		_owner["password"] = new sql::Text(password);
 		req = sql::make_insert_request(_owner, "owner");
 		db.run_set_request(req);
 
@@ -58,7 +60,8 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 		auto result = db.run_get_request(req);
 		for (auto chunk : result)
 		{
-			if (sql::type_to_string(chunk["owner"]) == name)
+			if (sql::type_to_string(chunk["owner"]) == name &&
+				sql::type_to_string(chunk["password"]) == password)
 			{
 				this->db_name = name + ".db";
 				return true;
