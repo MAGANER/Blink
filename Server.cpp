@@ -25,10 +25,14 @@ void Server::create_invite_link(int port,
 	string inv_link;
 	while (true)
 	{
-		int mode = -1;
+		string _mode;
 		cout << "save invite link or send it to special e-mail?(1,2):";
-		cin >> mode;
-		
+		cin >> _mode;
+
+		int mode = -1;
+		if (_mode.size() != 1) mode = 3;
+		mode = atoi(_mode.c_str());
+
 		auto write_link_to_file = [&](const string& path)
 		{
 			ofstream file;
