@@ -83,19 +83,23 @@ protected:
 			{
 				Packet pack;
 				pack << encr::AES::encrypt(key_iv, message);
-				client->send(pack);
+				client->send(pack);				
 			}
 		}
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{
 		string data = NetBase::get_message(socket);
+
 		if (data.size() > 0)
 		{
+			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			
+
 			//move it down, print received message and return
 			cout << endl;
 			json parsed = json::parse(data);
-			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			add_message(room_name, parsed["name"], cut(parsed["data"]));
 			cout << cut(parsed["name"])<<'|'<<cut(parsed["data"]) << endl;
 			dollar_printed = false;
 		}
@@ -108,15 +112,20 @@ protected:
 		{
 			//move it down, print received message and return
 			cout << endl;
-			json parsed = json::parse(data);
 			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
-			cout << cut(parsed["name"]) << '|' << cut(parsed["data"]) << endl;
+			
+
+			json parsed = json::parse(data);
+			auto name = cut(parsed["name"]);
+			auto data = cut(parsed["data"]);
+			add_message(room_name, name, data);
+			cout <<name << '|' << data << endl;
 			dollar_printed = false;
 			resend_messages_from_server(clients, &socket, data);
 		}
 	}
 
-	void send_input(TcpSocket& socket)
+	bool process_command()
 	{
 		if (input_buffer[0] == '$')
 		{
@@ -128,19 +137,24 @@ protected:
 			else
 				cout << "command " << "`" + command + "`" << " doesn't exist!";
 			cout << endl;
+			return true;
 		}
-		else if (ready_to_send_message && !dollar_printed)send_message(socket, input_buffer);		
+		return false;
+	}
+	void send_input(TcpSocket& socket)
+	{
+		 if (ready_to_send_message && !dollar_printed)send_message(socket, input_buffer);		
 	}
 	void receive_input_and_send_message(TcpSocket& socket)
 	{
 		process_input(input, dollar_printed, input_callback);
-		send_input(socket);
+		if(!process_command()) send_input(socket);
 		input_buffer.clear();
 	}
 	void receive_input_and_send_message_to_all(list<TcpSocket*>& clients)
 	{
 		process_input(input, dollar_printed, input_callback);
-		for (auto& client : clients) send_input(*client);
+		if (!process_command()) for (auto& client : clients) send_input(*client);
 		input_buffer.clear();
 	}
 

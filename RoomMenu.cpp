@@ -16,7 +16,7 @@ RoomMenu::RoomMenu(const string& encr_key,
 }
 void RoomMenu::list_all_messages()
 {
-	auto messages = get_messages(data["room_name"], data["user_name"]);
+	auto messages = get_messages(data["room_name"]);
 
 	int counter = 0;
 	for (auto& m : messages)

@@ -80,8 +80,6 @@ bool Server::run(const string& room_name,
 				 int port,
 				 RoomNetworkMode mode)
 {
-
-	//show_key_iv();
 	create_invite_link(port,room_name,room_password);
 
 	if (mode == RoomNetworkMode::OneToOne)
@@ -101,23 +99,29 @@ void Server::run_one2one_mode(const string& room_name,
 	listener.listen(port);
 
 	sf::TcpSocket socket;
-	if (listener.accept(socket) == TcpSocket::Done)
+	listener.accept(socket);
+	string check = get_raw_message(socket);
+	Packet p;
+	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
 	{
-		cout << "someone tries to connect.." << endl;
+		p << "1";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
 	}
-	//first we should accept ability to connect
-	check_access(socket);
+	else
+	{
+		p << "0";
+		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
 
-	listener.listen(port);
 	listener.accept(socket);
 	listener.close();
-
 	socket.setBlocking(false);
 	while (true)
 	{
 		get_and_show_message(socket);
 		receive_input_and_send_message(socket);
 	}
+		
 	return;
 }
 void Server::run_one2ones_mode(const string& room_name,
@@ -183,21 +187,6 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 		if (address != IpAddress::None)
 			allowed.push_back(address);
 
-		p << "1";
-		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
-	}
-	else
-	{
-		p << "0";
-		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
-	}
-}
-void Server::check_access(TcpSocket& socket)
-{
-	string check = get_raw_message(socket);
-	Packet p;
-	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
-	{
 		p << "1";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
 	}

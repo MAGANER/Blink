@@ -49,8 +49,7 @@ namespace Blink
 		void add_message(const string& room_name,
 						 const string& user_name,
 						 const string& message);
-		vector<message> get_messages(const string& room_name,
-									 const string& user_name);
+		vector<message> get_messages(const string& room_name);
 		
 		string get_encr_key() { return encryption_key; };
 	public:
