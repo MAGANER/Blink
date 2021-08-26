@@ -13,6 +13,7 @@
 #include"MessageCreator.h"
 #include"encryption/Encryption.h"
 #include"DataBaseProcessor.h"
+#include"RoomClient.hpp"
 namespace Blink
 {
 using namespace std;
@@ -57,33 +58,37 @@ protected:
 	virtual void send_message(TcpSocket& socket,
 							  const string& message)
 	{
-		Packet pack;
-		string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
-		pack << encr::AES::encrypt(key_iv, jmessage);
-		socket.send(pack);
-		add_message(room_name, user_name, message);
+		if (!message.empty())
+		{
+			Packet pack;
+			string jmessage = convert_message_to_json(message, user_name, MessageType::Text);
+			pack << encr::AES::encrypt(key_iv, jmessage);
+			socket.send(pack);
+			add_message(room_name, user_name, message);
+		}
 	}
 	virtual void send_message(TcpSocket& socket,
 							  const string& message,
 							  MessageType msg)
 	{
-		Packet pack;
-		string jmessage = convert_message_to_json(message, user_name, msg);
-		pack << encr::AES::encrypt(key_iv, jmessage);
-		socket.send(pack);
-		add_message(room_name, user_name, message);
+		if (!message.empty())
+		{
+			Packet pack;
+			string jmessage = convert_message_to_json(message, user_name, msg);
+			pack << encr::AES::encrypt(key_iv, jmessage);
+			socket.send(pack);
+			add_message(room_name, user_name, message);
+		}
 	}
-	void resend_messages_from_server(list<TcpSocket*>& clients,
-									 TcpSocket* exlude,
+	void resend_messages_from_server(list<RoomClient*>& clients,
+									 int exlude_id,
 									 const string& message)
 	{
 		for (auto& client : clients)
 		{
-			if (client != exlude)
+			if (client->id != exlude_id)
 			{
-				Packet pack;
-				pack << encr::AES::encrypt(key_iv, message);
-				client->send(pack);				
+				send_message(*client->socket, message);
 			}
 		}
 	}
@@ -104,10 +109,10 @@ protected:
 			dollar_printed = false;
 		}
 	}
-	void return_and_show_message(TcpSocket& socket, 
-								 list<TcpSocket*>& clients)
+	void return_and_show_message(RoomClient* client,
+								 list<RoomClient*>& clients)
 	{
-		string data = NetBase::get_message(socket);
+		string data = NetBase::get_message(*client->socket);
 		if (data.size() > 0)
 		{
 			//move it down, print received message and return
@@ -121,7 +126,7 @@ protected:
 			add_message(room_name, name, data);
 			cout <<name << '|' << data << endl;
 			dollar_printed = false;
-			resend_messages_from_server(clients, &socket, data);
+			resend_messages_from_server(clients, client->id, data);
 		}
 	}
 
@@ -151,10 +156,14 @@ protected:
 		if(!process_command()) send_input(socket);
 		input_buffer.clear();
 	}
-	void receive_input_and_send_message_to_all(list<TcpSocket*>& clients)
+	void receive_input_and_send_message_to_all(list<RoomClient*>& clients)
 	{
 		process_input(input, dollar_printed, input_callback);
-		if (!process_command()) for (auto& client : clients) send_input(*client);
+		if (!process_command()) 
+		{
+			for (auto& client : clients)
+				send_input(*client->socket);
+		}
 		input_buffer.clear();
 	}
 
@@ -177,7 +186,11 @@ protected:
 		pack >> data;
 		return data;
 	}
-
+	
+	void update_input()
+	{
+		dollar_printed = false;
+	}
 public:
 	bool should_disconnect() { return disconnect; }
 };
