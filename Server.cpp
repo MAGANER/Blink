@@ -136,7 +136,9 @@ void Server::run_one2ones_mode(const string& room_name,
 	listener.setBlocking(false);
 	listener.listen(port);
 
-	list<TcpSocket*> clients;
+	list<RoomClient*> clients;
+	int client_counter = 0;
+
 	vector<IpAddress> allowed;
 
 	TcpSocket* entering_socket = new TcpSocket;
@@ -148,12 +150,16 @@ void Server::run_one2ones_mode(const string& room_name,
 		if (listener.accept(*entering_socket) == sf::Socket::Done)
 		{
 			bool check1 = is_addres_allowed(allowed, entering_socket->getRemoteAddress());
-			if (check1 && true)
+			if (check1 && true && can_accept_new_connection(client_counter))
 			{
-				TcpSocket* client = move(entering_socket);
-				client->setBlocking(false);
+				RoomClient* client = new RoomClient;
+				client->socket = move(entering_socket);
+				client->socket->setBlocking(false);
 
+				client->id = client_counter;
 				clients.push_back(client);
+				client_counter++;
+
 				for (size_t i = 0; i < allowed.size(); i++)
 				{
 					auto curr = allowed[i];
@@ -167,8 +173,11 @@ void Server::run_one2ones_mode(const string& room_name,
 			else check_access(*entering_socket, allowed);
 		}
 
+		//receive message, show it and resend
 		for (auto& client : clients)
-			NetBase::return_and_show_message(*client, clients);
+			NetBase::return_and_show_message(client, clients);
+
+		update_clients(clients);
 	}
 
 	if (entering_socket != nullptr) delete entering_socket;
@@ -198,5 +207,36 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 	{
 		p << "0";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
+	}
+}
+void Server::update_clients(list<RoomClient*>& clients)
+{
+	//erase disconnected clients
+	//then change ids of the rest
+	
+	bool update = false;
+	Packet pack;
+	auto should_be_erased = [&](RoomClient* client)
+	{
+		if (client->socket->receive(pack) == TcpSocket::Disconnected)
+		{
+			cout << "\n#client with id " << client->id << " has been disconnected." << endl;
+			update_input();
+			update = true;
+			return true;
+		}
+		return false;
+	};
+	clients.remove_if(should_be_erased);
+
+	int counter = 0;
+	if (update)
+	{
+		for (auto& client : clients)
+		{
+			client->id = counter;
+			counter++;
+		}
+		update = false;
 	}
 }

@@ -52,6 +52,7 @@ namespace Blink
 
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
+		void update_clients(list<RoomClient*>& clients);
 	};
 };
 #endif //SERVER_H
