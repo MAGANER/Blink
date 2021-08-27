@@ -70,6 +70,7 @@ namespace Blink
 			if (_kbhit())
 			{
 				char ch = _getch();
+
 				if (secret_info && !is_backspace() && !is_enter())
 				{
 					if (!counter)
