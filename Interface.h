@@ -76,6 +76,7 @@ namespace Blink
 				(
 					[&]() {
 						commands["cls"]();
+						system("erase *.link");
 						exit(0); 
 							}
 			);
