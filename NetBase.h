@@ -136,7 +136,7 @@ protected:
 		{
 			//process command
 			string command = fp::slice(input_buffer, 1, input_buffer.size());
-			if (command == "disconnect") disconnect = true;
+			if (command == "exit") disconnect = true;
 			else if (commands.find(command) != commands.end())
 				commands[command]();
 			else

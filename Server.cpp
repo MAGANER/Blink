@@ -124,6 +124,7 @@ void Server::run_one2one_mode(const string& room_name,
 	{
 		get_and_show_message(socket);
 		receive_input_and_send_message(socket);
+		if (should_disconnect())break;
 	}
 		
 	return;
@@ -146,7 +147,6 @@ void Server::run_one2ones_mode(const string& room_name,
 	{
 		receive_input_and_send_message_to_all(clients);
 
-		// The listener is ready: there is a pending connection
 		if (listener.accept(*entering_socket) == sf::Socket::Done)
 		{
 			bool check1 = is_addres_allowed(allowed, entering_socket->getRemoteAddress());
@@ -178,6 +178,7 @@ void Server::run_one2ones_mode(const string& room_name,
 			NetBase::return_and_show_message(client, clients);
 
 		update_clients(clients);
+		if (should_disconnect())return;
 	}
 
 	if (entering_socket != nullptr) delete entering_socket;
@@ -239,4 +240,14 @@ void Server::update_clients(list<RoomClient*>& clients)
 		}
 		update = false;
 	}
+}
+void Server::run_decentralysed_mode(const string& room_name,
+									const string& room_password,
+									int port)
+{
+	listener.setBlocking(false);
+	listener.listen(port);
+
+
+
 }
