@@ -34,7 +34,7 @@ namespace Blink
 			   const string& db_name);
 		~Server();
 
-		bool run(const string& room_name,
+		virtual bool run(const string& room_name,
 				 const string& room_password,
 				 int port,
 				 RoomNetworkMode mode);
