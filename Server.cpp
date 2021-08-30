@@ -252,13 +252,3 @@ void Server::update_clients(list<RoomClient*>& clients)
 		update = false;
 	}
 }
-void Server::run_decentralysed_mode(const string& room_name,
-									const string& room_password,
-									int port)
-{
-	listener.setBlocking(false);
-	listener.listen(port);
-
-
-
-}

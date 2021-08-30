@@ -45,7 +45,6 @@ namespace Blink
 		string get_invite_link_str(int port,
 								   const string& room_name,
 								   const string& room_password);
-		void save_new_link();
 
 		void run_one2one_mode(const string& room_name,
 							  const string& room_password,
@@ -53,9 +52,6 @@ namespace Blink
 		void run_one2ones_mode(const string& room_name,
 							   const string& room_password,
 							   int port);
-		void run_decentralysed_mode(const string& room_name,
-									const string& room_password,
-									int port);
 
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
