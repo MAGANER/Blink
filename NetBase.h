@@ -81,6 +81,16 @@ protected:
 			add_message(room_name, user_name, message);
 		}
 	}
+	void send_jmessage(TcpSocket& socket,
+					   const string& message)
+	{
+		if (!message.empty())
+		{
+			Packet pack;
+			pack << encr::AES::encrypt(key_iv, message);
+			socket.send(pack);
+		}
+	}
 	void resend_messages_from_server(list<RoomClient*>& clients,
 									 int exlude_id,
 									 const string& message)
@@ -89,7 +99,7 @@ protected:
 		{
 			if (client->id != exlude_id)
 			{
-				send_message(*client->socket, message);
+				send_jmessage(*client->socket, message);
 			}
 		}
 	}
@@ -113,21 +123,21 @@ protected:
 	void return_and_show_message(RoomClient* client,
 								 list<RoomClient*>& clients)
 	{
-		string data = NetBase::get_message(*client->socket);
-		if (data.size() > 0)
+		string message = NetBase::get_message(*client->socket);
+		if (message.size() > 0)
 		{
 			//move it down, print received message and return
 			cout << endl;
 			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
 			
 
-			json parsed = json::parse(data);
+			json parsed = json::parse(message);
 			auto name = cut(parsed["name"]);
 			auto data = cut(parsed["data"]);
 			add_message(room_name, name, data);
 			cout <<name << '|' << data << endl;
 			dollar_printed = false;
-			resend_messages_from_server(clients, client->id, data);
+			resend_messages_from_server(clients, client->id, message);
 		}
 	}
 
