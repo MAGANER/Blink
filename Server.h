@@ -24,8 +24,9 @@ namespace Blink
 	private:
 		TcpListener listener;
 		string password, room_name;
+		int port;
 	public:
-		Server(const command_hash& commands,
+		Server(command_hash& commands,
 			   const string& password,
 			   const string& room_name,
 			   const string& user_name,
@@ -41,6 +42,10 @@ namespace Blink
 		void create_invite_link(int port,
 								const string& room_name,
 								const string& room_password);
+		string get_invite_link_str(int port,
+								   const string& room_name,
+								   const string& room_password);
+		void save_new_link();
 
 		void run_one2one_mode(const string& room_name,
 							  const string& room_password,

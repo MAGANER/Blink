@@ -1,7 +1,7 @@
 #include "Server.h"
 using namespace Blink;
 
-Server::Server(const command_hash& commands,
+Server::Server(command_hash& commands,
 			   const string& password,
 			   const string& room_name,
 			   const string& user_name,
@@ -11,6 +11,11 @@ Server::Server(const command_hash& commands,
 	this->password  = password;
 	this->room_name = room_name;
 
+	this->commands["makelink"] = function<void()>([&]()
+		{
+			create_invite_link(port, password, room_name);
+
+		});
 	key_iv = encr::AES::get_random_key();
 }
 Server::~Server()
@@ -21,7 +26,6 @@ void Server::create_invite_link(int port,
 								const string& room_name,
 								const string& room_password)
 {
-	cout << "before server starts...";
 	string inv_link;
 	while (true)
 	{
@@ -42,15 +46,7 @@ void Server::create_invite_link(int port,
 		};
 		if (mode != -1)
 		{
-			string key = encr::AES::convert_bytes(key_iv.first);
-			string iv = encr::AES::convert_bytes(key_iv.second);
-			inv_link = ::create_invite_link(get_ip(),
-											to_string(port),
-											room_name,
-											iv,
-											key,
-											room_password);
-			inv_link = ::encrypt_invite_link(inv_link);
+			inv_link = get_invite_link_str(port, room_name, room_password);
 		}
 		if (mode == 1)
 		{
@@ -76,14 +72,29 @@ void Server::create_invite_link(int port,
 		{
 			cout << "error occured!" << endl;
 		}
-	}
-	
+	}	
+}
+string Server::get_invite_link_str(int port,
+								   const string& room_name,
+								   const string& room_password)
+{
+	string key = encr::AES::convert_bytes(key_iv.first);
+	string iv = encr::AES::convert_bytes(key_iv.second);
+	string inv_link = ::create_invite_link(get_ip(),
+		to_string(port),
+		room_name,
+		iv,
+		key,
+		room_password);
+	inv_link = ::encrypt_invite_link(inv_link);
+	return inv_link;
 }
 bool Server::run(const string& room_name,
 				 const string& room_password,
 				 int port,
 				 RoomNetworkMode mode)
 {
+	this->port = port;
 	create_invite_link(port,room_name,room_password);
 
 	if (mode == RoomNetworkMode::OneToOne)
