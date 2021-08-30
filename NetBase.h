@@ -34,7 +34,9 @@ private:
 	bool dollar_printed = false;
 	bool disconnect = false;
 
-	
+	bool is_user = false;
+	bool can_show = true;
+
 	string user_name, room_name;
 protected:
 	command_hash commands;
@@ -43,13 +45,15 @@ protected:
 		const string& user_name,
 		const string& room_name,
 		const string& db_key,
-		const string& db_name) :DataBaseProcessor(db_key, db_name)
+		const string& db_name,
+		bool is_user=false) :DataBaseProcessor(db_key, db_name)
 	{
 		input_callback = [&](const string& str)
 		{
 			input_buffer = str;
 			ready_to_send_message = true;
 		};
+		this->is_user = is_user;
 		this->commands = commands;
 		this->user_name = user_name;
 		this->room_name = room_name;
@@ -107,7 +111,7 @@ protected:
 	{
 		string data = NetBase::get_message(socket);
 
-		if (data.size() > 0)
+		if (data.size() > 0 && can_show)
 		{
 			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
 			
@@ -124,7 +128,7 @@ protected:
 								 list<RoomClient*>& clients)
 	{
 		string message = NetBase::get_message(*client->socket);
-		if (message.size() > 0)
+		if (message.size() > 0 && message != "\n\n\n666\m\m\m\m1488\,\,\,")
 		{
 			//move it down, print received message and return
 			cout << endl;
@@ -183,11 +187,17 @@ protected:
 		Packet pack;
 		if (socket.receive(pack) == TcpSocket::Disconnected)
 		{
-			disconnect = true;
+			can_show = false;
+			if (is_user)disconnect = true;
+			return "\n\n\n666\m\m\m\m1488\,\,\,";
 		}
-		string data;
-		pack >> data;
-		return encr::AES::decrypt(key_iv,data);
+		else
+		{
+			can_show = true;
+			string data;
+			pack >> data;
+			return encr::AES::decrypt(key_iv, data);
+		}
 	}
 	string get_raw_message(TcpSocket& socket)
 	{
