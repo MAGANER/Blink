@@ -199,6 +199,23 @@ protected:
 			return encr::AES::decrypt(key_iv, data);
 		}
 	}
+	void process_message(Packet& pack)
+	{
+		string data;
+		pack >> data;
+		auto decr  = encr::AES::decrypt(key_iv, data);
+
+		if (data.size() > 0)
+		{
+			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			//move it down, print received message and return
+			cout << endl;
+			json parsed = json::parse(data);
+			add_message(room_name, parsed["name"], cut(parsed["data"]));
+			cout << cut(parsed["name"]) << '|' << cut(parsed["data"]) << endl;
+			dollar_printed = false;
+		}
+	}
 	string get_raw_message(TcpSocket& socket)
 	{
 		Packet pack;

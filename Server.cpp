@@ -237,6 +237,10 @@ void Server::update_clients(list<RoomClient*>& clients)
 			update = true;
 			return true;
 		}
+		else
+		{
+			process_message(pack);
+		}
 		return false;
 	};
 	clients.remove_if(should_be_erased);
