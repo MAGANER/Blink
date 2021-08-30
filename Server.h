@@ -21,7 +21,7 @@ namespace Blink
 	using namespace sf;
 	class Server:public NetBase
 	{
-	private:
+	protected:
 		TcpListener listener;
 		string password, room_name;
 		int port;
@@ -39,9 +39,7 @@ namespace Blink
 				 int port,
 				 RoomNetworkMode mode);
 	private:
-		void create_invite_link(int port,
-								const string& room_name,
-								const string& room_password);
+
 		string get_invite_link_str(int port,
 								   const string& room_name,
 								   const string& room_password);
@@ -52,7 +50,11 @@ namespace Blink
 		void run_one2ones_mode(const string& room_name,
 							   const string& room_password,
 							   int port);
-
+	
+	protected:
+	void create_invite_link(int port,
+							const string& room_name,
+							const string& room_password);
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
 		void update_clients(list<RoomClient*>& clients);
