@@ -13,7 +13,7 @@ Server::Server(command_hash& commands,
 
 	this->commands["makelink"] = function<void()>([&]()
 		{
-			create_invite_link(port, password, room_name);
+			create_invite_link(port, room_name, password);
 
 		});
 	key_iv = encr::AES::get_random_key();
