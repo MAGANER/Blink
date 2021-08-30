@@ -10,42 +10,12 @@
 #include"SFML/Network.hpp"
 #include "Interface.h"
 #include"DataBaseProcessor.h"
-#include"MessageCreator.h"
 #include"InviteLinkCreator.h"
-#include"encryption/Encryption.h"
+#include"EncryptionData.h"
+#include"ConnectionChecker.hpp"
 #include<fstream>
 namespace Blink
 {
-
-    struct ConnectionData
-    {
-        ConnectionData()
-        {
-        }
-        ~ConnectionData(){}
-        string room, password, ip, port;
-        RoomNetworkMode mode;
-        void clear()
-        {
-            room.clear();
-            password.clear();
-            ip.clear();
-            port.clear();
-            mode = (RoomNetworkMode)-1;
-        }
-    };
-    struct EncryptionData
-    {
-        EncryptionData(const string& key,
-                       const string& iv)
-        {
-            data = make_pair(encr::AES::convert_to_bytes(key),
-                             encr::AES::convert_to_bytes(iv));
-        }
-        ~EncryptionData(){}
-        encr::AES::key_iv data;
-    };
-
     using namespace sf;
     class MainMenu : public Interface, public DataBaseProcessor
     {
@@ -93,18 +63,7 @@ namespace Blink
         void create();
         void enter();
         void connect();
-        //void connect_with_link();
-        void connect_with_filelink();
-        bool can_connect();
         void show_rooms();
-
-        vector<string> parse_time(const string& time);
-        vector<string> split(const string& s, char delim);
-
-        string convert_time_string_to_seconds(const string& str);
-        string convert_secs_to_regular_time_view(int seconds);
-
-        int get_seconds(const string& time);
     };
 };
 
