@@ -34,10 +34,11 @@ private:
 	bool dollar_printed = false;
 	bool disconnect = false;
 
-	command_hash commands;
-
+	
 	string user_name, room_name;
 protected:
+	command_hash commands;
+
 	NetBase(const command_hash& commands,
 		const string& user_name,
 		const string& room_name,
