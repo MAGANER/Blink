@@ -30,7 +30,8 @@ string create_invite_link(const string& ip,
 						  const string& room,
 						  const string& IV,
 						  const string& KEY,
-						  const string& password);
+						  const string& password,
+						  bool decentralysed);
 
 string encrypt_invite_link(const string& link);
 string decrypt_invite_link(const string& link);

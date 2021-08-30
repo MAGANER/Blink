@@ -13,7 +13,8 @@ std::string Blink::create_invite_link(const string& ip,
 									  const string& room,
 									  const string& IV,
 									  const string& KEY,
-									  const string& password)
+									  const string& password,
+									  bool decentralysed)
 {
 	//link data will be encrypted
 	json link;
@@ -23,6 +24,7 @@ std::string Blink::create_invite_link(const string& ip,
 	link["key"]  = KEY;
 	link["room"]     = Encryption::SHA::sha256(room);
 	link["password"] = Encryption::SHA::sha256(password);
+	link["decentralysed"] = (decentralysed ? "1" : "0");
 
 	link["time"] = get_curr_time();
 
