@@ -31,7 +31,8 @@ namespace Blink
 			   const string& room_name,
 			   const string& user_name,
 			   const string& db_key,
-			   const string& db_name);
+			   const string& db_name,
+			   bool inherited = false);
 		~Server();
 
 		virtual bool run(const string& room_name,
@@ -42,7 +43,8 @@ namespace Blink
 
 		string get_invite_link_str(int port,
 								   const string& room_name,
-								   const string& room_password);
+								   const string& room_password,
+								   bool decentralysed);
 
 		void run_one2one_mode(const string& room_name,
 							  const string& room_password,
@@ -54,7 +56,8 @@ namespace Blink
 	protected:
 	void create_invite_link(int port,
 							const string& room_name,
-							const string& room_password);
+							const string& room_password,
+							bool decentralysed);
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
 		void update_clients(list<RoomClient*>& clients);

@@ -6,17 +6,19 @@ Server::Server(command_hash& commands,
 			   const string& room_name,
 			   const string& user_name,
 			   const string& db_key,
-			   const string& db_name):NetBase(commands,user_name, room_name, db_key,db_name)
+			   const string& db_name,
+			   bool inherited):NetBase(commands,user_name, room_name, db_key,db_name)
 {
 	this->password  = password;
 	this->room_name = room_name;
 
 	this->commands["makelink"] = function<void()>([&]()
 		{
-			create_invite_link(port, room_name, password);
+			create_invite_link(port, room_name, password,false);
 
 		});
-	key_iv = encr::AES::get_random_key();
+
+	if(!inherited)key_iv = encr::AES::get_random_key();
 }
 Server::~Server()
 {
@@ -24,7 +26,8 @@ Server::~Server()
 
 void Server::create_invite_link(int port,
 								const string& room_name,
-								const string& room_password)
+								const string& room_password,
+								bool decentralysed)
 {
 	string inv_link;
 	while (true)
@@ -46,7 +49,7 @@ void Server::create_invite_link(int port,
 		};
 		if (mode != -1)
 		{
-			inv_link = get_invite_link_str(port, room_name, room_password);
+			inv_link = get_invite_link_str(port, room_name, room_password,decentralysed);
 		}
 		if (mode == 1)
 		{
@@ -76,7 +79,8 @@ void Server::create_invite_link(int port,
 }
 string Server::get_invite_link_str(int port,
 								   const string& room_name,
-								   const string& room_password)
+								   const string& room_password,
+								   bool decentralysed)
 {
 	string key = encr::AES::convert_bytes(key_iv.first);
 	string iv = encr::AES::convert_bytes(key_iv.second);
@@ -85,7 +89,8 @@ string Server::get_invite_link_str(int port,
 		room_name,
 		iv,
 		key,
-		room_password);
+		room_password,
+		decentralysed);
 	inv_link = ::encrypt_invite_link(inv_link);
 	return inv_link;
 }
@@ -95,7 +100,7 @@ bool Server::run(const string& room_name,
 				 RoomNetworkMode mode)
 {
 	this->port = port;
-	create_invite_link(port,room_name,room_password);
+	create_invite_link(port,room_name,room_password,false);
 
 	if (mode == RoomNetworkMode::OneToOne)
 	{
@@ -211,7 +216,7 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 		auto address = socket.getRemoteAddress();
 		if (address != IpAddress::None)
 			allowed.push_back(address);
-
+			
 		p << "1";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
 	}
