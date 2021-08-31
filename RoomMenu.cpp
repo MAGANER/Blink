@@ -72,7 +72,7 @@ void RoomMenu::run(mode flag)
 		{
 			while (true)
 			{
-				client_server._run(data["room_name"], data["room_password"]);
+				client_server._run();
 				if (client_server.should_disconnect())
 				{
 					exit = true;
@@ -120,7 +120,7 @@ void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
 			client_server.set_key_iv(key);
 			while (true)
 			{
-				client_server._run(data["room_name"], data["room_password"]);
+				client_server._run();
 				if (client_server.should_disconnect())
 				{
 					exit = true;
