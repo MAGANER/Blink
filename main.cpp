@@ -75,6 +75,8 @@ int main()
 				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
+				if (main_menu->is_decentralysed()) data.mode = RoomNetworkMode::Decentralysed;
+
 				room_menu->set_room_data(data.port,
 										 data.ip,
 										 current_user_name,
@@ -90,8 +92,10 @@ int main()
 			else if (main_menu->_connect())
 			{
 				room_menu = new RoomMenu(key, db_name);
-
+				
 				ConnectionData data = main_menu->get_connection_data();
+				if (main_menu->is_decentralysed()) data.mode = RoomNetworkMode::Decentralysed;
+
 				room_menu->set_room_data(data.port,
 										 data.ip,
 										 current_user_name,
@@ -105,6 +109,7 @@ int main()
 					keys->first = main_menu->get_encryption_data()->data.first;
 					keys->second = main_menu->get_encryption_data()->data.second;
 				}
+
 				delete main_menu;
 
 				app_mode = RoomMenu::mode::CLIENT;

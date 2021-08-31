@@ -35,7 +35,8 @@ namespace Blink
 
         bool exit()       { return _exit;          }
         bool enter_room() { return can_enter_room; }
-        bool _connect() { return can_connect_to_room; };
+        bool _connect() { return can_connect_to_room; }
+        bool is_decentralysed() { return decentralysed; }
 
         ConnectionData get_connection_data(){ return data; }
         EncryptionData* get_encryption_data() { return encr_data; }
@@ -55,6 +56,7 @@ namespace Blink
         bool _exit          = false;
         bool can_enter_room = false;
         bool can_connect_to_room = false;
+        bool decentralysed = false;
         
         ConnectionData data;
         EncryptionData* encr_data = nullptr;

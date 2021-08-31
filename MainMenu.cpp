@@ -12,7 +12,7 @@ MainMenu::MainMenu(const string& encr_key,
 	commands["conflink"] = function<void()>([&]()
 		{
 			EncryptionData _data;
-			if (ConnectionChecker::connect_with_filelink(data, _data))
+			if (ConnectionChecker::connect_with_filelink(data, _data, decentralysed))
 			{
 				con_regime = CONNECTION_REGIME::WithLink;
 				can_connect_to_room = true;
