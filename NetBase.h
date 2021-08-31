@@ -109,13 +109,14 @@ protected:
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{
+		//for one2one mode
+
 		string data = NetBase::get_message(socket);
 
 		if (data.size() > 0 && can_show)
 		{
 			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
 			
-
 			//move it down, print received message and return
 			cout << endl;
 			json parsed = json::parse(data);
@@ -127,8 +128,9 @@ protected:
 	void return_and_show_message(RoomClient* client,
 								 list<RoomClient*>& clients)
 	{
+		//for one2many mode(also decentralysed)
 		string message = NetBase::get_message(*client->socket);
-		if (message.size() > 0 && message != "\n\n\n666\m\m\m\m1488\,\,\,")
+		if (message.size() > 0 && can_show)
 		{
 			//move it down, print received message and return
 			cout << endl;
@@ -189,7 +191,7 @@ protected:
 		{
 			can_show = false;
 			if (is_user)disconnect = true;
-			return "\n\n\n666\m\m\m\m1488\,\,\,";
+			return "";
 		}
 		else
 		{
