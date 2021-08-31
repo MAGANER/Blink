@@ -7,6 +7,7 @@
 #include"Client.h"
 #include "Interface.h"
 #include"DataBaseProcessor.h"
+#include"DecentralysedServerClient.h"
 
 namespace Blink
 {
@@ -14,6 +15,8 @@ namespace Blink
     {
     private:
         bool exit = false;
+        bool decentralysed = false;
+
         map<string, string> data;
 
         Server* server = nullptr;

@@ -56,36 +56,94 @@ void RoomMenu::set_room_data(const string& port,
 void RoomMenu::run(mode flag)
 {
 	auto port = atoi(data["port"].c_str());
-
-	if (flag == mode::SERVER)
-		server = new Server(commands,data["room_password"], 
-									 data["room_name"],
-									 data["user_name"],
-								     db_key,
-									 get_db_name());
+	if (room_mode == RoomNetworkMode::Decentralysed)
+	{
+		DecentralysedServerClient client_server(commands,
+								  data["room_password"],
+							      data["room_name"],
+								  data["user_name"],
+								  db_key,
+								  get_db_name());
+		if (client_server.cant_connect())
+		{
+			exit = true;
+		}
+		else
+		{
+			while (true)
+			{
+				client_server._run(data["room_name"], data["room_password"]);
+				if (client_server.should_disconnect())
+				{
+					exit = true;
+					break;
+				}
+			}	
+		}
+	}
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"],data["room_name"],db_key, get_db_name());
-	}
+		if (flag == mode::SERVER)
+			server = new Server(commands, data["room_password"],
+				data["room_name"],
+				data["user_name"],
+				db_key,
+				get_db_name());
+		else
+		{
+			client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"], db_key, get_db_name());
+		}
 
-	execute(port);
+		execute(port);
+	}
 }
 void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
 {
 	auto port = atoi(data["port"].c_str());
-
-	if (flag == mode::SERVER)
-		server = new Server(commands, data["room_password"],
-			data["room_name"],
-			data["user_name"],
-			db_key,
-			get_db_name());
+	if (room_mode == RoomNetworkMode::Decentralysed)
+	{
+		DecentralysedServerClient client_server(commands,
+												data["room_password"],
+												data["room_name"],
+												data["user_name"],
+												db_key,
+												get_db_name(),
+												true);
+		if (client_server.cant_connect())
+		{
+			exit = true;
+		}
+		else
+		{
+			client_server.set_ip_and_port_to_connect(data["ip"], data["port"]);
+			client_server.is_connecting(true);
+			client_server.set_key_iv(key);
+			while (true)
+			{
+				client_server._run(data["room_name"], data["room_password"]);
+				if (client_server.should_disconnect())
+				{
+					exit = true;
+					break;
+				}
+			}
+		}
+	}
 	else
 	{
-		client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"],key, db_key, get_db_name());
-	}
+		if (flag == mode::SERVER)
+			server = new Server(commands, data["room_password"],
+				data["room_name"],
+				data["user_name"],
+				db_key,
+				get_db_name());
+		else
+		{
+			client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"], key, db_key, get_db_name());
+		}
 
-	execute(port);
+		execute(port);
+	}
 }
 void RoomMenu::execute(int port)
 {
