@@ -14,7 +14,8 @@ Server::Server(command_hash& commands,
 
 	this->commands["makelink"] = function<void()>([&]()
 		{
-			create_invite_link(port, room_name, password,false);
+			//if inherited, than decentralysed
+			create_invite_link(port, room_name, password, inherited);
 
 		});
 
