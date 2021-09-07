@@ -12,8 +12,10 @@ namespace Blink
 	{
 		int id;
 		sf::TcpSocket* socket;
+		int listner_port;
 		RoomClient()
 		{
+			listner_port = -1;
 			id = 0;
 			socket = nullptr;
 		}
