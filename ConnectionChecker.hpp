@@ -83,8 +83,8 @@ namespace ConnectionChecker
 
 		//send data to get right to be connected
 		string message = convert_message_to_json(data.password,
-			data.room,
-			MessageType::ComeInRequest);
+												 data.room,
+												 MessageType::ComeInRequest);
 		Packet p; p << message;
 		if (socket.send(p) != TcpSocket::Done)
 		{
