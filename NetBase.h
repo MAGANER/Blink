@@ -21,6 +21,33 @@ using namespace sf;
 namespace fp = Functools;
 namespace encr = Encryption;
 
+
+/*
+* this data is sent from client you connected,
+* it's required with decentralysed mode.
+* after one leaves room, another one who got acccess can
+  enter room at any time.
+  Also it contains data of another connected clients.
+*/
+struct Received_decentralysed_info
+{
+	Received_decentralysed_info(const string& room_name,
+								const string& room_password,
+								const list<pair<IpAddress, int>>& clients)
+	{
+		this->room_name		= room_name;
+		this->room_password = room_password;
+		
+		//because = operator doesn't work correctly
+		for (auto& client : clients)
+		{
+			this->clients.push_back(client);
+		}
+	}
+	string room_name, room_password;
+	list<pair<IpAddress,int>> clients;
+};
+
 class NetBase :public DataBaseProcessor
 {
 protected:
@@ -58,6 +85,10 @@ protected:
 		this->user_name = user_name;
 		this->room_name = room_name;
 	}
+
+	bool received_clients_info = false;
+	Received_decentralysed_info* received_info = nullptr;
+
 	~NetBase() {}
 
 	virtual void send_message(TcpSocket& socket,
@@ -99,11 +130,18 @@ protected:
 									 int exlude_id,
 									 const string& message)
 	{
-		for (auto& client : clients)
+		//if number of clients is bigger
+		//then there is no need to resend
+		//because everyone have clients connection data
+		//so they already send data to each one
+		if (clients.size() > 3)
 		{
-			if (client->id != exlude_id)
+			for (auto& client : clients)
 			{
-				send_jmessage(*client->socket, message);
+				if (client->id != exlude_id)
+				{
+					send_jmessage(*client->socket, message);
+				}
 			}
 		}
 	}
@@ -198,24 +236,34 @@ protected:
 			can_show = true;
 			string data;
 			pack >> data;
-			return encr::AES::decrypt(key_iv, data);
-		}
-	}
-	void process_message(Packet& pack)
-	{
-		string data;
-		pack >> data;
-		auto decr  = encr::AES::decrypt(key_iv, data);
+			data = encr::AES::decrypt(key_iv, data);
+			if (data.size() > 0)
+			{	
+				json parsed = json::parse(data);
+				if (atoi(to_string(parsed["type"]).c_str()) == (int)MessageType::ClientsInfo)
+				{
+					can_show = false;
+					received_clients_info = true;
+					string room_name = parsed["room_name"];
+					string room_password = parsed["room_password"];
+					list<pair<IpAddress, int>> clients;
 
-		if (data.size() > 0)
-		{
-			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
-			//move it down, print received message and return
-			cout << endl;
-			json parsed = json::parse(data);
-			add_message(room_name, parsed["name"], cut(parsed["data"]));
-			cout << cut(parsed["name"]) << '|' << cut(parsed["data"]) << endl;
-			dollar_printed = false;
+					int clients_max = (int)parsed["max_clients"];
+					for (int counter = 0; counter < clients_max; counter++)
+					{
+						string cfield = "client" + to_string(counter);
+						string pfield = "port" + to_string(counter);
+						string ip = parsed[cfield];
+						int port = parsed[pfield];
+						IpAddress parsed_ip = IpAddress(ip);
+						clients.push_back(make_pair(parsed_ip, port));
+					}
+					received_info = new Received_decentralysed_info(room_name, room_password, clients);
+					return "";
+				}
+				//else return data;
+			}
+			return data;
 		}
 	}
 	string get_raw_message(TcpSocket& socket)
@@ -236,4 +284,3 @@ public:
 };
 };
 #endif //NET_BASE_H
-
