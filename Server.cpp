@@ -212,7 +212,9 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 {
 	string check = get_raw_message(socket);
 	Packet p;
-	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
+	string _password = password.size() !=64  ? encr::SHA::sha256(password) : password;
+	string _room_name= room_name.size()!=64  ? encr::SHA::sha256(room_name):  room_name;
+	if (can_come_in(check, _password, _room_name))
 	{
 		auto address = socket.getRemoteAddress();
 		if (address != IpAddress::None)
@@ -242,10 +244,6 @@ void Server::update_clients(list<RoomClient*>& clients)
 			update_input();
 			update = true;
 			return true;
-		}
-		else
-		{
-			process_message(pack);
 		}
 		return false;
 	};
