@@ -71,6 +71,16 @@ namespace ConnectionChecker
 	using namespace sf;
 	using namespace std;
 
+	bool can_come_in(const string& message,
+					 const string& password,
+					 const string& name)
+	{
+
+		json jdata = json::parse(message);
+		return string(jdata["data"]) == password &&
+			string(jdata["name"]) == name;
+	}
+
 	bool can_connect(const ConnectionData& data)
 	{
 		//connect to server

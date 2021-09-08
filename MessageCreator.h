@@ -68,18 +68,7 @@ namespace
 			client_counter++;
 		}
 		return jdata.dump();
-	}
-
-	bool can_come_in(const string& message,
-					 const string& password,
-					 const string& name)
-	{
-
-		json jdata = json::parse(message);
-		return string(jdata["data"]) == password &&
-			   string(jdata["name"]) == name;
-	}
-	
+	}	
 };
 };
 #endif //MESSAGE_CREATOR_H

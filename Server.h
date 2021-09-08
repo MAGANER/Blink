@@ -13,6 +13,7 @@
 #include"sql/Functools.hpp"
 #include"MessageCreator.h"
 #include"InviteLinkCreator.h"
+#include"ConnectionChecker.hpp"
 #include"getIP.h"
 
 namespace Blink

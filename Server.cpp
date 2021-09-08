@@ -123,7 +123,7 @@ void Server::run_one2one_mode(const string& room_name,
 	listener.accept(socket);
 	string check = get_raw_message(socket);
 	Packet p;
-	if (can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
+	if (ConnectionChecker::can_come_in(check, encr::SHA::sha256(password), encr::SHA::sha256(room_name)))
 	{
 		p << "1";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
@@ -214,7 +214,7 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 	Packet p;
 	string _password = password.size() !=64  ? encr::SHA::sha256(password) : password;
 	string _room_name= room_name.size()!=64  ? encr::SHA::sha256(room_name):  room_name;
-	if (can_come_in(check, _password, _room_name))
+	if (ConnectionChecker::can_come_in(check, _password, _room_name))
 	{
 		auto address = socket.getRemoteAddress();
 		if (address != IpAddress::None)
