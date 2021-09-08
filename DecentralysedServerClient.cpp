@@ -113,7 +113,7 @@ bool DecentralysedServerClient::_run()
 
 		//receive message, show it and resend
 		for (auto& client : clients)
-			NetBase::return_and_show_message(client, clients);
+			NetBase::get_and_show_message(*client->socket);
 
 		//when you connect to another client,
 		//it resends its data about another connected clients

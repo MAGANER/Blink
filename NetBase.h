@@ -134,8 +134,6 @@ protected:
 		//then there is no need to resend
 		//because everyone have clients connection data
 		//so they already send data to each one
-		if (clients.size() > 3)
-		{
 			for (auto& client : clients)
 			{
 				if (client->id != exlude_id)
@@ -143,7 +141,6 @@ protected:
 					send_jmessage(*client->socket, message);
 				}
 			}
-		}
 	}
 
 	void show_message(const string& message)
@@ -171,7 +168,7 @@ protected:
 	void return_and_show_message(RoomClient* client,
 								 list<RoomClient*>& clients)
 	{
-		//for one2many mode(also decentralysed)
+		//for one2many ones mode(also decentralysed)
 		string message = NetBase::get_message(*client->socket);
 		if (message.size() > 0 && can_show)
 		{
