@@ -145,6 +145,18 @@ protected:
 			}
 		}
 	}
+
+	void show_message(const string& message)
+	{
+		auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+
+		//move it down, print received message and return
+		cout << endl;
+		json parsed = json::parse(message);
+		add_message(room_name, parsed["name"], cut(parsed["data"]));
+		cout << cut(parsed["name"]) << '|' << cut(parsed["data"]) << endl;
+		dollar_printed = false;
+	}
 	void get_and_show_message(TcpSocket& socket)
 	{
 		//for one2one mode
@@ -153,14 +165,7 @@ protected:
 
 		if (data.size() > 0 && can_show)
 		{
-			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
-			
-			//move it down, print received message and return
-			cout << endl;
-			json parsed = json::parse(data);
-			add_message(room_name, parsed["name"], cut(parsed["data"]));
-			cout << cut(parsed["name"])<<'|'<<cut(parsed["data"]) << endl;
-			dollar_printed = false;
+			show_message(data);
 		}
 	}
 	void return_and_show_message(RoomClient* client,
@@ -170,17 +175,7 @@ protected:
 		string message = NetBase::get_message(*client->socket);
 		if (message.size() > 0 && can_show)
 		{
-			//move it down, print received message and return
-			cout << endl;
-			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
-			
-
-			json parsed = json::parse(message);
-			auto name = cut(parsed["name"]);
-			auto data = cut(parsed["data"]);
-			add_message(room_name, name, data);
-			cout <<name << '|' << data << endl;
-			dollar_printed = false;
+			show_message(message);
 			resend_messages_from_server(clients, client->id, message);
 		}
 	}
@@ -222,6 +217,8 @@ protected:
 		input_buffer.clear();
 	}
 
+
+	bool socket_dissconnected = false; //used in Server::update_clients only
 	string get_message(TcpSocket& socket)
 	{
 		Packet pack;
@@ -229,6 +226,7 @@ protected:
 		{
 			can_show = false;
 			if (is_user)disconnect = true;
+			socket_dissconnected = true;
 			return "";
 		}
 		else
