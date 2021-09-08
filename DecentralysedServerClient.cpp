@@ -75,7 +75,6 @@ bool DecentralysedServerClient::_run()
 	TcpSocket* entering_socket = new TcpSocket;
 	while (true)
 	{
-		update_clients(clients);
 		receive_input_and_send_message_to_all(clients);
 		
 		bool should_resend_clients_info = true;
@@ -158,6 +157,7 @@ bool DecentralysedServerClient::_run()
 			received_clients_info = false;
 		}
 
+		update_clients(clients);
 		if (should_disconnect())return true;
 	}
 
