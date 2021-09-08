@@ -235,15 +235,20 @@ void Server::update_clients(list<RoomClient*>& clients)
 	//then change ids of the rest
 	
 	bool update = false;
-	Packet pack;
 	auto should_be_erased = [&](RoomClient* client)
 	{
-		if (client->socket->receive(pack) == TcpSocket::Disconnected)
+		string message = get_message(*client->socket);
+		if (socket_dissconnected)
 		{
 			cout << "\n#client with id " << client->id << " has been disconnected." << endl;
 			update_input();
 			update = true;
+			socket_dissconnected = false;
 			return true;
+		}
+		else
+		{
+			if(message.size() > 0) show_message(message);
 		}
 		return false;
 	};
