@@ -130,17 +130,13 @@ protected:
 									 int exlude_id,
 									 const string& message)
 	{
-		//if number of clients is bigger
-		//then there is no need to resend
-		//because everyone have clients connection data
-		//so they already send data to each one
-			for (auto& client : clients)
+		for (auto& client : clients)
+		{
+			if (client->id != exlude_id)
 			{
-				if (client->id != exlude_id)
-				{
-					send_jmessage(*client->socket, message);
-				}
+				send_jmessage(*client->socket, message);
 			}
+		}
 	}
 
 	void show_message(const string& message)
