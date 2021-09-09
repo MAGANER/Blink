@@ -253,7 +253,7 @@ string SQLite3DataBaseTools::make_update_request(const map<string, SQLtype*>& fi
 	vector<string> requests;
 	for (auto field : fields_to_update)
 	{
-		string request = begin_request + " set " + field.first+" " + type_to_string(field.second) + ";";
+		string request = begin_request + " SET " + field.first+" = " + type_to_string(field.second) + ";";
 		requests.push_back(request);
 	}
 
