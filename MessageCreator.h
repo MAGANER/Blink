@@ -21,6 +21,7 @@ namespace
 		Text,
 		ComeInRequest,
 		ClientsInfo,
+		RoomName,
 	};
 
 	string convert_message_to_json(const string& data,
