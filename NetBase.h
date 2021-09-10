@@ -89,6 +89,9 @@ protected:
 	bool received_clients_info = false;
 	Received_decentralysed_info* received_info = nullptr;
 
+	bool received_room_name = false;
+	string *correct_room_name;
+
 	~NetBase() {}
 
 	virtual void send_message(TcpSocket& socket,
@@ -231,7 +234,12 @@ protected:
 			if (data.size() > 0)
 			{	
 				json parsed = json::parse(data);
-				if (atoi(to_string(parsed["type"]).c_str()) == (int)MessageType::ClientsInfo)
+
+				auto json_type_to_str = [](const json& js) {return to_string(js["type"]);};
+				auto type_to_int = [=](const json& js){
+					return atoi(json_type_to_str(js).c_str()); };
+
+				if (type_to_int(parsed) == (int)MessageType::ClientsInfo)
 				{
 					can_show = false;
 					received_clients_info = true;
@@ -252,7 +260,13 @@ protected:
 					received_info = new Received_decentralysed_info(room_name, room_password, clients);
 					return "";
 				}
-				//else return data;
+				if (type_to_int(parsed) == (int)MessageType::RoomName)
+				{
+					received_room_name = true;
+					correct_room_name = new string(to_string(parsed["data"]));
+					return "";
+				}
+				
 			}
 			return data;
 		}
