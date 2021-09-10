@@ -71,6 +71,105 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 	}
 	return false;
 }
+
+void DataBaseProcessor::create_room_connections_info(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	//format is ip:port;ip:port;
+	table conn_info;
+
+	conn_info["room_name"] = new sql::Text("");
+	conn_info["connections"] = new sql::Text("");
+
+	string req = sql::make_create_request(conn_info, "conn_data");
+	db.run_set_request(req);
+}
+
+string DataBaseProcessor::replace(const string& str, char old, char _new)
+{
+	string result;
+	for (auto& symbol : str)
+	{
+		if (symbol == old) result += _new;
+		else result += symbol;
+	}
+	return result;
+}
+void DataBaseProcessor::add_connection_info(const string& room_name,
+											const spair& ip_port)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	//first get all data
+	auto existing_data = get_connections_info(room_name);
+
+	//unite it
+	string data;
+	for (auto& elem : existing_data)
+	{
+		data += elem.first + ":" + elem.second + ";";
+	}
+	
+	//add new one
+	//sqlite dynamicaly will try to cast ip value to float
+	//so it must be prevented
+	string ip_port_val = "'" + ip_port.first + ":" + ip_port.second + "'";
+	data+= ip_port_val;
+	//create table
+	table conn_info;
+	conn_info["room_name"] = new sql::Text("'"+room_name+"'");
+	conn_info["connections"] = new sql::Text(data);
+
+	//create request and run it
+	string req = sql::make_update_request(conn_info, "conn_data");
+	db.run_set_request(req);
+}
+vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	string req = sql::make_select_request("conn_data");
+	auto result = db.run_get_request(req);
+
+	vector<spair> info;
+	for (auto& chunk : result)
+	{
+		bool eq_room = room_name == sql::type_to_string(chunk["room_name"]);
+		if (eq_room)
+		{
+			string data = sql::type_to_string(chunk["connections"]);
+
+			auto split = [](const string& str, char delim)
+			{
+				//split by ;
+				stringstream ss(str);
+				string item;
+				vector<string> elems;
+				while (getline(ss, item, delim))
+				{
+					elems.push_back(item);
+				}
+				return elems;
+			};
+
+			auto elems = split(data, ';');
+			//get ip and port
+			for (auto& elem : elems)
+			{
+				data = elem + ":";
+				auto ip_and_port = split(data, ':');
+				auto done_pair = make_pair(ip_and_port[0], ip_and_port[1]);
+				info.push_back(done_pair);
+			}
+
+			return info;
+		}
+	}
+
+	//return empty vector
+	return info;
+}
 void DataBaseProcessor::create_new_room(const string& name,
 										const string& password,
 										const string& port,
@@ -86,6 +185,8 @@ void DataBaseProcessor::create_new_room(const string& name,
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
+
+	create_room_connections_info(name);
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {

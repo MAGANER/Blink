@@ -11,19 +11,24 @@
 #include<tuple>
 #include"Interface.h"
 #include"RoomNetworkMode.h"
+#include"RoomClient.hpp"
 using namespace std;
 namespace Blink
 {
 	namespace sql = SQLite3DataBaseTools;
 	namespace fs  = std::filesystem;
 	typedef map<string, sql::SQLtype*> table;
-	typedef pair<string, string> message; //first is user name, second is message
+	typedef pair<string, string> spair; //pretty abstract
+	typedef spair message; //first is user name, second is message
 	typedef tuple<string, string, string> str3;
 	class DataBaseProcessor
 	{
 	private:
 		string encryption_key;
 		string db_name;
+
+		void create_room_connections_info(const string& room_name);
+		string replace(const string& str, char old,char _new);
 	protected:
 		DataBaseProcessor(const string& encr_key,
 						  const string& db_name):encryption_key(encr_key),
@@ -36,6 +41,10 @@ namespace Blink
 							 const string& password);
 		bool does_user_exist(const string& name,
 							 const string& password);
+
+		void add_connection_info(const string& room_name,
+								 const spair& ip_port);
+		vector<spair> get_connections_info(const string& room_name);
 
 		void create_new_room(const string& name,
 							 const string& password,
