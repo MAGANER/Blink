@@ -263,7 +263,9 @@ protected:
 				if (type_to_int(parsed) == (int)MessageType::RoomName)
 				{
 					received_room_name = true;
-					correct_room_name = new string(to_string(parsed["data"]));
+					string name = parsed["data"];
+					name = fp::slice(name, 0, name.size());
+					correct_room_name = new string(name);
 					return "";
 				}
 				

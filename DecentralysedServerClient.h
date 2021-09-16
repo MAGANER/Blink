@@ -1,6 +1,7 @@
 #pragma once
 #include"Server.h"
 #include"ConnectionChecker.hpp"
+#include<random>
 namespace Blink
 {
 class DecentralysedServerClient:public Server
@@ -9,9 +10,14 @@ private:
 	bool _cant_connect = false;
 	string conn_port, conn_ip;
 	bool connecting = false;
-
+	bool connect_to_saved_clients = false;
 
 	TcpSocket* socket = nullptr;
+
+	list<RoomClient*> clients;
+	vector<IpAddress> allowed;
+
+	int client_counter = 0;
 public:
 	DecentralysedServerClient(command_hash& commands,
 							  const string& password,
@@ -19,6 +25,7 @@ public:
 							  const string& user_name,
 							  const string& db_key,
 							  const string& db_name,
+							  bool connecting_with_conflink_command,
 							  bool inherited = false);
 	~DecentralysedServerClient();
 
@@ -36,6 +43,9 @@ private:
 					 int listner_port);
 	void send_clients_info(list<RoomClient*>& clients,
 						   TcpSocket* socket);
+
+	int get_random_port();
+	void connect_to_known_clients();
 };
 };
 
