@@ -27,7 +27,6 @@ namespace Blink
 		string encryption_key;
 		string db_name;
 
-		void create_room_connections_info(const string& room_name);
 		string replace(const string& str, char old,char _new);
 	protected:
 		DataBaseProcessor(const string& encr_key,
@@ -44,7 +43,20 @@ namespace Blink
 
 		void add_connection_info(const string& room_name,
 								 const spair& ip_port);
+		bool are_ip_port_saved(const spair& ip_port,
+							   const string& room_name);
 		vector<spair> get_connections_info(const string& room_name);
+		bool does_conn_info_exist(const string& room_name);
+		void create_room_connections_info(const string& room_name);
+
+
+		void save_own_port(const string& room_name,int port);
+		int get_own_port(const string& room_name);
+
+		void save_room_key(const string& room_name,
+						   const spair& key_iv);
+		spair get_key_iv(const string& room_name);
+		bool are_key_iv_saved(const string& room_name);
 
 		void create_new_room(const string& name,
 							 const string& password,

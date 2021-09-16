@@ -53,7 +53,7 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 		sql::DataBase db(curr_path_str, password, false);
 		if (!db.is_password_correct())
 		{
-			cout << "password is incorrect!"<<endl;
+			std::cout << "password is incorrect!"<<endl;
 			return false;
 		}
 		string req = sql::make_select_request("owner");
@@ -81,8 +81,11 @@ void DataBaseProcessor::create_room_connections_info(const string& room_name)
 
 	conn_info["room_name"] = new sql::Text("");
 	conn_info["connections"] = new sql::Text("");
-
 	string req = sql::make_create_request(conn_info, "conn_data");
+	db.run_set_request(req);
+	conn_info["room_name"] = new sql::Text(room_name);
+	conn_info["connections"] = new sql::Text("");
+	req = sql::make_insert_request(conn_info, "conn_data");
 	db.run_set_request(req);
 }
 
@@ -114,16 +117,33 @@ void DataBaseProcessor::add_connection_info(const string& room_name,
 	//add new one
 	//sqlite dynamicaly will try to cast ip value to float
 	//so it must be prevented
-	string ip_port_val = "'" + ip_port.first + ":" + ip_port.second + "'";
+	string ip_port_val = ip_port.first + ":" + ip_port.second ;
 	data+= ip_port_val;
+	data = "'" + data + "'";
+
 	//create table
 	table conn_info;
-	conn_info["room_name"] = new sql::Text("'"+room_name+"'");
-	conn_info["connections"] = new sql::Text(data);
 
+	//this is little fix, it works
+	auto room_name_val = room_name[0] == '\"' ? room_name : "\"" + room_name + "\"";
+	conn_info["room_name"] = new sql::Text(room_name_val);
+	conn_info["connections"] = new sql::Text(data);
 	//create request and run it
 	string req = sql::make_update_request(conn_info, "conn_data");
 	db.run_set_request(req);
+}
+bool DataBaseProcessor::does_conn_info_exist(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	string req = sql::make_select_request("conn_data");
+	auto result = db.run_get_request(req);
+	for (auto& chunk : result)
+	{
+		bool match = sql::type_to_string(chunk["room_name"]) == room_name;
+		if (match)return true;
+	}
+	return false;
 }
 vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
 {
@@ -131,7 +151,6 @@ vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
 
 	string req = sql::make_select_request("conn_data");
 	auto result = db.run_get_request(req);
-
 	vector<spair> info;
 	for (auto& chunk : result)
 	{
@@ -139,7 +158,6 @@ vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
 		if (eq_room)
 		{
 			string data = sql::type_to_string(chunk["connections"]);
-
 			auto split = [](const string& str, char delim)
 			{
 				//split by ;
@@ -153,22 +171,38 @@ vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
 				return elems;
 			};
 
-			auto elems = split(data, ';');
-			//get ip and port
-			for (auto& elem : elems)
+			if (!data.empty() && data != "0")
 			{
-				data = elem + ":";
-				auto ip_and_port = split(data, ':');
-				auto done_pair = make_pair(ip_and_port[0], ip_and_port[1]);
-				info.push_back(done_pair);
-			}
+				auto elems = split(data, ';');
 
-			return info;
+				//get ip and port
+				for (auto& elem : elems)
+				{
+					data = elem + ":";
+					auto ip_and_port = split(data, ':');
+					auto done_pair = make_pair(ip_and_port[0], ip_and_port[1]);
+					info.push_back(done_pair);
+				}
+
+				return info;
+			}
 		}
 	}
 
 	//return empty vector
 	return info;
+}
+bool DataBaseProcessor::are_ip_port_saved(const spair& ip_port,
+										  const string& room_name)
+{
+	auto data = get_connections_info(room_name);
+	for (auto& chunk : data)
+	{
+		bool check1 = chunk.first == ip_port.first;
+		bool check2 = chunk.second == ip_port.second;
+		if (check1 && check2)return true;
+	}
+	return false;
 }
 void DataBaseProcessor::create_new_room(const string& name,
 										const string& password,
@@ -185,8 +219,6 @@ void DataBaseProcessor::create_new_room(const string& name,
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
-
-	create_room_connections_info(name);
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
@@ -201,7 +233,7 @@ bool DataBaseProcessor::does_room_exists(const string& name)
 	auto result = db.run_get_request(req);
 	for (auto chunk : result)
 	{
-		bool eq_name     = sql::type_to_string(chunk["name"]) == name;
+		bool eq_name  = sql::type_to_string(chunk["name"]) == name;
 		
 		if (eq_name)
 		{
@@ -349,4 +381,95 @@ vector<str3> DataBaseProcessor::get_rooms(const string& password)
 		rooms.push_back(room);
 	}
 	return rooms;
+}
+bool DataBaseProcessor::are_key_iv_saved(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	string req = sql::make_select_request("room_key_iv");
+	auto result = db.run_get_request(req);
+	if (!db.is_ok()) return false;
+
+	for (auto& chunk : result)
+	{
+		bool check = sql::type_to_string(chunk["room_name"]) == room_name;
+		if (check)return true;
+	}
+	return false;
+}
+void DataBaseProcessor::save_room_key(const string& room_name,
+									  const spair& key_iv)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	if (are_key_iv_saved(room_name)) return;//break, do nothing
+
+	table data;
+	data["room_name"] = new sql::Text(room_name);
+	data["key"] = new sql::Text(key_iv.first);
+	data["iv"]  = new sql::Text(key_iv.second);
+
+	auto req = sql::make_create_request(data, "room_key_iv");
+	db.run_set_request(req);
+
+	req = sql::make_insert_request(data, "room_key_iv");
+	db.run_set_request(req);
+}
+spair DataBaseProcessor::get_key_iv(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	auto req = sql::make_select_request("room_key_iv");
+	auto result = db.run_get_request(req);
+
+	for (auto& chunk : result)
+	{
+		bool check = sql::type_to_string(chunk["room_name"]) == room_name;
+		if (check)
+		{
+			string key = sql::type_to_string(chunk["key"]);
+			string iv  = sql::type_to_string(chunk["iv"]);
+			return make_pair(key, iv);
+		}
+	}
+
+	//should return anyway
+	return make_pair("", "");
+}
+void DataBaseProcessor::save_own_port(const string& room_name, int port)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	table own_port;
+	own_port["room_name"] = new sql::Text(room_name);
+	own_port["port"] = new sql::Integer(port);
+
+	auto req = sql::make_create_request(own_port, "own_port");
+	db.run_set_request(req);
+
+	req = sql::make_insert_request(own_port, "own_port");
+	db.run_set_request(req);
+
+}
+int DataBaseProcessor::get_own_port(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	auto req = sql::make_select_request("own_port");
+	auto result = db.run_get_request(req);
+
+	for (auto& chunk : result)
+	{
+		bool eq = sql::type_to_string(chunk["room_name"]) == room_name;
+		if (eq)
+		{
+			auto val = chunk["port"];
+			if (val->type == sql::SQL_TYPES::INTEGER)
+			{
+				return static_cast<sql::Integer*>(val)->value;
+			}
+			return -1;
+		}
+	}
+	return -1;
 }
