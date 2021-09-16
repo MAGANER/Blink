@@ -53,7 +53,7 @@ void RoomMenu::set_room_data(const string& port,
 	data["room_password"] = room_password;
 	room_mode = mode;
 }
-void RoomMenu::run(mode flag)
+void RoomMenu::run(mode flag, bool connecting_with_file_link)
 {
 	auto port = atoi(data["port"].c_str());
 	if (room_mode == RoomNetworkMode::Decentralysed)
@@ -63,7 +63,8 @@ void RoomMenu::run(mode flag)
 							      data["room_name"],
 								  data["user_name"],
 								  db_key,
-								  get_db_name());
+								  get_db_name(),
+								  connecting_with_file_link);
 		if (client_server.cant_connect())
 		{
 			exit = true;
@@ -97,7 +98,7 @@ void RoomMenu::run(mode flag)
 		execute(port);
 	}
 }
-void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
+void RoomMenu::run(mode flag, const encr::AES::key_iv& key, bool connecting_with_file_link)
 {
 	auto port = atoi(data["port"].c_str());
 	if (room_mode == RoomNetworkMode::Decentralysed)
@@ -108,6 +109,7 @@ void RoomMenu::run(mode flag, const encr::AES::key_iv& key)
 												data["user_name"],
 												db_key,
 												get_db_name(),
+												connecting_with_file_link,
 												true);
 		if (client_server.cant_connect())
 		{

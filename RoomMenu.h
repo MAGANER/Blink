@@ -38,8 +38,8 @@ namespace Blink
             if (client != nullptr) delete client;
         }
 
-        void run(mode flag);
-        void run(mode flag, const encr::AES::key_iv& key);
+        void run(mode flag, bool connecting_with_file_link);
+        void run(mode flag, const encr::AES::key_iv& key, bool connecting_with_file_link);
         void set_room_data(const string& port,
                            const string& ip,
                            const string& user_name,
