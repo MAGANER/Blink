@@ -45,6 +45,7 @@ int main()
 	
 	string current_user_name;
 	encr::AES::key_iv* keys = nullptr;
+	bool connecting_with_conflink_command = false;
 	while (true)
 	{
 		if (current == state::ENTER)
@@ -109,7 +110,7 @@ int main()
 					keys->first = main_menu->get_encryption_data()->data.first;
 					keys->second = main_menu->get_encryption_data()->data.second;
 				}
-
+				connecting_with_conflink_command = main_menu->is_connecting_with_conflink_command();
 				delete main_menu;
 
 				app_mode = RoomMenu::mode::CLIENT;
@@ -119,15 +120,16 @@ int main()
 		if (current == state::ROOM)
 		{
 			if (keys != nullptr)
-				room_menu->run(app_mode, *keys);
+				room_menu->run(app_mode, *keys, connecting_with_conflink_command);
 			else
-				room_menu->run(app_mode);
+				room_menu->run(app_mode, connecting_with_conflink_command);
 
 			if (room_menu->should_exit())
 			{
 				current = state::MAIN;
 				main_menu = new MainMenu(key, db_name);
 				delete room_menu;
+				connecting_with_conflink_command = false;
 			}
 		}
 	}
