@@ -18,6 +18,8 @@ MainMenu::MainMenu(const string& encr_key,
 				can_connect_to_room = true;
 				encr_data = new EncryptionData();
 				encr_data->data = _data.data;
+
+				connecting_with_conflink_command = true;
 			}
 		});
 	commands["rooms"] = function<void()>([&]() {show_rooms(); });;
