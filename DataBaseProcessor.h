@@ -21,6 +21,7 @@ namespace Blink
 	typedef pair<string, string> spair; //pretty abstract
 	typedef spair message; //first is user name, second is message
 	typedef tuple<string, string, string> str3;
+	typedef tuple<string, string, int> friendly_connection;
 	class DataBaseProcessor
 	{
 	private:
@@ -45,7 +46,7 @@ namespace Blink
 								 const spair& ip_port);
 		bool are_ip_port_saved(const spair& ip_port,
 							   const string& room_name);
-		vector<spair> get_connections_info(const string& room_name);
+		vector<friendly_connection> get_connections_info(const string& room_name);
 		bool does_conn_info_exist(const string& room_name);
 		void create_room_connections_info(const string& room_name);
 

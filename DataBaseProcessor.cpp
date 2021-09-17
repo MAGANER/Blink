@@ -80,11 +80,11 @@ void DataBaseProcessor::create_room_connections_info(const string& room_name)
 	table conn_info;
 
 	conn_info["room_name"] = new sql::Text("");
-	conn_info["connections"] = new sql::Text("");
+	conn_info["ip"] = new sql::Text("");
+	conn_info["port"] = new sql::Integer(0);
 	string req = sql::make_create_request(conn_info, "conn_data");
 	db.run_set_request(req);
 	conn_info["room_name"] = new sql::Text(room_name);
-	conn_info["connections"] = new sql::Text("");
 	req = sql::make_insert_request(conn_info, "conn_data");
 	db.run_set_request(req);
 }
@@ -107,8 +107,26 @@ void DataBaseProcessor::add_connection_info(const string& room_name,
 	//first get all data
 	auto existing_data = get_connections_info(room_name);
 
+	auto add = [&](friendly_connection& data)
+	{
+		table chunk;
+		chunk["room_name"] = new sql::Text(get<0>(data));
+		chunk["ip"] = new sql::Text(get<1>(data));
+		chunk["port"] = new sql::Integer(get<2>(data));
+		auto req = sql::make_insert_request(chunk, "conn_data");
+		db.run_set_request(req);
+	};
+	for (auto& data : existing_data)
+	{
+		add(data);
+	}
+
+	auto new_one = make_tuple(room_name,
+							  ip_port.first,
+							  atoi(ip_port.second.c_str()));
+	add(new_one);
 	//unite it
-	string data;
+	/*string data;
 	for (auto& elem : existing_data)
 	{
 		data += elem.first + ":" + elem.second + ";";
@@ -130,7 +148,7 @@ void DataBaseProcessor::add_connection_info(const string& room_name,
 	conn_info["connections"] = new sql::Text(data);
 	//create request and run it
 	string req = sql::make_update_request(conn_info, "conn_data");
-	db.run_set_request(req);
+	db.run_set_request(req);*/
 }
 bool DataBaseProcessor::does_conn_info_exist(const string& room_name)
 {
@@ -145,15 +163,21 @@ bool DataBaseProcessor::does_conn_info_exist(const string& room_name)
 	}
 	return false;
 }
-vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
+vector<friendly_connection> DataBaseProcessor::get_connections_info(const string& room_name)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
 	string req = sql::make_select_request("conn_data");
 	auto result = db.run_get_request(req);
-	vector<spair> info;
+	vector<friendly_connection> info;
 	for (auto& chunk : result)
 	{
+		auto t = make_tuple(type_to_string(chunk["room_name"]), 
+							type_to_string(chunk["ip"]), 
+							atoi(type_to_string(chunk["port"]).c_str()));
+		info.push_back(t);
+	}
+		/*{
 		bool eq_room = room_name == sql::type_to_string(chunk["room_name"]);
 		if (eq_room)
 		{
@@ -187,7 +211,7 @@ vector<spair> DataBaseProcessor::get_connections_info(const string& room_name)
 				return info;
 			}
 		}
-	}
+	}*/
 
 	//return empty vector
 	return info;
@@ -198,8 +222,8 @@ bool DataBaseProcessor::are_ip_port_saved(const spair& ip_port,
 	auto data = get_connections_info(room_name);
 	for (auto& chunk : data)
 	{
-		bool check1 = chunk.first == ip_port.first;
-		bool check2 = chunk.second == ip_port.second;
+		bool check1 = get<1>(chunk) == ip_port.first;
+		bool check2 = to_string(get<2>(chunk)) == ip_port.second;
 		if (check1 && check2)return true;
 	}
 	return false;
