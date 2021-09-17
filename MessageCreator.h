@@ -22,6 +22,7 @@ namespace
 		ComeInRequest,
 		ClientsInfo,
 		RoomName,
+		ComeInAsFriend,
 	};
 
 	string convert_message_to_json(const string& data,
