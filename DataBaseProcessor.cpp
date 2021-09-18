@@ -76,7 +76,6 @@ void DataBaseProcessor::create_room_connections_info(const string& room_name)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
-	//format is ip:port;ip:port;
 	table conn_info;
 
 	conn_info["room_name"] = new sql::Text("");
@@ -125,30 +124,6 @@ void DataBaseProcessor::add_connection_info(const string& room_name,
 							  ip_port.first,
 							  atoi(ip_port.second.c_str()));
 	add(new_one);
-	//unite it
-	/*string data;
-	for (auto& elem : existing_data)
-	{
-		data += elem.first + ":" + elem.second + ";";
-	}
-	
-	//add new one
-	//sqlite dynamicaly will try to cast ip value to float
-	//so it must be prevented
-	string ip_port_val = ip_port.first + ":" + ip_port.second ;
-	data+= ip_port_val;
-	data = "'" + data + "'";
-
-	//create table
-	table conn_info;
-
-	//this is little fix, it works
-	auto room_name_val = room_name[0] == '\"' ? room_name : "\"" + room_name + "\"";
-	conn_info["room_name"] = new sql::Text(room_name_val);
-	conn_info["connections"] = new sql::Text(data);
-	//create request and run it
-	string req = sql::make_update_request(conn_info, "conn_data");
-	db.run_set_request(req);*/
 }
 bool DataBaseProcessor::does_conn_info_exist(const string& room_name)
 {
@@ -177,42 +152,6 @@ vector<friendly_connection> DataBaseProcessor::get_connections_info(const string
 							atoi(type_to_string(chunk["port"]).c_str()));
 		info.push_back(t);
 	}
-		/*{
-		bool eq_room = room_name == sql::type_to_string(chunk["room_name"]);
-		if (eq_room)
-		{
-			string data = sql::type_to_string(chunk["connections"]);
-			auto split = [](const string& str, char delim)
-			{
-				//split by ;
-				stringstream ss(str);
-				string item;
-				vector<string> elems;
-				while (getline(ss, item, delim))
-				{
-					elems.push_back(item);
-				}
-				return elems;
-			};
-
-			if (!data.empty() && data != "0")
-			{
-				auto elems = split(data, ';');
-
-				//get ip and port
-				for (auto& elem : elems)
-				{
-					data = elem + ":";
-					auto ip_and_port = split(data, ':');
-					auto done_pair = make_pair(ip_and_port[0], ip_and_port[1]);
-					info.push_back(done_pair);
-				}
-
-				return info;
-			}
-		}
-	}*/
-
 	//return empty vector
 	return info;
 }
