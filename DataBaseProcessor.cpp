@@ -161,7 +161,7 @@ bool DataBaseProcessor::are_ip_port_saved(const spair& ip_port,
 	auto data = get_connections_info(room_name);
 	for (auto& chunk : data)
 	{
-		bool check1 = get<1>(chunk) == ip_port.first;
+		bool check1 = get<1>(chunk)			   == ip_port.first;
 		bool check2 = to_string(get<2>(chunk)) == ip_port.second;
 		if (check1 && check2)return true;
 	}

@@ -2,6 +2,7 @@
 #include"Server.h"
 #include"ConnectionChecker.hpp"
 #include<random>
+#include<set>
 namespace Blink
 {
 class DecentralysedServerClient:public Server
@@ -15,7 +16,15 @@ private:
 	TcpSocket* socket = nullptr;
 
 	list<RoomClient*> clients;
+
+	//TODO::unite these vectors into vector of pairs
 	vector<IpAddress> allowed;
+	vector<int> allowed_ports;
+
+
+	//they already were connected
+	typedef pair<IpAddress, int> ip_port;
+	
 
 	int client_counter = 0;
 public:
@@ -37,6 +46,9 @@ public:
 	void is_connecting(bool flag);
 	void set_key_iv(const encr::AES::key_iv& key_iv);
 private:
+	void connnect_finally();
+	void process_received_clients_info();
+
 	void make_client(list<RoomClient*>& clients, 
 					 int& client_counter,
 					 TcpSocket* socket,
@@ -46,6 +58,8 @@ private:
 
 	int get_random_port();
 	void connect_to_known_clients();
+
+	bool is_port_allowed(vector<int>& ports, int port);
 };
 };
 

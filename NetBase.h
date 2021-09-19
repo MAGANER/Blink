@@ -91,6 +91,7 @@ protected:
 
 	bool received_room_name = false;
 	string *correct_room_name;
+	string *correct_password;
 
 	~NetBase() {}
 
@@ -205,7 +206,7 @@ protected:
 	void receive_input_and_send_message_to_all(list<RoomClient*>& clients)
 	{
 		process_input(input, dollar_printed, input_callback);
-		if (!process_command()) 
+		if (!process_command())
 		{
 			for (auto& client : clients)
 				send_input(*client->socket);
@@ -218,10 +219,11 @@ protected:
 	string get_message(TcpSocket& socket)
 	{
 		Packet pack;
-		if (socket.receive(pack) == TcpSocket::Disconnected)
+		if (socket.receive(pack) == TcpSocket::Disconnected &&
+			socket.getRemoteAddress() == IpAddress::None)
 		{
 			can_show = false;
-			if (is_user)disconnect = true;
+			//if (is_user)disconnect = true;
 			socket_dissconnected = true;
 			return "";
 		}
@@ -265,7 +267,11 @@ protected:
 					received_room_name = true;
 					string name = parsed["data"];
 					name = fp::slice(name, 0, name.size());
-					correct_room_name = new string(name);
+					auto plus_pos = name.find('+');
+					string corr_name = fp::slice(name, 0, plus_pos);
+					string corr_pass = fp::slice(name, plus_pos+1, name.size());
+					correct_room_name = new string(corr_name);
+					correct_password  = new string(corr_pass);
 					return "";
 				}
 				

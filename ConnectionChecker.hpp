@@ -77,6 +77,8 @@ namespace ConnectionChecker
 	{
 
 		json jdata = json::parse(message);
+		if (jdata["type"] == 4) return true;//come in as friend
+
 		return string(jdata["data"]) == password &&
 			string(jdata["name"]) == name;
 	}
@@ -101,13 +103,14 @@ namespace ConnectionChecker
 			cout << "can not send!" << endl;
 			return false;
 		}
+		else
 		p.clear();
-
 		//get the answer
 		socket.receive(p);
 		string received_result;
 		p >> received_result;
 		bool ability = false;
+		cout << received_result << endl;
 		if (received_result == "1") ability = true;
 
 		if (!ability)cout << "can not come in!" << endl;
@@ -183,11 +186,11 @@ namespace ConnectionChecker
 				cout << "link is accepted!" << endl;
 				return true;
 			}
-			else cout << "link is denyied!" << endl;
+			else cout << "1:link is denyied!" << endl;
 		}
 		else
 		{
-			cout << "link is denyied!" << endl;
+			cout << "2:link is denyied!" << endl;
 		}
 
 		return false;

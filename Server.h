@@ -60,7 +60,13 @@ namespace Blink
 							const string& room_password,
 							bool decentralysed);
 		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
+
+
 		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
+		void check_access(TcpSocket& socket, 
+						  vector<IpAddress>& allowed,
+						  vector<int>& port);
+
 		void update_clients(list<RoomClient*>& clients);
 	};
 };
