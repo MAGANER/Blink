@@ -3,6 +3,7 @@
 #include"ConnectionData.h"
 #include"MessageCreator.h"
 #include"EncryptionData.h"
+#include"StringOperations.hpp"
 #include<iostream>
 #include<fstream>
 namespace Blink
@@ -10,28 +11,7 @@ namespace Blink
 namespace {
 namespace inner
 	{
-		vector<string> split(const string& s, char delim)
-		{
-			std::stringstream ss(s);
-			std::string item;
-			std::vector<std::string> elems;
-			while (std::getline(ss, item, delim))
-			{
-				elems.push_back(item);
-			}
-
-			function<bool(string)> should_copy = [&](const string& arg)
-			{
-				if (arg.size() == 0)return false;
-				return true;
-			};
-			function<bool(char)> filter_elem_pd = [&](char ch) { return isprint(ch); };
-			function<string(string)> filter_str = [&](const string& str)
-			{
-				return Functools::filter(str, filter_elem_pd);
-			};
-			return Functools::map(Functools::filter(elems, should_copy), filter_str);
-		}
+		using namespace StringOperations;
 		string convert_time_string_to_seconds(const string& str)
 		{
 			int h, m, s = 0;
@@ -105,12 +85,12 @@ namespace ConnectionChecker
 		}
 		else
 		p.clear();
+
 		//get the answer
 		socket.receive(p);
 		string received_result;
 		p >> received_result;
 		bool ability = false;
-		cout << received_result << endl;
 		if (received_result == "1") ability = true;
 
 		if (!ability)cout << "can not come in!" << endl;
