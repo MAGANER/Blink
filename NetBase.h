@@ -14,6 +14,9 @@
 #include"encryption/Encryption.h"
 #include"DataBaseProcessor.h"
 #include"RoomClient.hpp"
+#include"StringOperations.hpp"
+#include<set>
+
 namespace Blink
 {
 using namespace std;
@@ -44,8 +47,21 @@ struct Received_decentralysed_info
 			this->clients.push_back(client);
 		}
 	}
+	~Received_decentralysed_info()
+	{}
 	string room_name, room_password;
 	list<pair<IpAddress,int>> clients;
+};
+struct Received_additional_info
+{
+	Received_additional_info(const list<pair<string, int>>& clients)
+	{
+		for (auto& client : clients)
+		{
+			this->clients.push_back(client);
+		}
+	}
+	list<pair<string, int>> clients;
 };
 
 class NetBase :public DataBaseProcessor
@@ -92,6 +108,9 @@ protected:
 	bool received_room_name = false;
 	string *correct_room_name;
 	string *correct_password;
+
+	bool received_additional_info = false;
+	Received_additional_info* additional_info = nullptr;
 
 	~NetBase() {}
 
@@ -248,12 +267,11 @@ protected:
 					string room_name = parsed["room_name"];
 					string room_password = parsed["room_password"];
 					list<pair<IpAddress, int>> clients;
-
 					int clients_max = (int)parsed["max_clients"];
 					for (int counter = 0; counter < clients_max; counter++)
 					{
 						string cfield = "client" + to_string(counter);
-						string pfield = "port" + to_string(counter);
+						string pfield = "port"   + to_string(counter);
 						string ip = parsed[cfield];
 						int port = parsed[pfield];
 						IpAddress parsed_ip = IpAddress(ip);
@@ -274,7 +292,6 @@ protected:
 					correct_password  = new string(corr_pass);
 					return "";
 				}
-				
 			}
 			return data;
 		}
@@ -288,6 +305,22 @@ protected:
 		return data;
 	}
 	
+	bool does_connection_exist(const pair<string, int>& conn,
+						       const vector<pair<string, int>>& data)
+	{
+		for (auto& elem : data)
+		{
+			bool check1 = elem.first  == conn.first;
+			bool check2 = elem.second == conn.second;
+			if (check1 && check2) return true;
+		}
+		return false;
+	}
+	pair<string, int> split_to_ip_port(const string& str)
+	{
+		auto splitted = StringOperations::split(str, ':');
+		return make_pair(splitted[0], atoi(splitted[1].c_str()));
+	}
 	void update_input()
 	{
 		dollar_printed = false;

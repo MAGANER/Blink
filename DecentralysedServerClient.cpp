@@ -88,6 +88,8 @@ bool DecentralysedServerClient::_run()
 	}
 
 
+	Clock timer;
+
 	TcpSocket* entering_socket = new TcpSocket;
 	while (true)
 	{
@@ -110,7 +112,6 @@ bool DecentralysedServerClient::_run()
 				true &&
 				can_accept_new_connection(client_counter))
 			{
-
 				// send room name, because room name from file link is hashed
 				auto data = room_name + "+" + password;
 				send_message(*entering_socket, data, MessageType::RoomName);
@@ -123,7 +124,8 @@ bool DecentralysedServerClient::_run()
 
 				//don't resend if you connect to user
 				//who already was connected to another one
-				if(should_resend_clients_info)send_clients_info(clients, entering_socket);
+				if(should_resend_clients_info)
+					send_clients_info(clients, entering_socket);
 
 				make_client(clients, client_counter, entering_socket,listner_port);
 				
@@ -151,6 +153,12 @@ bool DecentralysedServerClient::_run()
 
 		//info about another clients
 		process_received_clients_info();
+
+		if (timer.getElapsedTime().asSeconds() > 10.0f)
+		{
+			check_offline_clients();
+			timer.restart();
+		}
 
 		//update_clients(clients);
 		if (should_disconnect())return true;
@@ -190,7 +198,6 @@ void DecentralysedServerClient::make_client(list<RoomClient*>& clients,
 
 	auto ip_port = make_pair(client->socket->getRemoteAddress().toString(),
 							 to_string(listner_port));
-
 
 	//save only if it's not saved and port is correct value
 	bool are_saved = !are_ip_port_saved(ip_port, room_name);
@@ -238,6 +245,7 @@ void DecentralysedServerClient::connect_to_known_clients()
 
 	for (auto& client_data : info)
 	{
+
 		socket = new TcpSocket();
 		auto s = socket->connect(IpAddress(get<1>(client_data)), get<2>(client_data));
 
@@ -256,10 +264,11 @@ void DecentralysedServerClient::connect_to_known_clients()
 			Packet pack;
 			pack << "motherfucker";
 			socket->send(pack);
+
+
 			make_client(clients, client_counter, socket, get<2>(client_data));
 		}
-
-
+	
 	}
 }
 bool DecentralysedServerClient::is_port_allowed(vector<int>& ports, int port)
@@ -313,7 +322,7 @@ void DecentralysedServerClient::connnect_finally()
 void DecentralysedServerClient::process_received_clients_info()
 {
 	//when you connect to another client,
-//it resends its data about another connected clients
+	//it resends its data about another connected clients
 	if (received_clients_info)
 	{
 		//connect to existing users
@@ -341,16 +350,54 @@ void DecentralysedServerClient::process_received_clients_info()
 				int listner_port = atoi(conn_data.port.c_str());
 				make_client(clients, client_counter, socket, listner_port);
 			}
+			else
+			{
+				cout << "save  offline client!" << endl;
+				//save offline client
+				offline_clients.push_back(client);
+			}
 		}
 		//create room
 		if (!does_room_exists(received_info->room_name))
 		{
 			create_new_room(received_info->room_name,
-				received_info->room_password,
-				to_string(port),
-				RoomNetworkMode::Decentralysed);
+							received_info->room_password,
+							to_string(port),
+							RoomNetworkMode::Decentralysed);
 		}
 
 		received_clients_info = false;
+		delete received_info;
+	}
+}
+void DecentralysedServerClient::check_offline_clients()
+{
+	//connect to existing users
+	ConnectionData conn_data;
+	//should hash data, cos the same data is hashed in links
+	conn_data.password = encr::SHA::sha256(password);
+	conn_data.room = encr::SHA::sha256(room_name);
+	for (size_t i = 0;i<offline_clients.size();++i)
+	{
+		auto& client = offline_clients[i];
+		conn_data.ip = client.first.toString();
+		conn_data.port = to_string(client.second);
+
+		if (ConnectionChecker::can_connect(conn_data))
+		{
+			TcpSocket* socket = new TcpSocket;
+			socket->setBlocking(false);
+			socket->connect(client.first, client.second);
+
+			//send the key word to say
+			//don't resend client info
+			Packet pack;
+			pack << "motherfucker";
+			socket->send(pack);
+
+			int listner_port = atoi(conn_data.port.c_str());
+			make_client(clients, client_counter, socket, listner_port);
+			offline_clients.erase(offline_clients.begin() + i);
+		}
 	}
 }

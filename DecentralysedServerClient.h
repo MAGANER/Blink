@@ -3,6 +3,8 @@
 #include"ConnectionChecker.hpp"
 #include<random>
 #include<set>
+#include"SFML/System/Time.hpp"
+#include"SFML/System/Clock.hpp"
 namespace Blink
 {
 class DecentralysedServerClient:public Server
@@ -17,14 +19,12 @@ private:
 
 	list<RoomClient*> clients;
 
+	typedef pair<IpAddress, int> ip_port;
+	vector<ip_port> offline_clients;
+
 	//TODO::unite these vectors into vector of pairs
 	vector<IpAddress> allowed;
 	vector<int> allowed_ports;
-
-
-	//they already were connected
-	typedef pair<IpAddress, int> ip_port;
-	
 
 	int client_counter = 0;
 public:
@@ -58,6 +58,8 @@ private:
 
 	int get_random_port();
 	void connect_to_known_clients();
+
+	void check_offline_clients();
 
 	bool is_port_allowed(vector<int>& ports, int port);
 };
