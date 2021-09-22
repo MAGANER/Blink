@@ -57,6 +57,14 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 			key_iv.first  = encr::AES::convert_to_bytes(key_iv_val.first);
 			key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
 
+			//get offline clients
+			auto saved_offline_clients = get_offline_clients(room_name);
+			cout << "saved offline clients:" << saved_offline_clients.size()<<endl;
+			for (auto& client : saved_offline_clients)
+			{
+				offline_clients.push_back(client);
+			}
+
 
 			connect_to_saved_clients = true;
 			_cant_connect = false;
@@ -161,7 +169,19 @@ bool DecentralysedServerClient::_run()
 		}
 
 		//update_clients(clients);
-		if (should_disconnect())return true;
+		if (should_disconnect())
+		{
+			//save offline clients
+			//because if you don't do that you lost all data  about potential
+			//clients
+			cout << offline_clients.size() << "is offline clients!" << endl;
+			for (auto& client : offline_clients)
+			{
+				add_offline_client(room_name, client.first.toString(), client.second);
+			}
+
+			return true;
+		}
 	}
 
 	if (entering_socket != nullptr) delete entering_socket;
@@ -398,6 +418,8 @@ void DecentralysedServerClient::check_offline_clients()
 			int listner_port = atoi(conn_data.port.c_str());
 			make_client(clients, client_counter, socket, listner_port);
 			offline_clients.erase(offline_clients.begin() + i);
+			//also erase them from DB
+			erase_offline_client(room_name, client.first.toString(), listner_port);
 		}
 	}
 }

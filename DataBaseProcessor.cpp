@@ -182,6 +182,8 @@ void DataBaseProcessor::create_new_room(const string& name,
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
+
+	create_offline_clients_table(name);
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
@@ -435,4 +437,74 @@ int DataBaseProcessor::get_own_port(const string& room_name)
 		}
 	}
 	return -1;
+}
+void DataBaseProcessor::create_offline_clients_table(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	table offline_clients;
+	offline_clients["room_name"] = new sql::Text("");
+	offline_clients["ip"]		 = new sql::Text("");
+	offline_clients["port"]		 = new sql::Integer(0);
+
+	auto req = sql::make_create_request(offline_clients, "offline_clients");
+	if (!db.run_set_request(req))
+		cout << "create:" << db.get_error_message() << endl;
+}
+void DataBaseProcessor::add_offline_client(const string& room_name,
+										   const string& ip, 
+										   const int& port)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	table offline_clients;
+	offline_clients["room_name"] = new sql::Text(room_name);
+	offline_clients["ip"] = new sql::Text("'"+ip+"'");
+	offline_clients["port"] = new sql::Integer(port);
+
+	auto req = sql::make_insert_request(offline_clients, "offline_clients");
+	if (!db.run_set_request(req))
+		cout << "add:" << db.get_error_message() << endl;
+}
+vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	auto req = sql::make_select_request("offline_clients");
+	auto result = db.run_get_request(req);
+	
+	if(!db.is_ok())cout << "get:" << db.get_error_message() << endl;
+
+	vector<pair<string, int>> data;
+	for (auto& chunk : result)
+	{
+		bool same_room = sql::type_to_string(chunk["room_name"]) == room_name;
+		if (same_room)
+		{
+			string ip = sql::type_to_string(chunk["ip"]);
+			ip = Functools::slice(ip, 1, ip.size() - 1);
+			int port  = atoi(sql::type_to_string(chunk["port"]).c_str());
+			data.push_back(make_pair(ip, port));
+		}
+	}
+
+	return data;
+}
+void DataBaseProcessor::erase_offline_client(const string& room_name,
+											 const string& ip,
+											 const int& port)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	table data_to_delete;
+	data_to_delete["room_name"] = new sql::Text("'"+room_name+"'");
+	data_to_delete["ip"]		= new sql::Text("'"+ip+"'");
+	data_to_delete["port"]		= new sql::Integer(port);
+
+	auto req = sql::make_delete_request("offline_clients", data_to_delete);
+	if (!db.run_set_request(req))
+	{
+		cout << req << endl;
+		cout <<"erase:"<< db.get_error_message() << endl;
+	}
 }
