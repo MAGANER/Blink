@@ -59,8 +59,8 @@ namespace
 		jdata["max_clients"] = clients.size();
 		for (auto& client : clients)
 		{
-			client_field = client_field + to_string(client_counter);
-			port_field = port_field + to_string(client_counter);
+			client_field = "client" + to_string(client_counter);
+			port_field = "port" + to_string(client_counter);
 			auto ip = client->socket->getRemoteAddress();
 			if (ip != sf::IpAddress::None)
 			{
