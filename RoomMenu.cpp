@@ -43,149 +43,73 @@ void RoomMenu::set_room_data(const string& port,
 							 const string& ip,
 							 const string& user_name,
 							 const string& room_name,
-							 const string& room_password,
-							 RoomNetworkMode mode)
+							 const string& room_password)
 {
 	data["port"] = port;
 	data["ip"]   = ip;
 	data["user_name"] = user_name;
 	data["room_name"] = room_name;
 	data["room_password"] = room_password;
-	room_mode = mode;
 }
-void RoomMenu::run(mode flag, 
+void RoomMenu::run(bool connecting_with_file_link,
+				   bool starting_room)
+{
+	auto port = atoi(data["port"].c_str());
+
+	DecentralysedServerClient client_server(commands,
+											data["room_password"],
+											data["room_name"],
+											data["user_name"],
+											db_key,
+											get_db_name(),
+											connecting_with_file_link,
+											starting_room);
+	if (client_server.cant_connect())
+	{
+		exit = true;
+	}
+	else
+	{
+		while (true)
+		{
+			client_server._run();
+			if (client_server.should_disconnect())
+			{
+				exit = true;
+				break;
+			}
+		}	
+	}
+}
+void RoomMenu::run(const encr::AES::key_iv& key, 
 				   bool connecting_with_file_link,
 				   bool starting_room)
 {
 	auto port = atoi(data["port"].c_str());
-	if (room_mode == RoomNetworkMode::Decentralysed)
+
+	DecentralysedServerClient client_server(commands,
+											data["room_password"],
+											data["room_name"],
+											data["user_name"],
+											db_key,
+											get_db_name(),
+											connecting_with_file_link,
+											starting_room,
+											true);
+	if (client_server.cant_connect())
 	{
-		DecentralysedServerClient client_server(commands,
-								  data["room_password"],
-							      data["room_name"],
-								  data["user_name"],
-								  db_key,
-								  get_db_name(),
-								  connecting_with_file_link,
-								  starting_room);
-		if (client_server.cant_connect())
-		{
-			exit = true;
-		}
-		else
-		{
-			while (true)
-			{
-				client_server._run();
-				if (client_server.should_disconnect())
-				{
-					exit = true;
-					break;
-				}
-			}	
-		}
+		exit = true;
 	}
 	else
 	{
-		if (flag == mode::SERVER)
-			server = new Server(commands, data["room_password"],
-				data["room_name"],
-				data["user_name"],
-				db_key,
-				get_db_name());
-		else
+		client_server.set_ip_and_port_to_connect(data["ip"], data["port"]);
+		client_server.is_connecting(true);
+		client_server.set_key_iv(key);
+		while (true)
 		{
-			client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"], db_key, get_db_name());
-		}
-
-		execute(port);
-	}
-}
-void RoomMenu::run(mode flag, 
-				   const encr::AES::key_iv& key, 
-				   bool connecting_with_file_link,
-				   bool starting_room)
-{
-	auto port = atoi(data["port"].c_str());
-	if (room_mode == RoomNetworkMode::Decentralysed)
-	{
-		DecentralysedServerClient client_server(commands,
-												data["room_password"],
-												data["room_name"],
-												data["user_name"],
-												db_key,
-												get_db_name(),
-												connecting_with_file_link,
-												starting_room,
-												true);
-		if (client_server.cant_connect())
-		{
-			exit = true;
-		}
-		else
-		{
-			client_server.set_ip_and_port_to_connect(data["ip"], data["port"]);
-			client_server.is_connecting(true);
-			client_server.set_key_iv(key);
-			while (true)
+			client_server._run();
+			if (client_server.should_disconnect())
 			{
-				client_server._run();
-				if (client_server.should_disconnect())
-				{
-					exit = true;
-					break;
-				}
-			}
-		}
-	}
-	else
-	{
-		if (flag == mode::SERVER)
-			server = new Server(commands, data["room_password"],
-				data["room_name"],
-				data["user_name"],
-				db_key,
-				get_db_name());
-		else
-		{
-			client = new Client(data["ip"], port, commands, data["user_name"], data["room_name"], key, db_key, get_db_name());
-		}
-
-		execute(port);
-	}
-}
-void RoomMenu::execute(int port)
-{
-	bool run_server = true;
-
-	auto run = [&]()
-	{
-		server->run(data["room_name"], data["room_password"], port,room_mode);
-		return true;
-	};
-	while (true)
-	{
-		if (server != nullptr)
-		{
-			if (run_server)
-			{
-				run();
-				if (server->should_disconnect())
-				{
-					system("cls");
-					cout << "you have been disconnected from room..." << endl;
-					exit = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			client->run();
-			if (client->should_disconnect())
-			{
-				system("cls");
-				cout << "you have been disconnected from room..." << endl;
 				exit = true;
 				break;
 			}

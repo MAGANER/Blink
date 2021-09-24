@@ -32,7 +32,6 @@ namespace Blink
         bool exit()       { return _exit;          } //log out, back to enter menu
         bool enter_room() { return can_enter_room; } //has ability to enter(start room as owner)
         bool _connect() { return can_connect_to_room; } //has right link data to connect
-        bool is_decentralysed() { return decentralysed; } //means room is decentralyed
         bool is_connecting_with_conflink_command() { return connecting_with_conflink_command; }
         bool start_room() { return can_start_room; };
 
@@ -55,7 +54,6 @@ namespace Blink
         bool can_enter_room = false;
         bool can_start_room = false;
         bool can_connect_to_room = false;
-        bool decentralysed = false;
 
         //if u use conflink command, then next special
         //port will be generated. I mean port for your server

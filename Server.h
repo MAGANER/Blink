@@ -36,10 +36,6 @@ namespace Blink
 			   bool inherited = false);
 		~Server();
 
-		virtual bool run(const string& room_name,
-				 const string& room_password,
-				 int port,
-				 RoomNetworkMode mode);
 	private:
 
 		string get_invite_link_str(int port,
@@ -47,13 +43,6 @@ namespace Blink
 								   const string& room_password,
 								   bool decentralysed);
 
-		void run_one2one_mode(const string& room_name,
-							  const string& room_password,
-							  int port);
-		void run_one2ones_mode(const string& room_name,
-							   const string& room_password,
-							   int port);
-	
 	protected:
 	void create_invite_link(int port,
 							const string& room_name,

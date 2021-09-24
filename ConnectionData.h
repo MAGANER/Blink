@@ -9,15 +9,13 @@ namespace Blink
         {
         }
         ~ConnectionData() {}
-       std::string room, password, ip, port;
-        RoomNetworkMode mode;
+        std::string room, password, ip, port;
         void clear()
         {
             room.clear();
             password.clear();
             ip.clear();
             port.clear();
-            mode = (RoomNetworkMode)-1;
         }
     };
 };

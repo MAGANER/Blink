@@ -57,7 +57,7 @@ namespace Blink
 			return sf::Keyboard::isKeyPressed(sf::Keyboard::Enter);
 		}
 	public:
-		AsyncInput() {}
+		AsyncInput():history_element(0) {}
 		~AsyncInput() {}
 
 		void read(bool secret_info=false)

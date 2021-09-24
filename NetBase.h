@@ -149,18 +149,6 @@ protected:
 			socket.send(pack);
 		}
 	}
-	void resend_messages_from_server(list<RoomClient*>& clients,
-									 int exlude_id,
-									 const string& message)
-	{
-		for (auto& client : clients)
-		{
-			if (client->id != exlude_id)
-			{
-				send_jmessage(*client->socket, message);
-			}
-		}
-	}
 
 	void show_message(const string& message)
 	{
@@ -175,24 +163,11 @@ protected:
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{
-		//for one2one mode
-
 		string data = NetBase::get_message(socket);
 
 		if (data.size() > 0 && can_show)
 		{
 			show_message(data);
-		}
-	}
-	void return_and_show_message(RoomClient* client,
-								 list<RoomClient*>& clients)
-	{
-		//for one2many ones mode(also decentralysed)
-		string message = NetBase::get_message(*client->socket);
-		if (message.size() > 0 && can_show)
-		{
-			show_message(message);
-			resend_messages_from_server(clients, client->id, message);
 		}
 	}
 

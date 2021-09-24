@@ -41,8 +41,8 @@ int main()
 	enum class state{ ENTER,MAIN,ROOM };
 
 	state current = state::ENTER;
-	RoomMenu::mode app_mode;
-	
+
+
 	string current_user_name;
 	encr::AES::key_iv* keys = nullptr;
 
@@ -85,20 +85,17 @@ int main()
 				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
-				if (main_menu->is_decentralysed()) data.mode = RoomNetworkMode::Decentralysed;
 
 				room_menu->set_room_data(data.port,
 										 data.ip,
 										 current_user_name,
 										 data.room,
-										 data.password,
-										 data.mode);
+										 data.password);
 
 				if (main_menu->start_room())starting_room = true;
 
 				delete main_menu;
 
-				app_mode = RoomMenu::mode::SERVER;
 				current = state::ROOM;	
 			}
 			else if (main_menu->_connect())
@@ -106,14 +103,12 @@ int main()
 				room_menu = new RoomMenu(key, db_name);
 				
 				ConnectionData data = main_menu->get_connection_data();
-				if (main_menu->is_decentralysed()) data.mode = RoomNetworkMode::Decentralysed;
 
 				room_menu->set_room_data(data.port,
 										 data.ip,
 										 current_user_name,
 										 data.room,
-										 data.password,
-										 data.mode);
+										 data.password);
 
 
 				//init 
@@ -124,16 +119,15 @@ int main()
 
 				delete main_menu;
 
-				app_mode = RoomMenu::mode::CLIENT;
 				current = state::ROOM;		
 			}
 		}
 		if (current == state::ROOM)
 		{
 			if (keys != nullptr)
-				room_menu->run(app_mode, *keys, connecting_with_conflink_command,starting_room);
+				room_menu->run( *keys, connecting_with_conflink_command,starting_room);
 			else
-				room_menu->run(app_mode, connecting_with_conflink_command,starting_room);
+				room_menu->run( connecting_with_conflink_command,starting_room);
 
 			if (room_menu->should_exit())
 			{

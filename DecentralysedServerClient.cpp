@@ -373,8 +373,7 @@ void DecentralysedServerClient::process_received_clients_info()
 		{
 			create_new_room(received_info->room_name,
 							received_info->room_password,
-							to_string(port),
-							RoomNetworkMode::Decentralysed);
+							to_string(port));
 		}
 
 		received_clients_info = false;

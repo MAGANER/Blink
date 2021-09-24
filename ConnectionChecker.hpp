@@ -97,8 +97,7 @@ namespace ConnectionChecker
 		return ability;
 	}
 	bool connect_with_filelink(ConnectionData& data,
-							   EncryptionData& encr_data,
-							   bool& decentralysed)
+							   EncryptionData& encr_data)
 	{
 		using namespace inner;
 
@@ -133,11 +132,7 @@ namespace ConnectionChecker
 		data.room = jlink["room"];
 		data.password = jlink["password"];
 
-		if (jlink["decentralysed"] == "1")
-			decentralysed  = true;
-		else decentralysed = false;
-		
-
+	
 		auto new_encr_data = new EncryptionData(jlink["key"], jlink["iv"]);
 		encr_data = *new_encr_data;
 

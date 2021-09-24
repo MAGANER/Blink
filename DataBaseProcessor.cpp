@@ -17,7 +17,6 @@ void DataBaseProcessor::create_new_user(const string& name,
 		rooms["name"] = new sql::Text("");
 		rooms["password"] = new sql::Text("");
 		rooms["port"] = new sql::Text("");
-		rooms["mode"] = new sql::Integer(0);
 
 		chats["room_name"] = new sql::Text("");
 		chats["user_name"] = new sql::Text("");
@@ -171,8 +170,7 @@ bool DataBaseProcessor::are_ip_port_saved(const spair& ip_port,
 }
 void DataBaseProcessor::create_new_room(const string& name,
 										const string& password,
-										const string& port,
-										RoomNetworkMode mode)
+										const string& port)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
@@ -180,7 +178,6 @@ void DataBaseProcessor::create_new_room(const string& name,
 	room["name"]	 = new sql::Text(name);
 	room["password"] = new sql::Text(password);
 	room["port"]	 = new sql::Text(port);
-	room["mode"]	 = new sql::Integer((int)mode);
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
@@ -285,32 +282,6 @@ int Blink::get_room_port(const string& room_name,
 			{
 				auto result = static_cast<sql::Integer*>(val)->value;
 				return result;
-			}
-		}
-	}
-}
-RoomNetworkMode Blink::get_room_mode(const string& room_name,
-									 const string& db_key,
-									 const string& db_name)
-{
-	sql::DataBase db(db_name, db_key, false);
-
-	string req = sql::make_select_request("rooms");
-	auto result = db.run_get_request(req);
-
-	for (auto chunk : result)
-	{
-		if (sql::type_to_string(chunk["name"]) == room_name)
-		{
-			auto val = chunk["mode"];
-
-			//sqlite3 has dynamic type casting
-			//so integer number can become Primary key
-			//and when room is created it can not get port as not number
-			if (val->type == sql::SQL_TYPES::INTEGER)
-			{
-				auto result = static_cast<sql::Integer*>(val)->value;
-				return (RoomNetworkMode)result;
 			}
 		}
 	}
@@ -449,6 +420,7 @@ void DataBaseProcessor::create_offline_clients_table()
 
 	auto req = sql::make_create_request(offline_clients, "offline_clients");
 	db.run_set_request(req);
+	if (!db.is_ok())cout << db.get_error_message() << endl;
 }
 void DataBaseProcessor::add_offline_client(const string& room_name,
 										   const string& ip, 
@@ -464,6 +436,7 @@ void DataBaseProcessor::add_offline_client(const string& room_name,
 	auto req = sql::make_insert_request(offline_clients, "offline_clients");
 	if (!db.run_set_request(req))
 		cout << "add:" << db.get_error_message() << endl;
+	else cout << "added carefully!" << endl;
 }
 vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& room_name)
 {
@@ -501,9 +474,12 @@ void DataBaseProcessor::erase_offline_client(const string& room_name,
 	data_to_delete["port"]		= new sql::Integer(port);
 
 	auto req = sql::make_delete_request("offline_clients", data_to_delete);
-	if (!db.run_set_request(req))
-	{
-		cout << req << endl;
-		cout <<"erase:"<< db.get_error_message() << endl;
-	}
+	db.run_set_request(req); //it can raise error
+	//so let me show it's not a problem
+	//when user gets offline clients info
+	//he doesn't save it, he saves it, when exit
+	//so if offline client come online
+	//then it tries to erase, butt fail
+	//because offline client is not saved to db
+	//and should not be saved.
 }
