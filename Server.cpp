@@ -246,7 +246,6 @@ void Server::check_access(TcpSocket& socket,
 			allowed.push_back(address);
 			port.push_back(socket.getLocalPort());
 		}
-			
 		p << "1";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
 	}
