@@ -115,6 +115,7 @@ int main()
 				keys = new encr::AES::key_iv();
 				keys->first = main_menu->get_encryption_data()->data.first;
 				keys->second = main_menu->get_encryption_data()->data.second;
+				connecting_with_conflink_command = main_menu->is_connecting_with_conflink_command();
 
 				delete main_menu;
 
