@@ -45,6 +45,12 @@ int main()
 	
 	string current_user_name;
 	encr::AES::key_iv* keys = nullptr;
+
+	
+	//if u use conflink command, then next special
+	//port will be generated. I mean port for your server
+	//If you enter rooms, then old port is used
+	//see: MainMenu.h 58
 	bool connecting_with_conflink_command = false;
 	while (true)
 	{
@@ -104,13 +110,12 @@ int main()
 										 data.password,
 										 data.mode);
 
-				if (main_menu->get_connection_regime() == MainMenu::CONNECTION_REGIME::WithLink)
-				{
-					keys = new encr::AES::key_iv();
-					keys->first = main_menu->get_encryption_data()->data.first;
-					keys->second = main_menu->get_encryption_data()->data.second;
-				}
-				connecting_with_conflink_command = main_menu->is_connecting_with_conflink_command();
+
+				//init 
+				keys = new encr::AES::key_iv();
+				keys->first = main_menu->get_encryption_data()->data.first;
+				keys->second = main_menu->get_encryption_data()->data.second;
+
 				delete main_menu;
 
 				app_mode = RoomMenu::mode::CLIENT;
