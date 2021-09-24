@@ -8,13 +8,11 @@ MainMenu::MainMenu(const string& encr_key,
 	commands["exit"]    = function<void()>([&]() { _exit = true; });
 	commands["create"]  = function<void()>([&]() { create();     });
 	commands["enter"]   = function<void()>([&]() { enter();      });
-	commands["connect"] = function<void()>([&]() { connect();   });
 	commands["conflink"] = function<void()>([&]()
 		{
 			EncryptionData _data;
 			if (ConnectionChecker::connect_with_filelink(data, _data, decentralysed))
 			{
-				con_regime = CONNECTION_REGIME::WithLink;
 				can_connect_to_room = true;
 				encr_data = new EncryptionData();
 				encr_data->data = _data.data;
@@ -77,25 +75,6 @@ void MainMenu::enter()
 		system("cls");
 		cout << "welcome to " << name << " room!" << endl;
 	}
-}
-void MainMenu::connect()
-{
-	cout << "enter ip:";
-	cin >> data.ip;
-	cout << "enter port:";
-	cin >> data.port;
-	cout << "enter room name:";
-	cin >> data.room;
-	cout << "enter password:";
-	data.password = get_secret_data();
-
-	if (ConnectionChecker::can_connect(data))
-	{
-		cout << "connecting to " << data.room << endl;
-		can_connect_to_room = true;
-		con_regime = CONNECTION_REGIME::Manually;
-	}
-	else data.clear();
 }
 void MainMenu::show_rooms()
 {

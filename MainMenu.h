@@ -20,12 +20,6 @@ namespace Blink
     class MainMenu : public Interface, public DataBaseProcessor
     {
     public:
-        enum class CONNECTION_REGIME
-        {
-            WithLink,
-            Manually
-        };
-
         MainMenu(const string& encr_key,
                  const string& db_name);
         ~MainMenu()
@@ -41,7 +35,6 @@ namespace Blink
 
         ConnectionData get_connection_data(){ return data; }
         EncryptionData* get_encryption_data() { return encr_data; }
-        CONNECTION_REGIME get_connection_regime() { return con_regime; }
         void finish()
         {
             can_enter_room      = false;
@@ -58,15 +51,17 @@ namespace Blink
         bool can_enter_room = false;
         bool can_connect_to_room = false;
         bool decentralysed = false;
+
+        //if u use conflink command, then next special
+        //port will be generated. I mean port for your server
+        //If you enter rooms, then old port is used
         bool connecting_with_conflink_command = false;
         
         ConnectionData data;
         EncryptionData* encr_data = nullptr;
-        CONNECTION_REGIME con_regime;
 
         void create();
         void enter();
-        void connect();
         void show_rooms();
     };
 };
