@@ -34,6 +34,7 @@ namespace Blink
         bool _connect() { return can_connect_to_room; } //has right link data to connect
         bool is_decentralysed() { return decentralysed; } //means room is decentralyed
         bool is_connecting_with_conflink_command() { return connecting_with_conflink_command; }
+        bool start_room() { return can_start_room; };
 
         ConnectionData get_connection_data(){ return data; }
         EncryptionData* get_encryption_data() { return encr_data; }
@@ -42,7 +43,7 @@ namespace Blink
             //clear and set all flags to default
             can_enter_room      = false;
             can_connect_to_room = false;
-
+            can_start_room      = false;
             data.ip.clear();
             data.port.clear();
             data.password.clear();
@@ -52,6 +53,7 @@ namespace Blink
     private:
         bool _exit          = false;
         bool can_enter_room = false;
+        bool can_start_room = false;
         bool can_connect_to_room = false;
         bool decentralysed = false;
 
@@ -67,7 +69,11 @@ namespace Blink
         //they are processed as callbacks
         void create();
         void enter();
+        void _start_room();
         void show_rooms();
+
+        pair<string, string> get_login_password();
+        void init_room_data(const string& name, const string& password);
     };
 };
 

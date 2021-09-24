@@ -26,9 +26,10 @@ namespace Blink
         void list_all_messages();
 
         string db_key;
-        RoomNetworkMode room_mode;
+        RoomNetworkMode room_mode;//TODO::erase
     public:
-        enum class mode { SERVER, CLIENT };
+        enum class mode { SERVER, CLIENT }; //TODO::erase
+        enum class access_mode {STARTER, CONNECTOR};
 
         RoomMenu(const string& encr_key,
                  const string& db_name);
@@ -38,8 +39,8 @@ namespace Blink
             if (client != nullptr) delete client;
         }
 
-        void run(mode flag, bool connecting_with_file_link);
-        void run(mode flag, const encr::AES::key_iv& key, bool connecting_with_file_link);
+        void run(mode flag, bool connecting_with_file_link, bool starting_room);
+        void run(mode flag, const encr::AES::key_iv& key, bool connecting_with_file_link, bool starting_room);
         void set_room_data(const string& port,
                            const string& ip,
                            const string& user_name,

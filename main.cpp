@@ -52,6 +52,8 @@ int main()
 	//If you enter rooms, then old port is used
 	//see: MainMenu.h 58
 	bool connecting_with_conflink_command = false;
+
+	bool starting_room = false;
 	while (true)
 	{
 		if (current == state::ENTER)
@@ -77,7 +79,8 @@ int main()
 				delete main_menu;
 				enter_menu = new EnterMenu(key, db_name);
 			}
-			else if (main_menu->enter_room())
+			else if (main_menu->enter_room() || 
+					 main_menu->start_room())
 			{
 				room_menu = new RoomMenu(key, db_name);
 
@@ -90,6 +93,8 @@ int main()
 										 data.room,
 										 data.password,
 										 data.mode);
+
+				if (main_menu->start_room())starting_room = true;
 
 				delete main_menu;
 
@@ -126,9 +131,9 @@ int main()
 		if (current == state::ROOM)
 		{
 			if (keys != nullptr)
-				room_menu->run(app_mode, *keys, connecting_with_conflink_command);
+				room_menu->run(app_mode, *keys, connecting_with_conflink_command,starting_room);
 			else
-				room_menu->run(app_mode, connecting_with_conflink_command);
+				room_menu->run(app_mode, connecting_with_conflink_command,starting_room);
 
 			if (room_menu->should_exit())
 			{
@@ -136,6 +141,7 @@ int main()
 				main_menu = new MainMenu(key, db_name);
 				delete room_menu;
 				connecting_with_conflink_command = false;
+				starting_room = false;
 			}
 		}
 	}

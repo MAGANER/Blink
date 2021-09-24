@@ -35,6 +35,7 @@ public:
 							  const string& db_key,
 							  const string& db_name,
 							  bool connecting_with_conflink_command,
+							  bool starting_room,
 							  bool inherited = false);
 	~DecentralysedServerClient();
 

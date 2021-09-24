@@ -41,6 +41,8 @@ void DataBaseProcessor::create_new_user(const string& name,
 		req = sql::make_insert_request(_owner, "owner");
 		db.run_set_request(req);
 
+		create_offline_clients_table();
+
 	}
 }
 bool DataBaseProcessor::does_user_exist(const string& name,
@@ -182,8 +184,6 @@ void DataBaseProcessor::create_new_room(const string& name,
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
-
-	create_offline_clients_table(name);
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
@@ -438,7 +438,7 @@ int DataBaseProcessor::get_own_port(const string& room_name)
 	}
 	return -1;
 }
-void DataBaseProcessor::create_offline_clients_table(const string& room_name)
+void DataBaseProcessor::create_offline_clients_table()
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
@@ -448,8 +448,7 @@ void DataBaseProcessor::create_offline_clients_table(const string& room_name)
 	offline_clients["port"]		 = new sql::Integer(0);
 
 	auto req = sql::make_create_request(offline_clients, "offline_clients");
-	if (!db.run_set_request(req))
-		cout << "create:" << db.get_error_message() << endl;
+	db.run_set_request(req);
 }
 void DataBaseProcessor::add_offline_client(const string& room_name,
 										   const string& ip, 

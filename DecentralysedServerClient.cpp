@@ -8,6 +8,7 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 	const string& db_key,
 	const string& db_name,
 	bool connecting_with_conflink_command,
+	bool starting_room,
 	bool inherited) :Server(commands,password,room_name,user_name,db_key,db_name,inherited)
 {
 	while (true)
@@ -19,11 +20,13 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 			break;
 		}
 
+		
+		/*
 		cout << "if you start decentralysed room, then create link(1).\n" <<
 			"if you connect to existing decentralysed room(2)\n";
 		cout << ">>";
-		string mode;
-		cin >> mode;
+		*/
+		string mode = starting_room? "1":"2";
 		if (mode.size() != 1)
 		{
 			mode.clear();

@@ -50,7 +50,7 @@ namespace Blink
 		bool does_conn_info_exist(const string& room_name);
 		void create_room_connections_info(const string& room_name);
 
-		void create_offline_clients_table(const string& room_name);
+		void create_offline_clients_table();
 		void add_offline_client(const string& room_name,
 								const string& ip, 
 								const int& port);
