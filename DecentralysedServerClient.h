@@ -1,7 +1,7 @@
 #pragma once
 #include"Server.h"
 #include"ConnectionChecker.hpp"
-#include<random>
+#include"NetRandom.hpp"
 #include<set>
 #include"SFML/System/Time.hpp"
 #include"SFML/System/Clock.hpp"
@@ -56,7 +56,6 @@ private:
 	void send_clients_info(list<RoomClient*>& clients,
 						   TcpSocket* socket);
 
-	int get_random_port();
 	void connect_to_known_clients();
 
 	void check_offline_clients();

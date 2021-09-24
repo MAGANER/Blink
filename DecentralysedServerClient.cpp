@@ -14,7 +14,7 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 	{
 		if (connecting_with_conflink_command)
 		{
-			port = get_random_port();
+			port = NetRandom::get_random_port();
 			_cant_connect = false;
 			break;
 		}
@@ -53,13 +53,15 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 
 
 			//keys are still the same
-			auto key_iv_val = get_key_iv(room_name);
-			key_iv.first  = encr::AES::convert_to_bytes(key_iv_val.first);
-			key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
+			if (!connecting_with_conflink_command)
+			{
+				auto key_iv_val = get_key_iv(room_name);
+				key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
+				key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
+			}
 
 			//get offline clients
 			auto saved_offline_clients = get_offline_clients(room_name);
-			cout << "saved offline clients:" << saved_offline_clients.size()<<endl;
 			for (auto& client : saved_offline_clients)
 			{
 				offline_clients.push_back(client);
@@ -174,7 +176,6 @@ bool DecentralysedServerClient::_run()
 			//save offline clients
 			//because if you don't do that you lost all data  about potential
 			//clients
-			cout << offline_clients.size() << "is offline clients!" << endl;
 			for (auto& client : offline_clients)
 			{
 				add_offline_client(room_name, client.first.toString(), client.second);
@@ -235,19 +236,6 @@ void DecentralysedServerClient::send_clients_info(list<RoomClient*>& clients,
 	socket->setBlocking(true);
 	send_jmessage(*socket, message);
 	socket->setBlocking(false);
-}
-int DecentralysedServerClient::get_random_port()
-{
-	random_device rd;   
-	mt19937 gen(rd());  
-	uniform_int_distribution<> dist(1, 9);
-						
-	string port;
-	for (int i = 0; i < 5; ++i) 
-	{
-		port += to_string(dist(gen));
-	}
-	return atoi(port.c_str());
 }
 void DecentralysedServerClient::connect_to_known_clients()
 {
