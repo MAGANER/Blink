@@ -27,7 +27,7 @@ void MainMenu::create()
 	string name, password, port;
 	cout << "enter room name:";      cin >> name;
 	cout << "enter room password:"; password = get_secret_data();
-	cout << "enter room port:";      cin >> port;
+	port = to_string(NetRandom::get_random_port());
 	cout << "enter room network mode:"<< endl;
 	cout << "One to One(0)"    << endl;
 	cout << "One to ones(1)"   << endl;
@@ -62,11 +62,12 @@ void MainMenu::enter()
 	string name, password;
 	cout << "enter room name:";      cin >> name;
 	cout << "enter room password:"; 
-	password = get_secret_data();
+	password = get_secret_data(); //don't show entered symbols, while getting input
 
 	if (!is_password_correct(name,password)) cout << "can not enter to " << "`" + name + "`" << " room";
 	else
 	{
+		//init data to be passed further to room menu
 		data.room     = name;
 		data.password = password;
 		data.port = to_string(get_room_port(name, get_encr_key(),get_db_name()));
@@ -78,6 +79,10 @@ void MainMenu::enter()
 }
 void MainMenu::show_rooms()
 {
+	//enter password
+	//if it's right
+	//show list of rooms
+
 	cout << "password:";
 	string password = get_secret_data();
 

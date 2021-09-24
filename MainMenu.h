@@ -13,6 +13,7 @@
 #include"InviteLinkCreator.h"
 #include"EncryptionData.h"
 #include"ConnectionChecker.hpp"
+#include"NetRandom.hpp"
 #include<fstream>
 namespace Blink
 {
@@ -27,16 +28,18 @@ namespace Blink
             if (encr_data != nullptr) delete encr_data;
         }
 
-        bool exit()       { return _exit;          }
-        bool enter_room() { return can_enter_room; }
-        bool _connect() { return can_connect_to_room; }
-        bool is_decentralysed() { return decentralysed; }
+
+        bool exit()       { return _exit;          } //log out, back to enter menu
+        bool enter_room() { return can_enter_room; } //has ability to enter(start room as owner)
+        bool _connect() { return can_connect_to_room; } //has right link data to connect
+        bool is_decentralysed() { return decentralysed; } //means room is decentralyed
         bool is_connecting_with_conflink_command() { return connecting_with_conflink_command; }
 
         ConnectionData get_connection_data(){ return data; }
         EncryptionData* get_encryption_data() { return encr_data; }
         void finish()
         {
+            //clear and set all flags to default
             can_enter_room      = false;
             can_connect_to_room = false;
 
@@ -60,6 +63,8 @@ namespace Blink
         ConnectionData data;
         EncryptionData* encr_data = nullptr;
 
+        //commands of menu
+        //they are processed as callbacks
         void create();
         void enter();
         void show_rooms();
