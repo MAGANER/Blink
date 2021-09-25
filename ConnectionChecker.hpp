@@ -69,7 +69,6 @@ namespace ConnectionChecker
 		TcpSocket socket;
 		if (socket.connect(IpAddress(data.ip), atoi(data.port.c_str())) != TcpSocket::Done)
 		{
-			cout << "can not connect to " << data.ip<<":"<< data.port << "!" << endl;
 			return false;
 		}
 
@@ -80,7 +79,6 @@ namespace ConnectionChecker
 		Packet p; p << message;
 		if (socket.send(p) != TcpSocket::Done)
 		{
-			cout << "can not send!" << endl;
 			return false;
 		}
 		else
@@ -161,11 +159,11 @@ namespace ConnectionChecker
 				cout << "link is accepted!" << endl;
 				return true;
 			}
-			else cout << "1:link is denyied!" << endl;
+			else cout << "link is denyied!" << endl;
 		}
 		else
 		{
-			cout << "2:link is denyied!" << endl;
+			cout << "link is denyied!" << endl;
 		}
 
 		return false;

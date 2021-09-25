@@ -54,7 +54,6 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 		sql::DataBase db(curr_path_str, password, false);
 		if (!db.is_password_correct())
 		{
-			std::cout << "password is incorrect!"<<endl;
 			return false;
 		}
 		string req = sql::make_select_request("owner");
@@ -385,7 +384,6 @@ void DataBaseProcessor::save_own_port(const string& room_name, int port)
 
 	req = sql::make_insert_request(own_port, "own_port");
 	db.run_set_request(req);
-
 }
 int DataBaseProcessor::get_own_port(const string& room_name)
 {
@@ -420,7 +418,6 @@ void DataBaseProcessor::create_offline_clients_table()
 
 	auto req = sql::make_create_request(offline_clients, "offline_clients");
 	db.run_set_request(req);
-	if (!db.is_ok())cout << db.get_error_message() << endl;
 }
 void DataBaseProcessor::add_offline_client(const string& room_name,
 										   const string& ip, 
@@ -434,9 +431,7 @@ void DataBaseProcessor::add_offline_client(const string& room_name,
 	offline_clients["port"] = new sql::Integer(port);
 
 	auto req = sql::make_insert_request(offline_clients, "offline_clients");
-	if (!db.run_set_request(req))
-		cout << "add:" << db.get_error_message() << endl;
-	else cout << "added carefully!" << endl;
+	db.run_set_request(req);
 }
 vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& room_name)
 {
@@ -444,8 +439,6 @@ vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& r
 
 	auto req = sql::make_select_request("offline_clients");
 	auto result = db.run_get_request(req);
-	
-	if(!db.is_ok())cout << "get:" << db.get_error_message() << endl;
 
 	vector<pair<string, int>> data;
 	for (auto& chunk : result)
