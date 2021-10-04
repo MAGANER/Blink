@@ -29,31 +29,43 @@
 #include"MainMenu.h"
 #include"BaseGraphicalMenu.h"
 #include"GraphicalEnterMenu.hpp"
-using namespace Blink;
+#include"ConfigLoader.h"
 
-void run_graphical_mode();
+
+void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
 int main(int argc, char** argv)
 {
-	if (argc == 2 && string(argv[1]) == "-t")
+	using namespace Blink;
+	ConfigLoader config_loader;
+
+	bool console_mode1 = argc == 2 && string(argv[1]) == "-t";
+	bool console_mode2 = config_loader.get_mode();
+	if (console_mode1 || console_mode2)
 		run_console_mode();
 	else
-		run_graphical_mode();
+		run_graphical_mode(config_loader);
 
 	return 0;
 }
-void run_graphical_mode()
+void run_graphical_mode(Blink::ConfigLoader& loader)
 {
 	using namespace GraphicalBlink;
 	BaseGraphicalMenu* menu = new BaseGraphicalMenu;
+	if (loader.is_theme_loaded())
+	{
+		auto color = loader.get_background_win_color();
+		menu->set_background_color(color);
+	}
 	menu->updateTextSize();
-	create_enter_menu(*menu->get_gui());
+	create_enter_menu(*menu->get_gui(),loader);
 	menu->run();
 
 	delete menu;
 }
 void run_console_mode()
 {
+	using namespace Blink;
 	system("cls");
 	string key, db_name;
 
