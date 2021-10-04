@@ -27,18 +27,41 @@
 #include"RoomMenu.h"
 #include"EnterMenu.h"
 #include"MainMenu.h"
+#include"BaseGraphicalMenu.h"
+#include"GraphicalEnterMenu.hpp"
 using namespace Blink;
 
-int main()
+void run_graphical_mode();
+void run_console_mode();
+int main(int argc, char** argv)
+{
+	if (argc == 2 && string(argv[1]) == "-t")
+		run_console_mode();
+	else
+		run_graphical_mode();
+
+	return 0;
+}
+void run_graphical_mode()
+{
+	using namespace GraphicalBlink;
+	BaseGraphicalMenu* menu = new BaseGraphicalMenu;
+	menu->updateTextSize();
+	create_enter_menu(*menu->get_gui());
+	menu->run();
+
+	delete menu;
+}
+void run_console_mode()
 {
 	system("cls");
-	string key,db_name;
+	string key, db_name;
 
-	EnterMenu* enter_menu= new EnterMenu(key,db_name);
-	MainMenu*  main_menu = nullptr;
+	EnterMenu* enter_menu = new EnterMenu(key, db_name);
+	MainMenu* main_menu = nullptr;
 	RoomMenu* room_menu = nullptr;
 
-	enum class state{ ENTER,MAIN,ROOM };
+	enum class state { ENTER, MAIN, ROOM };
 
 	state current = state::ENTER;
 
@@ -46,7 +69,7 @@ int main()
 	string current_user_name;
 	encr::AES::key_iv* keys = nullptr;
 
-	
+
 	//if u use conflink command, then next special
 	//port will be generated. I mean port for your server
 	//If you enter rooms, then old port is used
@@ -66,7 +89,7 @@ int main()
 				key = enter_menu->get_correct_user_password();
 				db_name = enter_menu->get_db_name();
 				delete enter_menu;
-				main_menu = new MainMenu(key,db_name);
+				main_menu = new MainMenu(key, db_name);
 			}
 		}
 		if (current == state::MAIN)
@@ -79,36 +102,36 @@ int main()
 				delete main_menu;
 				enter_menu = new EnterMenu(key, db_name);
 			}
-			else if (main_menu->enter_room() || 
-					 main_menu->start_room())
+			else if (main_menu->enter_room() ||
+				main_menu->start_room())
 			{
 				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
 
 				room_menu->set_room_data(data.port,
-										 data.ip,
-										 current_user_name,
-										 data.room,
-										 data.password);
+					data.ip,
+					current_user_name,
+					data.room,
+					data.password);
 
 				if (main_menu->start_room())starting_room = true;
 
 				delete main_menu;
 
-				current = state::ROOM;	
+				current = state::ROOM;
 			}
 			else if (main_menu->_connect())
 			{
 				room_menu = new RoomMenu(key, db_name);
-				
+
 				ConnectionData data = main_menu->get_connection_data();
 
 				room_menu->set_room_data(data.port,
-										 data.ip,
-										 current_user_name,
-										 data.room,
-										 data.password);
+					data.ip,
+					current_user_name,
+					data.room,
+					data.password);
 
 
 				//init 
@@ -119,15 +142,15 @@ int main()
 
 				delete main_menu;
 
-				current = state::ROOM;		
+				current = state::ROOM;
 			}
 		}
 		if (current == state::ROOM)
 		{
 			if (keys != nullptr)
-				room_menu->run( *keys, connecting_with_conflink_command,starting_room);
+				room_menu->run(*keys, connecting_with_conflink_command, starting_room);
 			else
-				room_menu->run( connecting_with_conflink_command,starting_room);
+				room_menu->run(connecting_with_conflink_command, starting_room);
 
 			if (room_menu->should_exit())
 			{
@@ -143,9 +166,7 @@ int main()
 
 
 	if (enter_menu != nullptr) delete enter_menu;
-	if (main_menu  != nullptr) delete main_menu;
-	if (room_menu  != nullptr) delete room_menu;
+	if (main_menu != nullptr) delete main_menu;
+	if (room_menu != nullptr) delete room_menu;
 	if (keys != nullptr) delete keys;
-
-	return 0;
 }
