@@ -51,23 +51,7 @@ bool DataBaseProcessor::does_user_exist(const string& name,
 	auto db_path = fs::path{ curr_path_str };
 	if (fs::exists(db_path))
 	{
-		sql::DataBase db(curr_path_str, password, false);
-		if (!db.is_password_correct())
-		{
-			return false;
-		}
-		string req = sql::make_select_request("owner");
-		auto result = db.run_get_request(req);
-		for (auto chunk : result)
-		{
-			if (sql::type_to_string(chunk["owner"]) == name &&
-				sql::type_to_string(chunk["password"]) == password)
-			{
-				this->db_name = name + ".db";
-				return true;
-			}
-
-		}
+		return true;
 	}
 	return false;
 }
