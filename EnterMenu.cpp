@@ -15,7 +15,7 @@ void EnterMenu::create_user()
 	cout << "enter password:"; 
 	password = get_secret_data();
 
-	if (!does_user_exist(name, password)) create_new_user(name, password);
+	if (!does_user_exist(name)) create_new_user(name, password);
 	else cout << "can not create user!" << endl;
 }
 void EnterMenu::login()
@@ -25,7 +25,7 @@ void EnterMenu::login()
 	cout << "enter password:"; 
 	password = get_secret_data();
 
-	if (does_user_exist(name, password))
+	if (can_login(name, password))
 	{
 		system("cls");
 		cout << "welcome " << name << " to Blink!" << endl;
