@@ -39,8 +39,9 @@ namespace Blink
 
 		void create_new_user(const string& name,
 							 const string& password);
-		bool does_user_exist(const string& name,
-							 const string& password);
+		bool does_user_exist(const string& name);
+		bool can_login(const string& name,
+					   const string& password);
 
 		void add_connection_info(const string& room_name,
 								 const spair& ip_port);

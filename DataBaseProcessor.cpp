@@ -44,14 +44,37 @@ void DataBaseProcessor::create_new_user(const string& name,
 
 	}
 }
-bool DataBaseProcessor::does_user_exist(const string& name,
-										const string& password)
+bool DataBaseProcessor::does_user_exist(const string& name)
 {
 	auto curr_path_str = fs::current_path().string() + fs::path{ "/" + name + ".db" }.string();
 	auto db_path = fs::path{ curr_path_str };
 	if (fs::exists(db_path))
 	{
 		return true;
+	}
+	return false;
+}
+bool DataBaseProcessor::can_login(const string& name,
+								  const string& password)
+{
+	auto curr_path_str = fs::current_path().string() + fs::path{ "/" + name + ".db" }.string();
+	auto db_path = fs::path{ curr_path_str };
+	if (fs::exists(db_path))
+	{
+		//set data and it will be used after all
+		db_name = db_path.string();
+		encryption_key = password;
+
+		sql::DataBase db(db_name, encryption_key, false);
+		auto req = sql::make_select_request("owner");
+		auto result = db.run_get_request(req);
+
+		for (auto& chunk : result)
+		{
+			bool check1 = sql::type_to_string(chunk["owner"]) == name;
+			bool check2 = sql::type_to_string(chunk["password"]) == password;
+			if (check1 && check2)return true;
+		}
 	}
 	return false;
 }
