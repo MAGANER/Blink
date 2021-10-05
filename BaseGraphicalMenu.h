@@ -15,15 +15,14 @@ class BaseGraphicalMenu
 {
 private:
 	RenderWindow* window;
-	GuiSFML* gui;
-
 	sf::Color back_color;
+protected:
+	GuiSFML* gui;
 public:
 	BaseGraphicalMenu();
-	~BaseGraphicalMenu();
+	virtual ~BaseGraphicalMenu();
 
 	void run();
-	GuiSFML* get_gui() { return gui; }
 	void updateTextSize();
 	void set_background_color(sf::Color& color)
 	{
