@@ -33,6 +33,14 @@
 #include"ConfigLoader.h"
 
 
+/*
+Some config parameters must be used only at first run,
+so we should check it
+*/
+bool first_run = true;
+
+
+
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
 void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader);
@@ -81,6 +89,12 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		 Blink::ConfigLoader& loader,
 		 bool fullscreen)
 {
+	if (first_run)
+	{
+		fullscreen = loader.is_fullscreen();
+		first_run = false;
+	}
+
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
 	{
