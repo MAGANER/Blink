@@ -29,6 +29,7 @@
 #include"MainMenu.h"
 #include"BaseGraphicalMenu.h"
 #include"GraphicalEnterMenu.hpp"
+#include"GraphicalMainMenu.h"
 #include"ConfigLoader.h"
 
 
@@ -48,20 +49,54 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-void run_graphical_mode(Blink::ConfigLoader& loader)
+void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader)
 {
-	using namespace GraphicalBlink;
-	BaseGraphicalMenu* menu = new BaseGraphicalMenu;
 	if (loader.is_theme_loaded())
 	{
 		auto color = loader.get_background_win_color();
 		menu->set_background_color(color);
 	}
 	menu->updateTextSize();
-	create_enter_menu(*menu->get_gui(),loader);
-	menu->run();
+}
+GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
+run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
+		 string& key,
+		 string& db_name,
+		 Blink::ConfigLoader& loader)
+{
+	using namespace GraphicalBlink;
+	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
+	{
+		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(key, db_name);
+		prepare_menu(enter_menu, loader);
+		enter_menu->create_enter_menu(loader);
+		auto change = enter_menu->run();
 
-	delete menu;
+		key = enter_menu->get_user_password();
+		db_name = enter_menu->get_db_name();
+		delete enter_menu;
+		return change;
+	}
+	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
+	{
+		GraphicalMainMenu* main_menu = new GraphicalMainMenu(key, db_name);
+		prepare_menu(main_menu, loader);
+		auto result = main_menu->run();
+
+		delete main_menu;
+		return result;
+	}
+}
+void run_graphical_mode(Blink::ConfigLoader& loader)
+{
+	using namespace GraphicalBlink;
+
+	string key, db_name;
+	while (true)
+	{
+		auto start = BaseGraphicalMenu::CurrentMenu::EnterMenu;;
+		run_menu(run_menu(start,key,db_name,loader),key,db_name,loader);
+	}
 }
 void run_console_mode()
 {
