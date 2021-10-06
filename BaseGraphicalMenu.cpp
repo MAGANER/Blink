@@ -12,7 +12,7 @@ BaseGraphicalMenu::~BaseGraphicalMenu()
 	delete gui;
 }
 
-void BaseGraphicalMenu::run()
+BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run()
 {
     while (window->isOpen())
     {
@@ -22,13 +22,26 @@ void BaseGraphicalMenu::run()
             gui->handleEvent(event);
 
             if (event.type == sf::Event::Closed)
+            {
                 window->close();
+                delete window;
+                delete gui;
+                exit(0);
+            }
         }
 
         window->clear(back_color);
         gui->draw();
         window->display();
+
+        if (should_break)
+        {
+            window->close();
+            should_break = false;
+            return menu_to_run;
+        }
     }
+    return CurrentMenu::Nothing;
 }
 void BaseGraphicalMenu::updateTextSize()
 {

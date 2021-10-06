@@ -13,16 +13,25 @@ using namespace sf;
 using namespace tgui;
 class BaseGraphicalMenu
 {
+public:
+	enum class CurrentMenu
+	{
+		EnterMenu,
+		MainMenu,
+		Nothing
+	};
 private:
 	RenderWindow* window;
 	sf::Color back_color;
 protected:
 	GuiSFML* gui;
+	bool should_break = false;
+	CurrentMenu menu_to_run;
 public:
 	BaseGraphicalMenu();
 	virtual ~BaseGraphicalMenu();
 
-	void run();
+	CurrentMenu run();
 	void updateTextSize();
 	void set_background_color(sf::Color& color)
 	{
