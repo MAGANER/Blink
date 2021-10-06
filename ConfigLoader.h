@@ -31,6 +31,7 @@ private:
 	bool theme_is_loaded = false;
 	Color background_win_color, enter_menu_label_color;
 	TextAlignment default_text_align = TextAlignment::Center;
+	bool fullscreen = false;
 public:
 	ConfigLoader();
 	~ConfigLoader();
@@ -41,6 +42,7 @@ public:
 	bool is_theme_loaded() { return theme_is_loaded; }
 	bool get_mode() { return terminal_mode; }
 	auto get_win_size() { return Vector2i(width, height); }
+	bool is_fullscreen() { return fullscreen; }
 private:
 	void load_color(Color& color,const string& field_name);
 };

@@ -13,7 +13,8 @@ ConfigLoader::ConfigLoader()
 		width  = config["width"];
 		height = config["height"];
 		terminal_mode = config["mode"];
-		
+		fullscreen = config["fullscreen"];
+
 		string theme_path = config["theme"];
 		file.open("data/" + theme_path);
 		can_load = !!file;
