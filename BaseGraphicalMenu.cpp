@@ -1,9 +1,10 @@
 #include "BaseGraphicalMenu.h"
 using namespace GraphicalBlink;
 
-BaseGraphicalMenu::BaseGraphicalMenu()
+BaseGraphicalMenu::BaseGraphicalMenu(bool fullscreen)
 {
-	window = new RenderWindow(VideoMode(720, 640), "Blink");
+    auto style = fullscreen ?sf::Style::Fullscreen : sf::Style::Default;
+    window = new RenderWindow(VideoMode(720, 640), "Blink", style);
 	gui = new GuiSFML(*window);
 }
 BaseGraphicalMenu::~BaseGraphicalMenu()
@@ -12,7 +13,7 @@ BaseGraphicalMenu::~BaseGraphicalMenu()
 	delete gui;
 }
 
-BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run()
+BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen)
 {
     while (window->isOpen())
     {
@@ -28,6 +29,23 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run()
                 delete gui;
                 exit(0);
             }
+            if (event.type == sf::Event::TextEntered)
+            {
+                if (event.text.unicode == 6)//ctrl+f
+                {
+                    if (!make_fullscreen)
+                    {
+                        make_fullscreen = true;
+                        return CurrentMenu::MakeFullscreen;
+                    }
+                    else
+                    {
+                        make_fullscreen = false;
+                        return CurrentMenu::BackToWindow;
+                    }
+                }
+            }
+
         }
 
         window->clear(back_color);

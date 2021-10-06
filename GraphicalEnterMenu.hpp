@@ -17,11 +17,14 @@ private:
 	bool _can_login = false;
 	string name, password;
 public:
-	GraphicalEnterMenu(const string & encr_key,
-					   const string & db_name) :DataBaseProcessor(encr_key,db_name)
+	GraphicalEnterMenu(bool fullscreen,
+					   const string & encr_key,
+					   const string & db_name) :
+		DataBaseProcessor(encr_key,db_name),BaseGraphicalMenu(fullscreen)
 	{
 	}
 	~GraphicalEnterMenu() {}
+
 	void create_enter_menu(Blink::ConfigLoader & loader)
 		{
 			gui->removeAllWidgets();

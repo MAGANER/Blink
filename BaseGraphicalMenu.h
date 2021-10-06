@@ -7,6 +7,8 @@
 #include"TGUI/Core.hpp"
 #include"TGUI/Backends/SFML.hpp"
 #include<vector>
+#include<iostream>
+#include"ConfigLoader.h"
 namespace GraphicalBlink
 {
 using namespace sf;
@@ -18,7 +20,9 @@ public:
 	{
 		EnterMenu,
 		MainMenu,
-		Nothing
+		MakeFullscreen,
+		BackToWindow,
+		Nothing,
 	};
 private:
 	RenderWindow* window;
@@ -28,15 +32,17 @@ protected:
 	bool should_break = false;
 	CurrentMenu menu_to_run;
 public:
-	BaseGraphicalMenu();
+	BaseGraphicalMenu(bool fullscreen);
 	virtual ~BaseGraphicalMenu();
 
-	CurrentMenu run();
+	CurrentMenu run(bool& make_fullscreen);
 	void updateTextSize();
 	void set_background_color(sf::Color& color)
 	{
 		back_color = color;
 	}
+protected:
+	void set_old_win_size();
 
 };
 }

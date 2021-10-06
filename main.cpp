@@ -35,6 +35,21 @@
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
+void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader);
+
+void free(GraphicalBlink::BaseGraphicalMenu* menu,
+		  GraphicalBlink::BaseGraphicalMenu::CurrentMenu val);
+GraphicalBlink::BaseGraphicalMenu::CurrentMenu
+run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
+	     string& key,
+	     string& db_name,
+		 Blink::ConfigLoader& loader,
+		 bool fullscreen = false);
+void process_fullscreen(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
+	string& key,
+	string& db_name,
+	Blink::ConfigLoader& loader);
+
 int main(int argc, char** argv)
 {
 	using namespace Blink;
@@ -58,19 +73,24 @@ void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& 
 	}
 	menu->updateTextSize();
 }
+
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		 string& key,
 		 string& db_name,
-		 Blink::ConfigLoader& loader)
+		 Blink::ConfigLoader& loader,
+		 bool fullscreen)
 {
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
 	{
-		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(key, db_name);
+		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name);
 		prepare_menu(enter_menu, loader);
 		enter_menu->create_enter_menu(loader);
-		auto change = enter_menu->run();
+		auto change = enter_menu->run(fullscreen);
+
+		free(enter_menu, change);
+		process_fullscreen(change, key, db_name, loader);
 
 		key = enter_menu->get_user_password();
 		db_name = enter_menu->get_db_name();
@@ -79,12 +99,42 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
-		GraphicalMainMenu* main_menu = new GraphicalMainMenu(key, db_name);
+		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name);
 		prepare_menu(main_menu, loader);
-		auto result = main_menu->run();
+		auto result = main_menu->run(fullscreen);
+		if (result == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
+		{
+			auto start = BaseGraphicalMenu::CurrentMenu::MainMenu;
+			run_menu(start, key, db_name, loader, true);
+		}
 
 		delete main_menu;
 		return result;
+	}
+}
+void free(GraphicalBlink::BaseGraphicalMenu* menu,
+		 GraphicalBlink::BaseGraphicalMenu::CurrentMenu val)
+{
+	using namespace GraphicalBlink;
+	if (val == BaseGraphicalMenu::CurrentMenu::BackToWindow ||
+		val == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
+		delete menu;
+}
+void process_fullscreen(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
+						string& key,
+						string& db_name,
+						Blink::ConfigLoader& loader)
+{
+	using namespace GraphicalBlink;
+	if (val == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
+	{
+		auto start = BaseGraphicalMenu::CurrentMenu::EnterMenu;
+		run_menu(start, key, db_name, loader, true);
+	}
+	else if (val == BaseGraphicalMenu::CurrentMenu::BackToWindow)
+	{
+		auto start = BaseGraphicalMenu::CurrentMenu::EnterMenu;
+		run_menu(start, key, db_name, loader, false);
 	}
 }
 void run_graphical_mode(Blink::ConfigLoader& loader)
