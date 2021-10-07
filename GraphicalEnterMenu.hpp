@@ -46,12 +46,12 @@ public:
 			gui->add(password);
 
 			auto label = tgui::Label::create("Who you are?");
-			label->setPosition({ "34.67%","10.00%" });
+			label->setPosition({ "16.67%","10.00%" });
 			label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 			gui->add(label);
 
 			auto result_label = tgui::Label::create("");
-			result_label->setPosition({ "34.67%","60.00%" });
+			result_label->setPosition({ "16.67%","60.00%" });
 			result_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 			gui->add(result_label);
 
@@ -106,7 +106,7 @@ private:
 									name.size() > MAX_NAME_LEN;
 		if (name_is_more_or_less && ok)
 		{
-			result->setText("name is too short/long!");
+			result->setText(":name is too short/long!");
 			//create error window
 			ok = false;
 		}
@@ -115,7 +115,7 @@ private:
 										_password.size() > MAX_PASSWORD_LEN;
 		if (password_is_more_or_less && ok)
 		{
-			result->setText("password is too short/long!");
+			result->setText(":password is too short/long!");
 			//create error window
 			ok = false;
 		}
@@ -123,11 +123,11 @@ private:
 		if (!does_user_exist(name) && ok)
 		{
 			DataBaseProcessor::create_new_user(name, _password);
-			result->setText("user is created!");
+			result->setText(":user is created!");
 		}
 		else
 		{
-			if (ok)result->setText("can not create user!");
+			if (ok)result->setText(":can not create user!");
 			//create error window
 		}
 	}

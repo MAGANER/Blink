@@ -41,9 +41,6 @@ public:
 	{
 		back_color = color;
 	}
-protected:
-	void set_old_win_size();
-
 };
 }
 #endif //BASE_GRAPHICAL_MENU_H
