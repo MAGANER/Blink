@@ -25,8 +25,9 @@ public:
 	}
 	~GraphicalEnterMenu() {}
 
-	void create_enter_menu(Blink::ConfigLoader & loader)
+	void create(Blink::ConfigLoader & loader)
 		{
+			updateTextSize();
 			gui->removeAllWidgets();
 
 			auto user_name = EditBox::create();

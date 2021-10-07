@@ -5,6 +5,7 @@ BaseGraphicalMenu::BaseGraphicalMenu(bool fullscreen)
 {
     auto style = fullscreen ?sf::Style::Fullscreen : sf::Style::Default;
     window = new RenderWindow(VideoMode(720, 640), "Blink", style);
+    start_size = window->getSize();
 	gui = new GuiSFML(*window);
 }
 BaseGraphicalMenu::~BaseGraphicalMenu()
@@ -55,7 +56,6 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen)
         if (should_break)
         {
             window->close();
-            should_break = false;
             return menu_to_run;
         }
     }
@@ -65,4 +65,19 @@ void BaseGraphicalMenu::updateTextSize()
 {
     const float windowHeight = gui->getView().getRect().height;
     gui->setTextSize(static_cast<unsigned int>(0.04f * windowHeight));
+}
+void BaseGraphicalMenu::set_fullscreen(bool val, Blink::ConfigLoader& loader)
+{
+    delete gui;
+    auto curr = window->getSize();
+    if (val)
+    {
+        window->create(VideoMode(curr.x,curr.y), "Blink", Style::Fullscreen);
+    }
+    else
+    {
+        window->create(VideoMode(start_size.x, start_size.y), "Blink", Style::Default);
+    }
+    gui = new GuiSFML(*window);
+    create(loader);
 }

@@ -32,24 +32,26 @@
 #include"GraphicalMainMenu.h"
 #include"ConfigLoader.h"
 
+static bool currently_fullscreen = false;
+
+
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
 void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader);
 
-void free(GraphicalBlink::BaseGraphicalMenu* menu,
-		  GraphicalBlink::BaseGraphicalMenu::CurrentMenu val);
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	     string& key,
 	     string& db_name,
 		 Blink::ConfigLoader& loader,
 		 bool fullscreen = false);
-void process_fullscreen(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
-						GraphicalBlink::BaseGraphicalMenu::CurrentMenu next,
-						string& key,
-						string& db_name,
+void process_fullscreen(GraphicalBlink::BaseGraphicalMenu* menu,
+						GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 						Blink::ConfigLoader& loader);
-
+GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
+process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu, 
+					 bool fullscreen,
+					 Blink::ConfigLoader& loader);
 int main(int argc, char** argv)
 {
 	using namespace Blink;
@@ -71,7 +73,6 @@ void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& 
 		auto color = loader.get_background_win_color();
 		menu->set_background_color(color);
 	}
-	menu->updateTextSize();
 }
 
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
@@ -85,13 +86,10 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
 	{
 		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name);
+		enter_menu->create(loader);
 		prepare_menu(enter_menu, loader);
-		enter_menu->create_enter_menu(loader);
-		auto change = enter_menu->run(fullscreen);
 
-		free(enter_menu, change);
-		auto menu = GraphicalMainMenu::CurrentMenu::EnterMenu;
-		process_fullscreen(change,menu, key, db_name, loader);
+		auto change = process_menu_running(enter_menu, fullscreen,loader);
 
 		key = enter_menu->get_user_password();
 		db_name = enter_menu->get_db_name();
@@ -101,39 +99,48 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
 		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name);
+		if (currently_fullscreen)
+		{
+			main_menu->set_fullscreen(true, loader);
+		}
 		prepare_menu(main_menu, loader);
-		auto change = main_menu->run(fullscreen);
 
-		free(main_menu, change);
-		auto menu = GraphicalMainMenu::CurrentMenu::MainMenu;
-		process_fullscreen(change,menu, key, db_name, loader);
+
+		auto change = process_menu_running(main_menu, fullscreen, loader);
 
 		if(main_menu != nullptr)delete main_menu;
 		return change;
 	}
 }
-void free(GraphicalBlink::BaseGraphicalMenu* menu,
-		 GraphicalBlink::BaseGraphicalMenu::CurrentMenu val)
-{
-	using namespace GraphicalBlink;
-	if (val == BaseGraphicalMenu::CurrentMenu::BackToWindow ||
-		val == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
-		delete menu;
-}
-void process_fullscreen(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
-						GraphicalBlink::BaseGraphicalMenu::CurrentMenu next,
-						string& key,
-						string& db_name,
+void process_fullscreen(GraphicalBlink::BaseGraphicalMenu* menu,
+						GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 						Blink::ConfigLoader& loader)
 {
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
 	{
-		run_menu(next, key, db_name, loader, true);
+		currently_fullscreen = true;
+		menu->set_fullscreen(true,loader);
 	}
 	else if (val == BaseGraphicalMenu::CurrentMenu::BackToWindow)
 	{
-		run_menu(next, key, db_name, loader, false);
+		currently_fullscreen = false;
+		menu->set_fullscreen(false,loader);
+	}
+}
+GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
+process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu,
+					 bool fullscreen,
+					  Blink::ConfigLoader& loader)
+{
+	cout << fullscreen << endl;
+	auto change = GraphicalBlink::BaseGraphicalMenu::CurrentMenu::Nothing;
+	while (true)
+	{
+		change = menu->run(fullscreen);
+		process_fullscreen(menu, change,loader);
+		if (menu->is_end()) return change;
+	
 	}
 }
 void run_graphical_mode(Blink::ConfigLoader& loader)

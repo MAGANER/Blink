@@ -31,6 +31,7 @@ protected:
 	GuiSFML* gui;
 	bool should_break = false;
 	CurrentMenu menu_to_run;
+	sf::Vector2u start_size;
 public:
 	BaseGraphicalMenu(bool fullscreen);
 	virtual ~BaseGraphicalMenu();
@@ -41,6 +42,11 @@ public:
 	{
 		back_color = color;
 	}
+	void set_fullscreen(bool val, Blink::ConfigLoader& loader);
+	bool is_end() { return should_break; }
+
+	//there is no ability to make this class abstract
+	virtual void create(Blink::ConfigLoader& loader) {/*do nothing, child classes do only*/};
 };
 }
 #endif //BASE_GRAPHICAL_MENU_H
