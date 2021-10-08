@@ -41,7 +41,7 @@ public:
 	auto get_text_align() { return default_text_align; }
 	bool is_theme_loaded() { return theme_is_loaded; }
 	bool get_mode() { return terminal_mode; }
-	auto get_win_size() { return Vector2i(width, height); }
+	auto get_win_size() { return Vector2u(width, height); }
 	bool is_fullscreen() { return fullscreen; }
 private:
 	void load_color(Color& color,const string& field_name);
