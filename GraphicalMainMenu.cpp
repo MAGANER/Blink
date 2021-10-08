@@ -7,7 +7,8 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 	BaseGraphicalMenu(fullscreen),
 	DataBaseProcessor(encr_key,db_name)
 {
-
+	rooms = get_rooms(encr_key);
+	if (rooms.empty())no_rooms = true;
 }
 GraphicalMainMenu::~GraphicalMainMenu()
 {
@@ -16,7 +17,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
 	auto room_box = ListBox::create();
-	room_box->setUserData(1);
+	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
 	echo_functions.push_back([&](sf::Event::EventType type)
@@ -24,8 +25,18 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 
 	auto create_room_button = Button::create("create room");
-	create_room_button->setUserData(0);
+	create_room_button->setUserData(default_id);
 	gui->add(create_room_button);
+
+	if (no_rooms)
+	{
+		auto no_rooms_label = Label::create("no rooms");
+		no_rooms_label->setUserData(no_rooms_id);
+		no_rooms_label->setPosition({ "50%" },{ "50%" });
+		gui->add(no_rooms_label);
+		echo_functions.push_back([&](sf::Event::EventType type)
+			{set_no_rooms_label_to_center(type); });
+	}
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
@@ -45,11 +56,25 @@ void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
 		auto widgets = gui->getWidgets();
 		for (auto& wid : widgets)
 		{
-			if (wid->getUserData<int>() == 1)
+			if (wid->getUserData<int>() == room_list_id)
 			{
 				tgui::Layout2d size = wid->getSizeLayout();
 				size.y = get_window_size().y;
 				wid->setSize(size);
+			}
+		}
+	}
+}
+void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
+{
+	if (type == sf::Event::EventType::Resized)
+	{
+		auto widgets = gui->getWidgets();
+		for (auto& wid : widgets)
+		{
+			if (wid->getUserData<int>() == no_rooms_id)
+			{
+				wid->setPosition({ "50%" }, { "50%" });
 			}
 		}
 	}
