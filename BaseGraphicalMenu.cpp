@@ -47,6 +47,12 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen)
                 }
             }
 
+
+            //process child event functions
+            for (auto& fn : echo_functions)
+            {
+                fn(event.type);
+            }
         }
 
         window->clear(back_color);

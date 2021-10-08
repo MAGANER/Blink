@@ -13,6 +13,7 @@ namespace GraphicalBlink
 {
 using namespace sf;
 using namespace tgui;
+using namespace std;
 class BaseGraphicalMenu
 {
 public:
@@ -32,6 +33,9 @@ protected:
 	bool should_break = false;
 	CurrentMenu menu_to_run;
 	sf::Vector2u start_size;
+	vector<function<void(sf::Event::EventType type)>> echo_functions;
+
+	auto get_window_size() { return window->getSize(); }
 public:
 	BaseGraphicalMenu(bool fullscreen);
 	virtual ~BaseGraphicalMenu();
