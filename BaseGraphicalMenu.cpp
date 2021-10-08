@@ -1,10 +1,10 @@
 #include "BaseGraphicalMenu.h"
 using namespace GraphicalBlink;
 
-BaseGraphicalMenu::BaseGraphicalMenu(bool fullscreen)
+BaseGraphicalMenu::BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_size)
 {
     auto style = fullscreen ?sf::Style::Fullscreen : sf::Style::Default;
-    window = new RenderWindow(VideoMode(720, 640), "Blink", style);
+    window = new RenderWindow(VideoMode(win_size.x, win_size.y), "Blink", style);
     start_size = window->getSize();
 	gui = new GuiSFML(*window);
 }
@@ -14,7 +14,7 @@ BaseGraphicalMenu::~BaseGraphicalMenu()
 	delete gui;
 }
 
-BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen)
+BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf::Vector2u& win_size)
 {
     while (window->isOpen())
     {
@@ -46,7 +46,10 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen)
                     }
                 }
             }
-
+            if (event.type == sf::Event::Resized)
+            {
+                win_size = window->getSize();
+            }
 
             //process child event functions
             for (auto& fn : echo_functions)

@@ -33,7 +33,7 @@
 #include"ConfigLoader.h"
 
 static bool currently_fullscreen = false;
-
+static sf::Vector2u win_size(720,640);//default value
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
@@ -85,7 +85,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
 	{
-		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name);
+		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name,win_size);
 		enter_menu->create(loader);
 		prepare_menu(enter_menu, loader);
 
@@ -98,7 +98,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
-		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name);
+		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name, win_size);
 		main_menu->create(loader);
 		if (currently_fullscreen)
 		{
@@ -137,7 +137,7 @@ process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu,
 	auto change = GraphicalBlink::BaseGraphicalMenu::CurrentMenu::Nothing;
 	while (true)
 	{
-		change = menu->run(fullscreen);
+		change = menu->run(fullscreen,win_size);
 		process_fullscreen(menu, change,loader);
 		if (menu->is_end()) return change;
 	

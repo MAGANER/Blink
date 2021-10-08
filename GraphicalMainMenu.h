@@ -6,6 +6,7 @@
 #include"TGUI/Widgets/ListBox.hpp"
 #include"TGUI/Widgets/Button.hpp"
 #include"TGUI/Widgets/Label.hpp"
+#include"TGUI/Widgets/ChildWindow.hpp"
 namespace GraphicalBlink
 {
 using namespace Blink;
@@ -16,13 +17,16 @@ private:
 	vector<str3> rooms;
 	bool no_rooms = true;
 
+
+	//user data for widgets
 	const int no_rooms_id  = 3;
 	const int default_id   = 0;
 	const int room_list_id = 1;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
-					  const string& db_name);
+					  const string& db_name,
+					  const sf::Vector2u& win_size);
 	~GraphicalMainMenu();
 
 	void create(Blink::ConfigLoader& loader);

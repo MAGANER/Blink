@@ -3,8 +3,9 @@ using namespace GraphicalBlink;
 
 GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 									 const string& encr_key,
-									 const string& db_name):
-	BaseGraphicalMenu(fullscreen),
+									 const string& db_name,
+									 const sf::Vector2u& win_size):
+	BaseGraphicalMenu(fullscreen,win_size),
 	DataBaseProcessor(encr_key,db_name)
 {
 	rooms = get_rooms(encr_key);

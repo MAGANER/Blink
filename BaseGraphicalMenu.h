@@ -37,10 +37,10 @@ protected:
 
 	auto get_window_size() { return window->getSize(); }
 public:
-	BaseGraphicalMenu(bool fullscreen);
+	BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_size);
 	virtual ~BaseGraphicalMenu();
 
-	CurrentMenu run(bool& make_fullscreen);
+	CurrentMenu run(bool& make_fullscreen,sf::Vector2u& win_size);
 	void updateTextSize();
 	void set_background_color(sf::Color& color)
 	{
