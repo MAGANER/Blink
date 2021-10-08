@@ -56,6 +56,8 @@ int main(int argc, char** argv)
 {
 	using namespace Blink;
 	ConfigLoader config_loader;
+	win_size = config_loader.get_win_size();
+
 
 	bool console_mode1 = argc == 2 && string(argv[1]) == "-t";
 	bool console_mode2 = config_loader.get_mode();
