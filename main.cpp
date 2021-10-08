@@ -99,6 +99,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
 		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name);
+		main_menu->create(loader);
 		if (currently_fullscreen)
 		{
 			main_menu->set_fullscreen(true, loader);
@@ -132,8 +133,7 @@ GraphicalBlink::BaseGraphicalMenu::CurrentMenu
 process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu,
 					 bool fullscreen,
 					  Blink::ConfigLoader& loader)
-{
-	cout << fullscreen << endl;
+{ 
 	auto change = GraphicalBlink::BaseGraphicalMenu::CurrentMenu::Nothing;
 	while (true)
 	{
