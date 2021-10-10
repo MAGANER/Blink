@@ -71,6 +71,37 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
     }
     return CurrentMenu::Nothing;
 }
+void BaseGraphicalMenu::run()
+{
+    while (window->isOpen())
+    {
+        sf::Event event;
+        while (window->pollEvent(event))
+        {
+            gui->handleEvent(event);
+
+            if (event.type == sf::Event::Closed)
+            {
+                window->close();
+            }
+
+            //process child event functions
+            for (auto& fn : echo_functions)
+            {
+                fn(event.type);
+            }
+        }
+
+        window->clear(back_color);
+        gui->draw();
+        window->display();
+
+        if (should_break)
+        {
+            window->close();
+        }
+    }
+}
 void BaseGraphicalMenu::updateTextSize()
 {
     const float windowHeight = gui->getView().getRect().height;

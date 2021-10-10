@@ -41,6 +41,7 @@ public:
 	virtual ~BaseGraphicalMenu();
 
 	CurrentMenu run(bool& make_fullscreen,sf::Vector2u& win_size);
+	void run();
 	void updateTextSize();
 	void set_background_color(sf::Color& color)
 	{
