@@ -37,8 +37,6 @@ static sf::Vector2u win_size(720,640);//default value
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
-void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader);
-
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	     string& key,
@@ -68,15 +66,6 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-void prepare_menu(GraphicalBlink::BaseGraphicalMenu* menu, Blink::ConfigLoader& loader)
-{
-	if (loader.is_theme_loaded())
-	{
-		auto color = loader.get_background_win_color();
-		menu->set_background_color(color);
-	}
-}
-
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		 string& key,
@@ -89,7 +78,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	{
 		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name,win_size);
 		enter_menu->create(loader);
-		prepare_menu(enter_menu, loader);
+		enter_menu->prepare_menu(loader);
 
 		auto change = process_menu_running(enter_menu, fullscreen,loader);
 
@@ -106,7 +95,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		{
 			main_menu->set_fullscreen(true, loader);
 		}
-		prepare_menu(main_menu, loader);
+		main_menu->prepare_menu(loader);
 
 
 		auto change = process_menu_running(main_menu, fullscreen, loader);

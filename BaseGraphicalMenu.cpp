@@ -58,6 +58,11 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
                 fn(event.type);
             }
         }
+        for (auto& fn : paramless_echo_functions)
+        {
+            fn();
+        }
+
 
         window->clear(back_color);
         gui->draw();
@@ -91,6 +96,11 @@ void BaseGraphicalMenu::run()
                 fn(event.type);
             }
         }
+        for (auto& fn : paramless_echo_functions)
+        {
+            fn();
+        }
+
 
         window->clear(back_color);
         gui->draw();
@@ -121,4 +131,12 @@ void BaseGraphicalMenu::set_fullscreen(bool val, Blink::ConfigLoader& loader)
     }
     gui = new GuiSFML(*window);
     create(loader);
+}
+void BaseGraphicalMenu::prepare_menu(Blink::ConfigLoader& loader)
+{
+    if (loader.is_theme_loaded())
+    {
+        auto color = loader.get_background_win_color();
+        set_background_color(color);
+    }
 }

@@ -34,6 +34,7 @@ protected:
 	CurrentMenu menu_to_run;
 	sf::Vector2u start_size;
 	vector<function<void(sf::Event::EventType type)>> echo_functions;
+	vector<function<void()>> paramless_echo_functions;
 
 	auto get_window_size() { return window->getSize(); }
 public:
@@ -52,6 +53,7 @@ public:
 
 	//there is no ability to make this class abstract
 	virtual void create(Blink::ConfigLoader& loader) {/*do nothing, child classes do only*/};
+	void prepare_menu(Blink::ConfigLoader& loader);
 };
 }
 #endif //BASE_GRAPHICAL_MENU_H
