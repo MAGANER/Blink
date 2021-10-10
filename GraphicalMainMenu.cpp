@@ -10,6 +10,7 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 {
 	rooms = get_rooms(encr_key);
 	if (rooms.empty())no_rooms = true;
+	else no_rooms = false;
 }
 GraphicalMainMenu::~GraphicalMainMenu()
 {
@@ -17,6 +18,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
+	this->loader = &loader;
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
@@ -24,12 +26,21 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	echo_functions.push_back([&](sf::Event::EventType type)
 		{resize_room_list_box(type); });
 
+	
+	int counter = 0;
+	for (auto& room : rooms)
+	{
+		tgui::String name = get<0>(room);
+		tgui::String id(counter);
+		room_box->addItem(name,id);
+		counter++;
+	}
+	rooms_ptr = room_box;
 
 	auto create_room_button = Button::create("create room");
 	create_room_button->setUserData(default_id);
-
-	auto creating_lambda = [&]() {run_create_room_menu(); };
-	create_room_button->onPress(creating_lambda);
+	auto creating_lambda = [&]() { run_create_room_menu(loader); };
+	create_room_button->onClick(creating_lambda);
 
 	gui->add(create_room_button);
 
@@ -84,11 +95,28 @@ void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 		}
 	}
 }
-void GraphicalMainMenu::run_create_room_menu()
+void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 {
 	CreateRoomMenu* menu = new CreateRoomMenu(get_encr_key(),
 											  get_db_name());
-	
+	menu->prepare_menu(loader);
+	menu->create(loader);
 	menu->run();
+	if (menu->should_update())
+	{
+		auto rooms = get_rooms(get_encr_key());
+		int counter = this->rooms.size() + 1;
+		for (auto& room : rooms)
+		{
+			bool added = find(this->rooms.begin(), this->rooms.end(), room) != this->rooms.end();
+			if (!added)
+			{
+				rooms_ptr->addItem(get<0>(room), tgui::String(counter));
+				this->rooms.push_back(room);
+				counter++;
+			}
+		}
+	}
+
 	delete menu;
 }

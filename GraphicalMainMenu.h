@@ -25,6 +25,10 @@ private:
 	const int no_rooms_id  = 3;
 	const int default_id   = 0;
 	const int room_list_id = 1;
+
+	Blink::ConfigLoader* loader = nullptr;
+
+	ListBox::Ptr rooms_ptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -40,7 +44,7 @@ private:
 	void set_no_rooms_label_to_center(sf::Event::EventType type);
 
 
-	void run_create_room_menu();
+	void run_create_room_menu(Blink::ConfigLoader& loader);
 };
 };
 #endif
