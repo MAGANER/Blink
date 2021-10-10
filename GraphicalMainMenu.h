@@ -1,12 +1,15 @@
 #ifndef GRAPHICAL_MAIN_MENU_H
 #define GRAPHICAL_MAIN_MENU_H
+#ifndef COMMON_HEADERS_H
+#define COMMON_HEADERS_H
 #include"DataBaseProcessor.h"
 #include"BaseGraphicalMenu.h"
 #include"ConfigLoader.h"
+#endif
+#include"CreateRoomMenu.h"
 #include"TGUI/Widgets/ListBox.hpp"
 #include"TGUI/Widgets/Button.hpp"
 #include"TGUI/Widgets/Label.hpp"
-#include"TGUI/Widgets/ChildWindow.hpp"
 namespace GraphicalBlink
 {
 using namespace Blink;
@@ -35,6 +38,9 @@ private:
 	void set_room_box_pos_and_size(ListBox::Ptr ptr);
 	void resize_room_list_box(sf::Event::EventType type);
 	void set_no_rooms_label_to_center(sf::Event::EventType type);
+
+
+	void run_create_room_menu();
 };
 };
 #endif

@@ -27,6 +27,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 	auto create_room_button = Button::create("create room");
 	create_room_button->setUserData(default_id);
+
+	auto creating_lambda = [&]() {run_create_room_menu(); };
+	create_room_button->onPress(creating_lambda);
+
 	gui->add(create_room_button);
 
 	if (no_rooms)
@@ -79,4 +83,12 @@ void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 			}
 		}
 	}
+}
+void GraphicalMainMenu::run_create_room_menu()
+{
+	CreateRoomMenu* menu = new CreateRoomMenu(get_encr_key(),
+											  get_db_name());
+	
+	menu->run();
+	delete menu;
 }
