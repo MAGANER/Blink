@@ -41,8 +41,18 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	create_room_button->setUserData(default_id);
 	auto creating_lambda = [&]() { run_create_room_menu(loader); };
 	create_room_button->onClick(creating_lambda);
-
 	gui->add(create_room_button);
+
+	auto connect_button = Button::create(" connect ");
+	connect_button->setUserData(default_id);
+
+	auto create_button_y_pos = create_room_button->getPositionLayout().y +
+							   create_room_button->getSizeLayout().y;
+	connect_button->setPosition({"0"},create_button_y_pos);
+	connect_button->setSize(create_room_button->getSizeLayout());
+	gui->add(connect_button);
+
+	
 
 	if (no_rooms)
 	{
@@ -52,7 +62,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		gui->add(no_rooms_label);
 		echo_functions.push_back([&](sf::Event::EventType type)
 			{set_no_rooms_label_to_center(type); });
+		no_rooms_label_ptr = no_rooms_label;
 	}
+	
+	paramless_echo_functions.push_back([&]() {enter_room(); });
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
@@ -62,7 +75,7 @@ void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 	ptr->setSize(size);
 	tgui::Layout2d pos;
 	pos.x = 0;
-	pos.y = 20;
+	pos.y = 42;
 	ptr->setPosition(pos);
 }
 void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
@@ -111,12 +124,16 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 			bool added = find(this->rooms.begin(), this->rooms.end(), room) != this->rooms.end();
 			if (!added)
 			{
+				no_rooms_label_ptr->setText("");
 				rooms_ptr->addItem(get<0>(room), tgui::String(counter));
 				this->rooms.push_back(room);
 				counter++;
 			}
 		}
 	}
-
 	delete menu;
+}
+void GraphicalMainMenu::enter_room()
+{
+	auto room_to_enter = rooms_ptr->getSelectedItem();
 }

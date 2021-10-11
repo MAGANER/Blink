@@ -10,6 +10,7 @@
 #include"TGUI/Widgets/ListBox.hpp"
 #include"TGUI/Widgets/Button.hpp"
 #include"TGUI/Widgets/Label.hpp"
+#include"TGUI/Widgets/EditBox.hpp"
 namespace GraphicalBlink
 {
 using namespace Blink;
@@ -29,6 +30,7 @@ private:
 	Blink::ConfigLoader* loader = nullptr;
 
 	ListBox::Ptr rooms_ptr;
+	Label::Ptr no_rooms_label_ptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -45,6 +47,7 @@ private:
 
 
 	void run_create_room_menu(Blink::ConfigLoader& loader);
+	void enter_room();
 };
 };
 #endif
