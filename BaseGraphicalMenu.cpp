@@ -6,6 +6,7 @@ BaseGraphicalMenu::BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_si
     auto style = fullscreen ?sf::Style::Fullscreen : sf::Style::Default;
     window = new RenderWindow(VideoMode(win_size.x, win_size.y), "Blink", style);
     window->setPosition(sf::Vector2i(window->getPosition().x, 10));
+    window->setFramerateLimit(30);
     start_size = window->getSize();
 	gui = new GuiSFML(*window);
 }
