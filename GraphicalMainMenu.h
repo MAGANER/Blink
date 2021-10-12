@@ -26,11 +26,15 @@ private:
 	const int no_rooms_id  = 3;
 	const int default_id   = 0;
 	const int room_list_id = 1;
+	const int enter_room_id = 4;
+	const int conn_room_id = 5;
 
 	Blink::ConfigLoader* loader = nullptr;
 
 	ListBox::Ptr rooms_ptr;
-	Label::Ptr no_rooms_label_ptr;
+	Label::Ptr no_rooms_label_ptr, entering_room_label_ptr;
+	EditBox::Ptr room_passw;
+	Button::Ptr enter_room_ptr,conn_room_ptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,

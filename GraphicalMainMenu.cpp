@@ -52,8 +52,6 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	connect_button->setSize(create_room_button->getSizeLayout());
 	gui->add(connect_button);
 
-	
-
 	if (no_rooms)
 	{
 		auto no_rooms_label = Label::create("no rooms");
@@ -66,6 +64,40 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	}
 	
 	paramless_echo_functions.push_back([&]() {enter_room(); });
+
+	auto enter_room_password = EditBox::create();
+	enter_room_password->setDefaultText("room password");
+	enter_room_password->setSize({ "40.00%", "5.0%" });
+	enter_room_password->setPosition({ "30%", "40%" });
+	enter_room_password->setUserData(default_id);
+	enter_room_password->setVisible(false);
+	room_passw = enter_room_password;
+	gui->add(enter_room_password);
+
+	auto entering_room_label = Label::create();
+	entering_room_label->setUserData(default_id);
+	entering_room_label->setPosition({"30%","35%"});
+	entering_room_label->setTextSize(22);
+	entering_room_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
+	entering_room_label->setVisible(false);
+	entering_room_label_ptr = entering_room_label;
+	gui->add(entering_room_label);
+
+	auto enter_room_button = Button::create("enter");
+	enter_room_button->setUserData(enter_room_id);
+	enter_room_button->setSize({ "18%","5%" });
+	enter_room_button->setPosition({ "30%","48%" });
+	enter_room_button->setVisible(false);
+	enter_room_ptr = enter_room_button;
+	gui->add(enter_room_ptr);
+
+	auto conn_room_button = Button::create("connect");
+	conn_room_button->setUserData(conn_room_id);
+	conn_room_button->setSize({ "18%","5%" });
+	conn_room_button->setPosition({ "52%","48%" });
+	conn_room_button->setVisible(false);
+	conn_room_ptr = conn_room_button;
+	gui->add(conn_room_button);
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
@@ -135,5 +167,17 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::enter_room()
 {
-	auto room_to_enter = rooms_ptr->getSelectedItem();
+	if (rooms_ptr->getSelectedItem() != "")
+	{
+		room_passw->setVisible(true);
+		auto room_name = rooms_ptr->getSelectedItem();
+		entering_room_label_ptr->setText("entering `" + room_name +"` room");
+		entering_room_label_ptr->setVisible(true);
+		enter_room_ptr->setVisible(true);
+		conn_room_ptr->setVisible(true);
+
+		rooms_ptr->setSelectedItem("");
+		
+	}
+
 }
