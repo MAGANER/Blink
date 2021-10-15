@@ -8,17 +8,21 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 	BaseGraphicalMenu(fullscreen,win_size),
 	DataBaseProcessor(encr_key,db_name)
 {
+	room_gate_menu = new RoomGateMenu(encr_key, db_name);
+	
+
 	rooms = get_rooms(encr_key);
 	if (rooms.empty())no_rooms = true;
 	else no_rooms = false;
 }
 GraphicalMainMenu::~GraphicalMainMenu()
 {
-
+	delete room_gate_menu;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
 	this->loader = &loader;
+	room_gate_menu->init(gui, *this->loader,init_chat);
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
@@ -63,41 +67,9 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		no_rooms_label_ptr = no_rooms_label;
 	}
 	
-	paramless_echo_functions.push_back([&]() {enter_room(); });
+	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
+	paramless_echo_functions.push_back([&]() {process_chat(); });
 
-	auto enter_room_password = EditBox::create();
-	enter_room_password->setDefaultText("room password");
-	enter_room_password->setSize({ "40.00%", "5.0%" });
-	enter_room_password->setPosition({ "30%", "40%" });
-	enter_room_password->setUserData(default_id);
-	enter_room_password->setVisible(false);
-	room_passw = enter_room_password;
-	gui->add(enter_room_password);
-
-	auto entering_room_label = Label::create();
-	entering_room_label->setUserData(default_id);
-	entering_room_label->setPosition({"30%","35%"});
-	entering_room_label->setTextSize(22);
-	entering_room_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
-	entering_room_label->setVisible(false);
-	entering_room_label_ptr = entering_room_label;
-	gui->add(entering_room_label);
-
-	auto enter_room_button = Button::create("enter");
-	enter_room_button->setUserData(enter_room_id);
-	enter_room_button->setSize({ "18%","5%" });
-	enter_room_button->setPosition({ "30%","48%" });
-	enter_room_button->setVisible(false);
-	enter_room_ptr = enter_room_button;
-	gui->add(enter_room_ptr);
-
-	auto conn_room_button = Button::create("connect");
-	conn_room_button->setUserData(conn_room_id);
-	conn_room_button->setSize({ "18%","5%" });
-	conn_room_button->setPosition({ "52%","48%" });
-	conn_room_button->setVisible(false);
-	conn_room_ptr = conn_room_button;
-	gui->add(conn_room_button);
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
@@ -165,19 +137,11 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 	}
 	delete menu;
 }
-void GraphicalMainMenu::enter_room()
+void GraphicalMainMenu::process_chat()
 {
-	if (rooms_ptr->getSelectedItem() != "")
+	if (init_chat)
 	{
-		room_passw->setVisible(true);
-		auto room_name = rooms_ptr->getSelectedItem();
-		entering_room_label_ptr->setText("entering `" + room_name +"` room");
-		entering_room_label_ptr->setVisible(true);
-		enter_room_ptr->setVisible(true);
-		conn_room_ptr->setVisible(true);
-
-		rooms_ptr->setSelectedItem("");
-		
+		gui->removeAllWidgets();
+		init_chat = true;
 	}
-
 }
