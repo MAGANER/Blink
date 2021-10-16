@@ -29,10 +29,7 @@ namespace Blink
 	public:
 		Server(command_hash& commands,
 			   const string& password,
-			   const string& room_name,
-			   const string& user_name,
-			   const string& db_key,
-			   const string& db_name,
+			   const NetBaseData& data,
 			   bool inherited = false);
 		~Server();
 

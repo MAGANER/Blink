@@ -3,30 +3,21 @@ using namespace Blink;
 
 DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 	const string& password,
-	const string& room_name,
-	const string& user_name,
-	const string& db_key,
-	const string& db_name,
+	const NetBaseData& data,
 	bool connecting_with_conflink_command,
 	bool starting_room,
-	bool inherited) :Server(commands,password,room_name,user_name,db_key,db_name,inherited)
+	bool inherited) :Server(commands,password,data,inherited)
 {
 	while (true)
 	{
 		if (connecting_with_conflink_command)
 		{
-			port = NetRandom::get_random_port();
+			port = get_random_port();
 			_cant_connect = false;
 			break;
 		}
 
-		
-		/*
-		cout << "if you start decentralysed room, then create link(1).\n" <<
-			"if you connect to existing decentralysed room(2)\n";
-		cout << ">>";
-		*/
-		string mode = starting_room? "1":"2";
+		string mode = starting_room?"1":"2";
 		if (mode.size() != 1)
 		{
 			mode.clear();
@@ -34,37 +25,36 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 		}
 		else if (mode == "1")
 		{
-			if (!does_conn_info_exist(room_name))
-				create_room_connections_info(room_name);
+			if (!does_conn_info_exist(data.room_name))
+				create_room_connections_info(data.room_name);
 
-			port = get_room_port(room_name, db_key, db_name);
-			save_own_port(room_name, port);
-			create_invite_link(port, room_name, password,true);
+			port = get_room_port(data.room_name, data.db_key, data.db_name);
+			save_own_port(data.room_name, port);
+			create_invite_link(port, data.room_name, password,true);
 			
 			auto key = encr::AES::convert_bytes(key_iv.first);
 			auto iv = encr::AES::convert_bytes(key_iv.second);
-			save_room_key(room_name, make_pair(key, iv));
+			save_room_key(data.room_name, make_pair(key, iv));
 
 			break;
 		}
 		else if (mode == "2")
 		{
 			//use the same port as it was used at first session
-			port = get_own_port(room_name);
+			port = get_own_port(data.room_name);
+			cout << data.room_name << endl;
+			cout << port << endl;
 			if (port == -1 && !connecting_with_conflink_command)
 				_cant_connect = true;
 
 
 			//keys are still the same
-			if (!connecting_with_conflink_command)
-			{
-				auto key_iv_val = get_key_iv(room_name);
-				key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
-				key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
-			}
+			auto key_iv_val = get_key_iv(data.room_name);
+			key_iv.first  = encr::AES::convert_to_bytes(key_iv_val.first);
+			key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
 
 			//get offline clients
-			auto saved_offline_clients = get_offline_clients(room_name);
+			auto saved_offline_clients = get_offline_clients(data.room_name);
 			for (auto& client : saved_offline_clients)
 			{
 				offline_clients.push_back(client);
@@ -179,6 +169,7 @@ bool DecentralysedServerClient::_run()
 			//save offline clients
 			//because if you don't do that you lost all data  about potential
 			//clients
+			cout << offline_clients.size() << "is offline clients!" << endl;
 			for (auto& client : offline_clients)
 			{
 				add_offline_client(room_name, client.first.toString(), client.second);
@@ -239,6 +230,19 @@ void DecentralysedServerClient::send_clients_info(list<RoomClient*>& clients,
 	socket->setBlocking(true);
 	send_jmessage(*socket, message);
 	socket->setBlocking(false);
+}
+int DecentralysedServerClient::get_random_port()
+{
+	random_device rd;   
+	mt19937 gen(rd());  
+	uniform_int_distribution<> dist(1, 9);
+						
+	string port;
+	for (int i = 0; i < 5; ++i) 
+	{
+		port += to_string(dist(gen));
+	}
+	return atoi(port.c_str());
 }
 void DecentralysedServerClient::connect_to_known_clients()
 {

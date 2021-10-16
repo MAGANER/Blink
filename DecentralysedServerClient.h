@@ -1,7 +1,7 @@
 #pragma once
 #include"Server.h"
 #include"ConnectionChecker.hpp"
-#include"NetRandom.hpp"
+#include<random>
 #include<set>
 #include"SFML/System/Time.hpp"
 #include"SFML/System/Clock.hpp"
@@ -30,10 +30,7 @@ private:
 public:
 	DecentralysedServerClient(command_hash& commands,
 							  const string& password,
-							  const string& room_name,
-							  const string& user_name,
-							  const string& db_key,
-							  const string& db_name,
+							  const NetBaseData& data,
 							  bool connecting_with_conflink_command,
 							  bool starting_room,
 							  bool inherited = false);
@@ -57,6 +54,7 @@ private:
 	void send_clients_info(list<RoomClient*>& clients,
 						   TcpSocket* socket);
 
+	int get_random_port();
 	void connect_to_known_clients();
 
 	void check_offline_clients();

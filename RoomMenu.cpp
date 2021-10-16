@@ -56,12 +56,13 @@ void RoomMenu::run(bool connecting_with_file_link,
 {
 	auto port = atoi(data["port"].c_str());
 
+	NetBaseData _data(data["user_name"],
+					  data["room_name"],
+				      db_key,
+				      get_db_name());
 	DecentralysedServerClient client_server(commands,
 											data["room_password"],
-											data["room_name"],
-											data["user_name"],
-											db_key,
-											get_db_name(),
+											_data,
 											connecting_with_file_link,
 											starting_room);
 	if (client_server.cant_connect())
@@ -87,12 +88,13 @@ void RoomMenu::run(const encr::AES::key_iv& key,
 {
 	auto port = atoi(data["port"].c_str());
 
+	NetBaseData _data(data["user_name"],
+					  data["room_name"],
+					  db_key,
+					  get_db_name());
 	DecentralysedServerClient client_server(commands,
 											data["room_password"],
-											data["room_name"],
-											data["user_name"],
-											db_key,
-											get_db_name(),
+											_data,
 											connecting_with_file_link,
 											starting_room,
 											true);

@@ -64,6 +64,24 @@ struct Received_additional_info
 	list<pair<string, int>> clients;
 };
 
+
+//i know it looks weird
+#define s string
+#define cs const s&
+
+struct NetBaseData
+{
+	s user_name, room_name, db_key, db_name;
+
+	NetBaseData(cs user_name,
+			cs room_name,
+			cs db_key,
+			cs db_name):user_name(user_name),
+						 room_name(room_name),
+						 db_key(db_key),
+						 db_name(db_name)
+	{}
+};
 class NetBase :public DataBaseProcessor
 {
 protected:
@@ -85,11 +103,8 @@ protected:
 	command_hash commands;
 
 	NetBase(const command_hash& commands,
-		const string& user_name,
-		const string& room_name,
-		const string& db_key,
-		const string& db_name,
-		bool is_user=false) :DataBaseProcessor(db_key, db_name)
+		const NetBaseData& data,
+		bool is_user=false) :DataBaseProcessor(data.db_key, data.db_name)
 	{
 		input_callback = [&](const string& str)
 		{
@@ -98,8 +113,8 @@ protected:
 		};
 		this->is_user = is_user;
 		this->commands = commands;
-		this->user_name = user_name;
-		this->room_name = room_name;
+		this->user_name = data.user_name;
+		this->room_name = data.room_name;
 	}
 
 	bool received_clients_info = false;
@@ -149,6 +164,18 @@ protected:
 			socket.send(pack);
 		}
 	}
+	void resend_messages_from_server(list<RoomClient*>& clients,
+									 int exlude_id,
+									 const string& message)
+	{
+		for (auto& client : clients)
+		{
+			if (client->id != exlude_id)
+			{
+				send_jmessage(*client->socket, message);
+			}
+		}
+	}
 
 	void show_message(const string& message)
 	{
@@ -163,11 +190,24 @@ protected:
 	}
 	void get_and_show_message(TcpSocket& socket)
 	{
+		//for one2one mode
+
 		string data = NetBase::get_message(socket);
 
 		if (data.size() > 0 && can_show)
 		{
 			show_message(data);
+		}
+	}
+	void return_and_show_message(RoomClient* client,
+								 list<RoomClient*>& clients)
+	{
+		//for one2many ones mode(also decentralysed)
+		string message = NetBase::get_message(*client->socket);
+		if (message.size() > 0 && can_show)
+		{
+			show_message(message);
+			resend_messages_from_server(clients, client->id, message);
 		}
 	}
 

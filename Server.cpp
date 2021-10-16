@@ -3,19 +3,16 @@ using namespace Blink;
 
 Server::Server(command_hash& commands,
 			   const string& password,
-			   const string& room_name,
-			   const string& user_name,
-			   const string& db_key,
-			   const string& db_name,
-			   bool inherited):NetBase(commands,user_name, room_name, db_key,db_name)
+			  const NetBaseData& data,
+			   bool inherited):NetBase(commands,data)
 {
 	this->password  = password;
-	this->room_name = room_name;
+	this->room_name = data.room_name;
 
 	this->commands["makelink"] = function<void()>([&]()
 		{
 			//if inherited, than decentralysed
-			create_invite_link(port, room_name, password, inherited);
+			create_invite_link(port, data.room_name, password, inherited);
 
 		});
 
