@@ -34,6 +34,15 @@ public:
 							  bool connecting_with_conflink_command,
 							  bool starting_room,
 							  bool inherited = false);
+	
+	//special constructor used in graphical mode
+	DecentralysedServerClient(command_hash& commands,
+							  const string& password,
+						      const NetBaseData& data,
+							  const string& link_creator_data,
+							  bool starting_room,
+							  bool save_link,
+							  bool inherited = false);
 	~DecentralysedServerClient();
 
 

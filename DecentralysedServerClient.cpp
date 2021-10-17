@@ -42,8 +42,6 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 		{
 			//use the same port as it was used at first session
 			port = get_own_port(data.room_name);
-			cout << data.room_name << endl;
-			cout << port << endl;
 			if (port == -1 && !connecting_with_conflink_command)
 				_cant_connect = true;
 
@@ -70,6 +68,59 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 			mode.clear();
 			continue;
 		}
+	}
+}
+DecentralysedServerClient::
+DecentralysedServerClient(command_hash& commands,
+						  const string& password,
+						  const NetBaseData& data,
+						  const string& link_creator_data,
+						  bool starting_room,
+						  bool save_link,
+						  bool inherited) :Server(commands, password, data, inherited)
+{
+	string mode = starting_room ? "1" : "2";
+
+	if (mode == "1")
+	{
+		if (!does_conn_info_exist(data.room_name))
+			create_room_connections_info(data.room_name);
+
+		port = get_room_port(data.room_name, data.db_key, data.db_name);
+		save_own_port(data.room_name, port);
+
+		if (save_link)
+			create_invite_link_to_save(port, data.room_name, password, true, link_creator_data);
+		else
+			create_invite_link_to_send(port, data.room_name, password, true, link_creator_data);
+
+		auto key = encr::AES::convert_bytes(key_iv.first);
+		auto iv = encr::AES::convert_bytes(key_iv.second);
+		save_room_key(data.room_name, make_pair(key, iv));
+	}
+	else if (mode == "2")
+	{
+		//use the same port as it was used at first session
+		port = get_own_port(data.room_name);
+		if (port == -1)
+			_cant_connect = true;
+
+
+		//keys are still the same
+		auto key_iv_val = get_key_iv(data.room_name);
+		key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
+		key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
+
+		//get offline clients
+		auto saved_offline_clients = get_offline_clients(data.room_name);
+		for (auto& client : saved_offline_clients)
+		{
+			offline_clients.push_back(client);
+		}
+
+
+		connect_to_saved_clients = true;
+		_cant_connect = false;
 	}
 }
 DecentralysedServerClient::~DecentralysedServerClient()
