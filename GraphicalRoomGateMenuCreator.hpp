@@ -1,6 +1,8 @@
 /*
-	This class is used to init/delete
-	sub menu to enter or start room
+	This menu is used to enter/start room.
+	If user has acess to room, then everything is deleted.
+	If user start room, then before delete everything,
+	he/she must create/send invite link.
 */
 #ifndef GRAPHICAL_ROOM_GATE_MENU_CREATOR_HPP
 #define GRAPHICAL_ROOM_GATE_MENU_CREATOR_HPP
@@ -11,6 +13,7 @@
 #include"ConfigLoader.h"
 #include"DataBaseProcessor.h"
 #include<string>
+#include<utility>
 namespace GraphicalBlink
 {
 using namespace tgui;
@@ -26,13 +29,18 @@ private:
 	const int enter_room_id = 4;
 
 	tgui::String room_password, room_name;
+
+	bool save_link = true;//else send
+	string link_creator_additional_data;//recepient name/path to save
+
+	bool link_creator_init = false;
 public:
 	RoomGateMenu(const string& encr_key,
 				 const string& db_name):Blink::DataBaseProcessor(encr_key,db_name)
 	{
 	}
 	~RoomGateMenu(){}
-	void init(GuiBase* gui, Blink::ConfigLoader& loader,bool& init_chat)
+	void init(GuiBase* gui, Blink::ConfigLoader& loader,bool& init_chat,bool& start)
 	{
 		auto enter_room_password = EditBox::create();
 		enter_room_password->setDefaultText("room password");
@@ -75,7 +83,7 @@ public:
 		start_room_button->setSize({ "18%","5%" });
 		start_room_button->setPosition({ "52%","48%" });
 		start_room_button->setVisible(false);
-		start_room_button->onPress([&]() {can_start_room(init_chat); });
+		start_room_button->onPress([&]() {can_start_room(init_chat,start); });
 		start_room_ptr = start_room_button;
 		gui->add(start_room_button);
 	}
@@ -99,7 +107,7 @@ public:
 			}
 		}
 	}
-	void can_start_room(bool& init_chat)
+	void can_start_room(bool& init_chat,bool& start)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
 		if (active_input_box)
@@ -110,7 +118,7 @@ public:
 
 			if (can_enter)
 			{
-				init_chat = true;
+				start = true;
 			}
 			else
 			{
@@ -132,6 +140,43 @@ public:
 
 			rooms_ptr->setSelectedItem("");
 		}
+	}
+
+
+	void init_inv_link_creating(bool& init_chat)
+	{
+		if (!link_creator_init)
+		{
+			room_passw->setText("");
+			link_creator_init = true;
+		}
+		room_passw->setPasswordCharacter(0);
+		room_passw->setDefaultText("invite link path/recepient");
+		enter_room_ptr->setText("save");
+		enter_room_ptr->onPress([&]() {link_callback_fn(true, init_chat); });
+
+		start_room_ptr->setText("send");
+		start_room_ptr->onPress([&]() {link_callback_fn(false, init_chat); });
+
+		entering_room_label_ptr->setText("save/send invite link:");
+		result_label_ptr->setText("");
+	}
+	bool _save_link() { return save_link; }
+	string get_link_creator_additional_data()
+	{
+		return link_creator_additional_data;
+	}
+
+	pair<string, string> get_room_name_password()
+	{
+		return make_pair(room_name.toStdString(), room_password.toStdString());
+	}
+private:
+	void link_callback_fn(bool flag,bool& init_chat)
+	{
+		save_link = flag;
+		link_creator_additional_data = room_passw->getText().toStdString();
+		init_chat = true;
 	}
 };
 };
