@@ -75,6 +75,45 @@ void Server::create_invite_link(int port,
 		}
 	}	
 }
+void Server::create_invite_link_to_send(int port,
+								const string& room_name,
+								const string& room_password,
+								bool decentralysed,
+								const string& additional_data)
+{
+	string inv_link = get_invite_link_str(port, room_name, room_password, decentralysed);
+	auto write_link_to_file = [&](const string& path)
+	{
+		ofstream file;
+		file.open(path, ios::binary);
+		file << inv_link;
+		file.close();
+	};
+
+	write_link_to_file("link");
+	string command = "sender.exe " + additional_data;
+	system(command.c_str());
+	system("@echo off\n erase link");
+}
+void Server::create_invite_link_to_save(int port,
+								const string& room_name,
+								const string& room_password,
+								bool decentralysed,
+								const string& additional_data)
+{
+	string inv_link = get_invite_link_str(port, room_name, room_password, decentralysed);
+
+	auto write_link_to_file = [&](const string& path)
+	{
+		ofstream file;
+		file.open(path, ios::binary);
+		file << inv_link;
+		file.close();
+	};
+	write_link_to_file(additional_data);
+}
+
+
 string Server::get_invite_link_str(int port,
 								   const string& room_name,
 								   const string& room_password,

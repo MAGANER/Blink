@@ -45,15 +45,26 @@ namespace Blink
 							const string& room_name,
 							const string& room_password,
 							bool decentralysed);
-		bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
+	void create_invite_link_to_send(int port,
+							const string& room_name,
+							const string& room_password,
+							bool decentralysed,
+							const string& additional_data);
+	void create_invite_link_to_save(int port,
+							const string& room_name,
+							const string& room_password,
+							bool decentralysed,
+							const string& additional_data);
+
+	bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 
 
-		void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
-		void check_access(TcpSocket& socket, 
-						  vector<IpAddress>& allowed,
-						  vector<int>& port);
+	void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
+	void check_access(TcpSocket& socket, 
+					  vector<IpAddress>& allowed,
+					  vector<int>& port);
 
-		void update_clients(list<RoomClient*>& clients);
+	void update_clients(list<RoomClient*>& clients);
 	};
 };
 #endif //SERVER_H
