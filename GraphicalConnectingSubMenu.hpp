@@ -13,10 +13,14 @@ using namespace tgui;
 class GraphicalConnectingSubMenu
 {
 private:
-	Blink::EncryptionData data;
+	Blink::EncryptionData encr_data;
+	Blink::ConnectionData conn_data;
+
 	bool can_connect_flag = false;
+	bool should_return_to_prev_menu = false;
 
 	Label::Ptr result_label_ptr;
+	EditBox::Ptr inv_link_ptr;
 public:
 	GraphicalConnectingSubMenu()
 	{
@@ -31,12 +35,12 @@ public:
 		inv_link->setSize({ "40.00%", "5.0%" });
 		inv_link->setPosition({ "30%", "40%" });
 		inv_link->setUserData(-1);//default id is -1 for this menu
-		inv_link->setPasswordCharacter('*');
 		gui->add(inv_link);
+		inv_link_ptr = inv_link;
 
 		auto result_label = Label::create();
 		result_label->setUserData(-1);
-		result_label->setPosition({ "30%","55%" });
+		result_label->setPosition({ "25%","55%" });
 		result_label->setTextSize(20);
 		result_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 		result_label_ptr = result_label;
@@ -50,14 +54,25 @@ public:
 		gui->add(conn_button);
 	}
 	bool can_connect() { return can_connect_flag; }
+	bool return_to_prev_menu() { return should_return_to_prev_menu; }
 	Blink::EncryptionData& get_encrpyption_data()
 	{
-		return data;
+		return encr_data;
 	}
 
 	void check_can_connect()
 	{
-
+		string path = inv_link_ptr->getText().toStdString();
+		if (ConnectionChecker::connect_with_filelink(conn_data,encr_data,path))
+		{
+			can_connect_flag = true;
+			result_label_ptr->setText("link is accepted! will be connected in 2 seconds!");
+		}
+		else
+		{
+			should_return_to_prev_menu = true;
+			result_label_ptr->setText("link is denyied! will be leaving in 2 seconds!");
+		}
 	}
 };
 };
