@@ -13,6 +13,7 @@
 #include"TGUI/Widgets/EditBox.hpp"
 #include"GraphicalRoomGateMenuCreator.hpp"
 #include"DecentralysedServerClient.h"
+#include"GraphicalConnectingSubMenu.hpp"
 namespace GraphicalBlink
 {
 using namespace Blink;
@@ -37,10 +38,11 @@ private:
 	EditBox::Ptr room_passw;
 
 	RoomGateMenu* room_gate_menu = nullptr;
+	GraphicalConnectingSubMenu* conn_menu = nullptr;
 
 	string user_name;
 
-	DecentralysedServerClient* client;
+	DecentralysedServerClient* client = nullptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -57,6 +59,8 @@ private:
 	void set_no_rooms_label_to_center(sf::Event::EventType type);
 	void run_create_room_menu(Blink::ConfigLoader& loader);
 	void create_link();
+	void connect_link(Blink::ConfigLoader& loader);
+	void recreate_this_menu(Blink::ConfigLoader& loader);
 
 	void process_chat();
 };

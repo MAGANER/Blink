@@ -20,6 +20,7 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
+	if (conn_menu != nullptr) delete conn_menu;
 	if (client != nullptr) delete client;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
@@ -52,6 +53,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 	auto connect_button = Button::create(" connect ");
 	connect_button->setUserData(default_id);
+	connect_button->onPress([&]() {connect_link(loader); });
 
 	auto create_button_y_pos = create_room_button->getPositionLayout().y +
 							   create_room_button->getSizeLayout().y;
@@ -73,6 +75,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
 	paramless_echo_functions.push_back([&]() {process_chat(); });
 	paramless_echo_functions.push_back([&]() {create_link(); });
+	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
 
 }
 void GraphicalMainMenu::create_link()
@@ -171,6 +174,30 @@ void GraphicalMainMenu::process_chat()
 				room_gate_menu->get_link_creator_additional_data(), 
 				room_gate_menu->_save_link(), 
 				true);
+		}
+	}
+}
+void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
+{
+	gui->removeAllWidgets();
+	if (conn_menu == nullptr)
+	{
+		conn_menu =  new GraphicalConnectingSubMenu();
+		conn_menu->init_menu(gui, loader);
+	}
+}
+void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
+{
+	if (conn_menu != nullptr)
+	{
+		if (conn_menu->return_to_prev_menu())
+		{
+			update_win();
+			sf::sleep(sf::Time(sf::seconds(2.0f))); //wait to show it
+			gui->removeAllWidgets();
+			delete conn_menu;
+			conn_menu = nullptr;
+			create(loader);
 		}
 	}
 }
