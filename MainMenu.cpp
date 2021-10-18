@@ -12,12 +12,15 @@ MainMenu::MainMenu(const string& encr_key,
 	commands["conflink"] = function<void()>([&]()
 		{
 			EncryptionData _data;
-			if (ConnectionChecker::connect_with_filelink(data, _data))
+
+			string path;
+			cout << "enter path to link:";
+			cin >> path;
+			if (ConnectionChecker::connect_with_filelink(data, _data,path))
 			{
 				can_connect_to_room = true;
 				encr_data = new EncryptionData();
 				encr_data->data = _data.data;
-
 				connecting_with_conflink_command = true;
 			}
 		});

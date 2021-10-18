@@ -95,21 +95,18 @@ namespace ConnectionChecker
 		return ability;
 	}
 	bool connect_with_filelink(ConnectionData& data,
-							   EncryptionData& encr_data)
+							   EncryptionData& encr_data,
+							   const string& path)
 	{
 		using namespace inner;
 
-		string path;
 		ifstream link_file;
 		while (true)
 		{
-			cout << "enter path to link:";
-			cin >> path;
 			link_file.open(path, ios::binary);
 			if (!link_file)
 			{
 				cout << "can not open " << path << "!" << endl;
-				path.clear();
 			}
 			else break;
 		}
