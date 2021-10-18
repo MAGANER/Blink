@@ -103,17 +103,19 @@ void BaseGraphicalMenu::run()
             }
         }
 
-
-
-        window->clear(back_color);
-        gui->draw();
-        window->display();
+        update_win();
 
         if (should_break)
         {
             window->close();
         }
     }
+}
+void BaseGraphicalMenu::update_win()
+{
+    window->clear(back_color);
+    gui->draw();
+    window->display();
 }
 void BaseGraphicalMenu::updateTextSize()
 {

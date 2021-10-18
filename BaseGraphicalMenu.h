@@ -37,6 +37,8 @@ protected:
 	vector<function<void()>> paramless_echo_functions;
 
 	auto get_window_size() { return window->getSize(); }
+
+	void update_win();
 public:
 	BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_size);
 	virtual ~BaseGraphicalMenu();
