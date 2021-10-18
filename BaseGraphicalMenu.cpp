@@ -81,6 +81,11 @@ void BaseGraphicalMenu::run()
 {
     while (window->isOpen())
     {
+        for (auto& fn : paramless_echo_functions)
+        {
+            fn();
+        }
+
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -97,10 +102,7 @@ void BaseGraphicalMenu::run()
                 fn(event.type);
             }
         }
-        for (auto& fn : paramless_echo_functions)
-        {
-            fn();
-        }
+
 
 
         window->clear(back_color);
