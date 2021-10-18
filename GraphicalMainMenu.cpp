@@ -4,12 +4,14 @@ using namespace GraphicalBlink;
 GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 									 const string& encr_key,
 									 const string& db_name,
-									 const sf::Vector2u& win_size):
+									 const sf::Vector2u& win_size,
+									 const string& user_name):
 	BaseGraphicalMenu(fullscreen,win_size),
 	DataBaseProcessor(encr_key,db_name)
 {
 	room_gate_menu = new RoomGateMenu(encr_key, db_name);
 	
+	this->user_name = user_name;
 
 	rooms = get_rooms(encr_key);
 	if (rooms.empty())no_rooms = true;
@@ -18,11 +20,12 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
+	if (client != nullptr) delete client;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
 	this->loader = &loader;
-	room_gate_menu->init(gui, *this->loader,init_chat);
+	room_gate_menu->init(gui, *this->loader,init_chat, start_room);
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
@@ -69,7 +72,18 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	
 	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
 	paramless_echo_functions.push_back([&]() {process_chat(); });
+	paramless_echo_functions.push_back([&]() {create_link(); });
 
+}
+void GraphicalMainMenu::create_link()
+{
+	//create client and save/send link
+	if (start_room)
+	{
+		room_gate_menu->init_inv_link_creating(init_chat);
+
+		start_room = false;
+	}
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
@@ -142,6 +156,21 @@ void GraphicalMainMenu::process_chat()
 	if (init_chat)
 	{
 		gui->removeAllWidgets();
-		init_chat = true;
+		init_chat = false;
+
+		if (room_gate_menu->is_starting_room())
+		{
+			auto name_passw = room_gate_menu->get_room_name_password();
+
+			NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
+			auto none = command_hash();
+			client = 
+			new DecentralysedServerClient(none, 
+										  name_passw.second, 
+										  data, 
+				room_gate_menu->get_link_creator_additional_data(), 
+				room_gate_menu->_save_link(), 
+				true);
+		}
 	}
 }

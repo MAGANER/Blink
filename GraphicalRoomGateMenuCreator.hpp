@@ -33,7 +33,7 @@ private:
 	bool save_link = true;//else send
 	string link_creator_additional_data;//recepient name/path to save
 
-	bool link_creator_init = false;
+	bool starting_room = false;
 public:
 	RoomGateMenu(const string& encr_key,
 				 const string& db_name):Blink::DataBaseProcessor(encr_key,db_name)
@@ -145,11 +145,8 @@ public:
 
 	void init_inv_link_creating(bool& init_chat)
 	{
-		if (!link_creator_init)
-		{
-			room_passw->setText("");
-			link_creator_init = true;
-		}
+		starting_room = true;
+		room_passw->setText("");
 		room_passw->setPasswordCharacter(0);
 		room_passw->setDefaultText("invite link path/recepient");
 		enter_room_ptr->setText("save");
@@ -162,6 +159,7 @@ public:
 		result_label_ptr->setText("");
 	}
 	bool _save_link() { return save_link; }
+	bool is_starting_room() { return starting_room; }
 	string get_link_creator_additional_data()
 	{
 		return link_creator_additional_data;
