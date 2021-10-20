@@ -81,10 +81,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 void GraphicalMainMenu::create_link()
 {
 	//create client and save/send link
+	//callback function for button to create link
 	if (start_room)
 	{
 		room_gate_menu->init_inv_link_creating(init_chat);
-
 		start_room = false;
 	}
 }
@@ -161,29 +161,68 @@ void GraphicalMainMenu::process_chat()
 		gui->removeAllWidgets();
 		init_chat = false;
 
-		if (room_gate_menu->is_starting_room())
+		bool can_connect_with_link = false;
+		if (conn_menu != nullptr)
 		{
+			can_connect_with_link = conn_menu->can_connect();
+		}
+		if (!can_connect_with_link)
+		{
+			if (room_gate_menu->is_starting_room())
+			{
+				auto name_passw = room_gate_menu->get_room_name_password();
+				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
+				auto none = command_hash();
+				client =
+					new GraphicalDecentralysedServerClient(none,
+						name_passw.second,
+						data,
+						room_gate_menu->get_link_creator_additional_data(),
+						true,
+						room_gate_menu->_save_link());
+			}
+			else
+			{
+				auto name_passw = room_gate_menu->get_room_name_password();
+				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
+				auto none = command_hash();
+				client =
+					new GraphicalDecentralysedServerClient(none, name_passw.second, data, false, false);
+			}
+			
+			client->prepare();
+			main_echo_function = [&]() {client->run_in_window(); };
+		}
+		else
+		{
+			//conn menu is not nullptr
+			auto keys = conn_menu->get_encrpyption_data();
+			auto conn_data = conn_menu->get_connection_data();
+			
 			auto name_passw = room_gate_menu->get_room_name_password();
-
 			NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
 			auto none = command_hash();
-			client = 
-			new DecentralysedServerClient(none, 
-										  name_passw.second, 
-										  data, 
-				room_gate_menu->get_link_creator_additional_data(), 
-				room_gate_menu->_save_link(), 
-				true);
+
+			client = new GraphicalDecentralysedServerClient(none, name_passw.second, data, true, false);
+			client->set_ip_and_port_to_connect(conn_data.ip,conn_data.port);
+			client->is_connecting(true);
+			client->set_key_iv(keys.data);
+
+			client->prepare();
+			main_echo_function = [&]() {client->run_in_window(); };
 		}
+		should_run_paramless_echo_function = false;
+		
 	}
 }
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 {
+	//call back function for connect button
 	gui->removeAllWidgets();
 	if (conn_menu == nullptr)
 	{
 		conn_menu =  new GraphicalConnectingSubMenu();
-		conn_menu->init_menu(gui, loader);
+		conn_menu->init_menu(gui, loader,init_chat);
 	}
 }
 void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)

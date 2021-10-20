@@ -12,7 +12,7 @@
 #include"TGUI/Widgets/Label.hpp"
 #include"TGUI/Widgets/EditBox.hpp"
 #include"GraphicalRoomGateMenuCreator.hpp"
-#include"DecentralysedServerClient.h"
+#include"GraphicalDecentralysedServerClient.h"
 #include"GraphicalConnectingSubMenu.hpp"
 namespace GraphicalBlink
 {
@@ -25,7 +25,7 @@ private:
 	bool no_rooms = true;
 	bool init_chat = false;
 	bool start_room = false;
-
+	
 	//user data for widgets
 	const int no_rooms_id  = 3;
 	const int default_id   = 0;
@@ -42,7 +42,7 @@ private:
 
 	string user_name;
 
-	DecentralysedServerClient* client = nullptr;
+	GraphicalDecentralysedServerClient* client = nullptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
