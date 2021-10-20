@@ -33,8 +33,11 @@ protected:
 	bool should_break = false;
 	CurrentMenu menu_to_run;
 	sf::Vector2u start_size;
+
 	vector<function<void(sf::Event::EventType type)>> echo_functions;
 	vector<function<void()>> paramless_echo_functions;
+	bool should_run_paramless_echo_function = true;
+	function<void()> main_echo_function;
 
 	auto get_window_size() { return window->getSize(); }
 

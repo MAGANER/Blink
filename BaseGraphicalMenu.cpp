@@ -59,11 +59,20 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
                 fn(event.type);
             }
         }
-        for (auto& fn : paramless_echo_functions)
-        {
-            fn();
-        }
 
+        if (should_run_paramless_echo_function)
+            for (auto& fn : paramless_echo_functions)
+            {
+                fn();
+            }
+        else
+        {
+            if(!paramless_echo_functions.empty())
+                paramless_echo_functions.clear();
+
+
+            main_echo_function();
+        }
 
         window->clear(back_color);
         gui->draw();
