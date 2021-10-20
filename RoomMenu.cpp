@@ -73,7 +73,8 @@ void RoomMenu::run(bool connecting_with_file_link,
 	{
 		while (true)
 		{
-			client_server._run();
+			client_server.prepare();
+			client_server.run_in_console();
 			if (client_server.should_disconnect())
 			{
 				exit = true;
@@ -109,7 +110,8 @@ void RoomMenu::run(const encr::AES::key_iv& key,
 		client_server.set_key_iv(key);
 		while (true)
 		{
-			client_server._run();
+			client_server.prepare();
+			client_server.run_in_console();
 			if (client_server.should_disconnect())
 			{
 				exit = true;
