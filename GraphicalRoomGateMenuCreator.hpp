@@ -34,6 +34,9 @@ private:
 	string link_creator_additional_data;//recepient name/path to save
 
 	bool starting_room = false;
+
+	bool first_state = true;//first state means entering/starting menu
+	//so second one is where you save/send link
 public:
 	RoomGateMenu(const string& encr_key,
 				 const string& db_name):Blink::DataBaseProcessor(encr_key,db_name)
@@ -92,7 +95,11 @@ public:
 		bool active_input_box = enter_room_ptr->isVisible();
 		if (active_input_box)
 		{
-			room_password = room_passw->getText();
+			//don't change it fixes bug, when password is link path!
+			if(first_state)
+				room_password = room_passw->getText();
+			//
+
 			bool can_enter = is_password_correct(room_name.toStdString(),
 												 room_password.toStdString());
 
@@ -112,7 +119,11 @@ public:
 		bool active_input_box = enter_room_ptr->isVisible();
 		if (active_input_box)
 		{
-			room_password = room_passw->getText();
+			//don't change it fixes bug, when password is link path!
+			if(first_state)
+				room_password = room_passw->getText();
+			//
+
 			bool can_enter = is_password_correct(room_name.toStdString(),
 												 room_password.toStdString());
 
@@ -145,6 +156,7 @@ public:
 
 	void init_inv_link_creating(bool& init_chat)
 	{
+		first_state = false;
 		starting_room = true;
 		room_passw->setText("");
 		room_passw->setPasswordCharacter(0);
