@@ -9,7 +9,7 @@ namespace Blink
 {
 class DecentralysedServerClient:public Server
 {
-private:
+protected:
 	bool _cant_connect = false;
 	string conn_port, conn_ip;
 	bool connecting = false;
@@ -27,6 +27,10 @@ private:
 	vector<int> allowed_ports;
 
 	int client_counter = 0;
+
+	Clock timer;
+
+	TcpSocket* entering_socket = new TcpSocket;
 public:
 	DecentralysedServerClient(command_hash& commands,
 							  const string& password,
@@ -43,16 +47,16 @@ public:
 							  bool starting_room,
 							  bool save_link,
 							  bool inherited = false);
-	~DecentralysedServerClient();
+	virtual ~DecentralysedServerClient();
 
-
-	bool _run();
+	void prepare();
+	bool run_in_console();
 	bool cant_connect() { return _cant_connect; };
 
 	void set_ip_and_port_to_connect(const string& ip, const string& port);
 	void is_connecting(bool flag);
 	void set_key_iv(const encr::AES::key_iv& key_iv);
-private:
+protected:
 	void connnect_finally();
 	void process_received_clients_info();
 

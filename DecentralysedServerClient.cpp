@@ -127,7 +127,8 @@ DecentralysedServerClient::~DecentralysedServerClient()
 {
 	if (socket != nullptr)delete socket;
 }
-bool DecentralysedServerClient::_run()
+
+void DecentralysedServerClient::prepare()
 {
 	listener.setBlocking(false);
 	listener.listen(port);
@@ -140,11 +141,9 @@ bool DecentralysedServerClient::_run()
 		connect_to_known_clients();
 		connect_to_saved_clients = false;
 	}
-
-
-	Clock timer;
-
-	TcpSocket* entering_socket = new TcpSocket;
+}
+bool DecentralysedServerClient::run_in_console()
+{
 	while (true)
 	{
 		receive_input_and_send_message_to_all(clients);
@@ -231,7 +230,6 @@ bool DecentralysedServerClient::_run()
 	}
 
 	if (entering_socket != nullptr) delete entering_socket;
-
 	return true;
 }
 void DecentralysedServerClient::set_ip_and_port_to_connect(const string& ip, const string& port)
