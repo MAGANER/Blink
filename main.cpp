@@ -4,23 +4,25 @@
 
 	$main.cpp is entry point to application. that's obvious
 	
-		How does it work?
-	If application is executed first time, then before all
-	there will be created data base encrypted with special key.
+	(Simple and not complicated)
+	Console Mode:
+			How does it work?
+		If application is executed first time, then before all
+		there will be created data base encrypted with special key.
 
-	When you start new Blink session you should enter this key.
+		When you start new Blink session you should enter this key.
 
-	On top there are 3 menu: Room, Enter and Main
-	EnterMenu provides an abilities to create new user/login.
+		On top there are 3 menu: Room, Enter and Main
+		EnterMenu provides an abilities to create new user/login.
 
-	If you get access you get to MainMenu.
+		If you get access you get to MainMenu.
 
-	MainMenu provides abilities to enter room(start your own server)
-	or connect to the room manually or with special invite link.
-	Invite link is created when you enter room.
+		MainMenu provides abilities to enter room(start your own server)
+		or connect to the room manually or with special invite link.
+		Invite link is created when you enter room.
 
-	And there is third menu. RoomMenu. Users moves to this one after
-	he/she/it enters room or connect to the one.
+		And there is third menu. RoomMenu. Users moves to this one after
+		he/she/it enters room or connect to the one.
 	
 */
 
@@ -34,6 +36,7 @@
 
 static bool currently_fullscreen = false;
 static sf::Vector2u win_size(720,640);//default value
+static string user_name; //should be passed to MainMenu
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
@@ -50,6 +53,7 @@ GraphicalBlink::BaseGraphicalMenu::CurrentMenu
 process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu, 
 					 bool fullscreen,
 					 Blink::ConfigLoader& loader);
+
 int main(int argc, char** argv)
 {
 	using namespace Blink;
@@ -66,6 +70,7 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		 string& key,
@@ -84,12 +89,13 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 
 		key = enter_menu->get_user_password();
 		db_name = enter_menu->get_db_name();
+		user_name = enter_menu->get_user_name();
 		if(enter_menu != nullptr)delete enter_menu;
 		return change;
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
-		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name, win_size);
+		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name, win_size,user_name);
 		main_menu->create(loader);
 		if (currently_fullscreen)
 		{
@@ -145,6 +151,7 @@ void run_graphical_mode(Blink::ConfigLoader& loader)
 		run_menu(run_menu(start,key,db_name,loader, loader.is_fullscreen()),key,db_name,loader, loader.is_fullscreen());
 	}
 }
+
 void run_console_mode()
 {
 	using namespace Blink;
