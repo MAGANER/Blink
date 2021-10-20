@@ -28,7 +28,7 @@ public:
 	~GraphicalConnectingSubMenu()
 	{
 	}
-	void init_menu(GuiBase* gui, Blink::ConfigLoader& loader)
+	void init_menu(GuiBase* gui, Blink::ConfigLoader& loader,bool& init_chat)
 	{
 		auto inv_link = EditBox::create();
 		inv_link->setDefaultText("inviting link path");
@@ -50,7 +50,7 @@ public:
 		conn_button->setUserData(-1);
 		conn_button->setSize({ "18%","5%" });
 		conn_button->setPosition({ "40%","48%" });
-		conn_button->onPress([&]() {check_can_connect(); });
+		conn_button->onPress([&]() {check_can_connect(init_chat); });
 		gui->add(conn_button);
 	}
 	bool can_connect() { return can_connect_flag; }
@@ -59,13 +59,17 @@ public:
 	{
 		return encr_data;
 	}
-
-	void check_can_connect()
+	Blink::ConnectionData& get_connection_data()
+	{
+		return conn_data;
+	}
+	void check_can_connect(bool& init_chat)
 	{
 		string path = inv_link_ptr->getText().toStdString();
 		if (ConnectionChecker::connect_with_filelink(conn_data,encr_data,path))
 		{
 			can_connect_flag = true;
+			init_chat = true;
 			result_label_ptr->setText("link is accepted! will be connected in 2 seconds!");
 		}
 		else
