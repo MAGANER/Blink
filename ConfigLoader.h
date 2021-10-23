@@ -29,7 +29,7 @@ private:
 	int width  = 720;
 
 	bool theme_is_loaded = false;
-	Color background_win_color, enter_menu_label_color;
+	Color background_win_color, enter_menu_label_color, message_background;
 	TextAlignment default_text_align = TextAlignment::Center;
 	bool fullscreen = false;
 public:
@@ -38,10 +38,11 @@ public:
 
 	auto get_background_win_color()  { return background_win_color; }
 	auto get_enter_menu_label_color(){ return enter_menu_label_color; }
+	auto get_message_background_color() { return message_background; }
 	auto get_text_align() { return default_text_align; }
 	bool is_theme_loaded() { return theme_is_loaded; }
 	bool get_mode() { return terminal_mode; }
-	auto get_win_size() { return Vector2u(width, height); }
+	auto get_win_size() { return sf::Vector2u(width, height); }
 	bool is_fullscreen() { return fullscreen; }
 private:
 	void load_color(Color& color,const string& field_name);

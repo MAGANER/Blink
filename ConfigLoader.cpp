@@ -31,7 +31,7 @@ ConfigLoader::ConfigLoader()
 	{
 		load_color(background_win_color, "background_win_color");
 		load_color(enter_menu_label_color, "enter_menu_label_color");
-
+		load_color(message_background, "message_background_color");
 		int text_align = theme["default_text_align"];
 		default_text_align = TextAlignment(text_align);
 
