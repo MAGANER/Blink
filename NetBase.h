@@ -82,6 +82,16 @@ struct NetBaseData
 						 db_name(db_name)
 	{}
 };
+struct message_store
+{
+	message_store(const string& name,
+		const string& text) :
+		name(name), text(text)
+	{}
+	~message_store()
+	{}
+	string name, text;
+};
 class NetBase :public DataBaseProcessor
 {
 protected:
@@ -177,6 +187,19 @@ protected:
 		}
 	}
 
+
+	void get_and_save_message(TcpSocket& socket,list<message_store*>& messages)
+	{
+		string data = NetBase::get_message(socket);
+		if (data.size() > 0 && can_show)
+		{
+			auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };
+			json parsed = json::parse(data);
+
+			message_store* msg = new message_store(cut(parsed["name"]), cut(parsed["data"]));
+			messages.push_back(msg);
+		}
+	}
 	void show_message(const string& message)
 	{
 		auto cut = [&](const string& str) { return fp::slice(str, 0, str.size()); };

@@ -219,7 +219,6 @@ bool DecentralysedServerClient::run_in_console()
 			//save offline clients
 			//because if you don't do that you lost all data  about potential
 			//clients
-			cout << offline_clients.size() << "is offline clients!" << endl;
 			for (auto& client : offline_clients)
 			{
 				add_offline_client(room_name, client.first.toString(), client.second);
@@ -424,6 +423,7 @@ void DecentralysedServerClient::process_received_clients_info()
 		//create room
 		if (!does_room_exists(received_info->room_name))
 		{
+			cout << received_info->room_password << endl;
 			create_new_room(received_info->room_name,
 							received_info->room_password,
 							to_string(port));
