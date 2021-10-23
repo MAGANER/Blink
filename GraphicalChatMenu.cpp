@@ -7,6 +7,8 @@ void GraphicalChatMenu::init(GuiBase* gui,
 {
 	local_gui_ptr = gui;
 
+	message_background_color = loader.get_message_background_color();
+
 	auto input = TextArea::create();
 	input->setSize({ "70%","10%" });
 	input->setPosition({ "3%","80%" });
@@ -35,6 +37,7 @@ void GraphicalChatMenu::add_message(const string& text)
 {	
 	auto box = make_default_message_box();
 	box->setText(split_text_if_required(text));
+	cout << box->getText()<<"::" << endl;
 	if (!messages.empty())
 	{
 		for (auto start = messages.begin(); start != (--messages.end());++start)
@@ -83,14 +86,26 @@ string GraphicalChatMenu::split_text_if_required(const string& _text)
 		{
 			__text += word + "\n";
 		}
-		return __text;
+
+		//erase useless spaces
+		reverse(__text.begin(), __text.end());
+		string new_text;
+		int i = 0;
+		for (i; i < __text.size(); i++)
+		{
+			if (!isspace(__text[i]))break;
+		}
+
+		new_text = Functools::slice(__text, i, __text.size());
+		reverse(new_text.begin(), new_text.end());
+		return new_text;
 	}
 	return text;
 }
 Label::Ptr GraphicalChatMenu::make_default_message_box()
 {
 	auto box = Label::create();
-	box->getSharedRenderer()->setBackgroundColor(tgui::Color::Magenta);
+	box->getSharedRenderer()->setBackgroundColor(message_background_color);
 	box->setAutoSize(true);
 	box->setUserData(-1);
 	box->setMouseCursor(tgui::Cursor::Type::Text);

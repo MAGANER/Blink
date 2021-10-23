@@ -25,7 +25,7 @@ private:
 	vector<Label::Ptr> messages;
 
 	GuiBase* local_gui_ptr = nullptr;
-	tgui::Color message_background_color;
+	sf::Color message_background_color;
 public:
 	GraphicalChatMenu()
 	{
