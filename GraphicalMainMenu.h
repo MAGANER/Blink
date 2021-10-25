@@ -14,6 +14,7 @@
 #include"GraphicalRoomGateMenuCreator.hpp"
 #include"GraphicalDecentralysedServerClient.h"
 #include"GraphicalConnectingSubMenu.hpp"
+#include"GraphicalChatMenu.h"
 namespace GraphicalBlink
 {
 using namespace Blink;
@@ -39,6 +40,7 @@ private:
 
 	RoomGateMenu* room_gate_menu = nullptr;
 	GraphicalConnectingSubMenu* conn_menu = nullptr;
+	GraphicalChatMenu* chat_menu = nullptr;
 
 	string user_name;
 
@@ -63,6 +65,7 @@ private:
 	void recreate_this_menu(Blink::ConfigLoader& loader);
 
 	void process_chat();
+	void _main_echo_function();
 };
 };
 #endif

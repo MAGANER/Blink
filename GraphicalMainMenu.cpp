@@ -21,7 +21,8 @@ GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
 	if (conn_menu != nullptr) delete conn_menu;
-	if (client != nullptr) delete client;
+	if (client != nullptr)    delete client;
+	if (chat_menu != nullptr) delete chat_menu;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
@@ -191,7 +192,7 @@ void GraphicalMainMenu::process_chat()
 			}
 			
 			client->prepare();
-			main_echo_function = [&]() {client->run_in_window(); };
+			main_echo_function = [&]() {_main_echo_function(); };
 		}
 		else
 		{
@@ -209,10 +210,12 @@ void GraphicalMainMenu::process_chat()
 			client->set_key_iv(keys.data);
 
 			client->prepare();
-			main_echo_function = [&]() {client->run_in_window(); };
+			main_echo_function = [&]() {_main_echo_function(); };
 		}
+
+		chat_menu = new GraphicalChatMenu();
+		chat_menu->init(gui, *loader,client);
 		should_run_paramless_echo_function = false;
-		
 	}
 }
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
@@ -238,5 +241,23 @@ void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 			conn_menu = nullptr;
 			create(loader);
 		}
+	}
+}
+void GraphicalMainMenu::_main_echo_function()
+{
+	if (chat_menu->_should_send())
+	{
+		auto text_to_send = chat_menu->get_text_to_send();
+		MessageToShow msg(text_to_send, true);
+		chat_menu->add_message(msg);
+		client->set_text_to_send(text_to_send);
+	}
+	client->run_in_window();
+
+	if (client->has_message_to_show())
+	{
+		auto msg = client->get_message_to_show();
+		MessageToShow _msg(msg->text, false);
+		chat_menu->add_message(_msg);
 	}
 }
