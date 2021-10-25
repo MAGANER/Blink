@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include<utility>
+#include<locale>
 #include"sql/Functools.hpp"
 namespace Blink
 {
@@ -25,12 +26,24 @@ namespace
 				if (arg.size() == 0)return false;
 				return true;
 			};
-			function<bool(char)> filter_elem_pd = [&](char ch) { return isprint(ch); };
+
+			function<bool(char)> filter_elem_pd = [&](char ch) { return isprint(ch)>0; };
 			function<string(string)> filter_str = [&](const string& str)
 			{
 				return Functools::filter(str, filter_elem_pd);
 			};
 			return Functools::map(Functools::filter(elems, should_copy), filter_str);
+		}
+		vector<string> simple_split(const string& s, char delim)
+		{
+			std::stringstream ss(s);
+			std::string item;
+			std::vector<std::string> elems;
+			while (std::getline(ss, item, delim))
+			{
+				elems.push_back(item);
+			}
+			return elems;
 		}
 	};
 };
