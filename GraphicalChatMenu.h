@@ -12,7 +12,7 @@
 #include<string>
 #include"GraphicalDecentralysedServerClient.h"
 #include"StringOperations.hpp"
-#define step 15.0f //number of puxels between messages P.S. constant just doesn't work(wtf)
+#define step 20.0f //number of pixels between messages P.S. constant just doesn't work(wtf)
 namespace GraphicalBlink
 {
 using namespace tgui;
@@ -41,8 +41,7 @@ private:
 	TextArea::Ptr text_input_ptr;
 	bool should_send = false;
 
-	vector<Label::Ptr> my_messages;//left align
-	vector<Label::Ptr> another_messages;//right align
+	vector<Label::Ptr> messages;
 
 	GuiBase* local_gui_ptr = nullptr;
 	sf::Color message_background_color;
@@ -66,11 +65,8 @@ public:
 	string get_text_to_send();
 private:
 	Label::Ptr make_default_message_box();
-	Label::Ptr get_last_message_box(vector<Label::Ptr>& messages) { return *(--messages.end()); }
-	void move_messages_up(vector<Label::Ptr>& messages,MsgAlign align);
-
-	string split_text_if_required(const string& _text);
 	float get_message_box_x_pos(MsgAlign val, float box_size);
+	string split_text_if_required(const string& _text);
 };
 };
 #endif

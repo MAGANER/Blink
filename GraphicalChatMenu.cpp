@@ -37,66 +37,29 @@ void GraphicalChatMenu::add_message(const MessageToShow& msg)
 {	
 	auto box = make_default_message_box();
 
-	auto name = msg.mine ? "you:\n " : msg.name + "\n";
+	auto name = msg.mine ? "you:\n " : msg.name + ":\n";
 	box->setText(name + split_text_if_required(msg.text));
 
+	MsgAlign align = msg.mine ? MsgAlign::Left : MsgAlign::Right;
 
-	move_messages_up(my_messages, MsgAlign::Left);
-	move_messages_up(another_messages, MsgAlign::Right);
+	auto pos  = text_input_ptr->getPosition();
+	auto size = box->getSize();
+	box->setPosition(get_message_box_x_pos(align, size.x), pos.y - size.y - step);
+	messages.push_back(box);
 
-	auto get_align = [&]() {return msg.mine ? MsgAlign::Left : MsgAlign::Right; };
-	auto get_y_pos = [&](float box_height, float y) { return y - box_height - step;};
-	if (my_messages.empty() && msg.mine)
+	for (int i = messages.size()-1; i > -1; --i)
 	{
-		//set my first message
-		auto pos = text_input_ptr->getPosition();
-		pos.x = get_message_box_x_pos(MsgAlign::Left, box->getSize().x);
-		box->setPosition(pos.x, get_y_pos(box->getSize().y,pos.y));
+		auto msg = messages[i];
+		if (i + 1 < messages.size())
+		{
+			auto next = messages[i + 1];
+			messages[i]->setPosition(messages[i]->getPosition().x,
+				next->getPosition().y - next->getSize().y - step);
+		}
 	}
-	else if(!my_messages.empty() && msg.mine)
-	{
-		auto last = get_last_message_box(my_messages);
-		auto pos = last->getPosition();
-		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
-		last->setPosition(pos.x, pos.y);
-	}
-
-
-	if (another_messages.empty() && !msg.mine)
-	{
-		//set another first message
-		auto pos = text_input_ptr->getPosition();
-		pos.x = get_message_box_x_pos(MsgAlign::Right, box->getSize().x);
-		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
-	}
-	else if(!another_messages.empty() && !msg.mine)
-	{
-		auto last = get_last_message_box(another_messages);
-		auto pos = last->getPosition();
-		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
-	}
-
-	if (msg.mine)
-		my_messages.push_back(box);
-	else
-		another_messages.push_back(box);
 
 	local_gui_ptr->add(box);
 	
-}
-void GraphicalChatMenu::move_messages_up(vector<Label::Ptr>& messages, MsgAlign align)
-{
-	if (!messages.empty())
-	{
-
-		//move previous messages up
-		for (auto start = messages.begin(); start != (messages.end()); ++start)
-		{
-			auto pos = (*start)->getPosition();
-			pos.x = get_message_box_x_pos(align, (*start)->getSize().x);
-			(*start)->setPosition(pos.x, pos.y - (*start)->getSize().y - step);
-		}
-	}
 }
 string GraphicalChatMenu::split_text_if_required(const string& _text)
 {
@@ -106,7 +69,7 @@ string GraphicalChatMenu::split_text_if_required(const string& _text)
 	if (text.size() > 20)
 	{
 		namespace so = Blink::StringOperations;
-		auto words = so::split(text, ' ');
+		auto words = so::simple_split(text, ' ');
 		vector<string> fitable_words;
 		string fitable_word;
 		for (auto& word : words)
@@ -132,7 +95,8 @@ string GraphicalChatMenu::split_text_if_required(const string& _text)
 		int i = 0;
 		for (i; i < __text.size(); i++)
 		{
-			if (!isspace(__text[i]))break;
+			string test; test += __text[i];
+			if (test!=" ")break;
 		}
 
 		new_text = Functools::slice(__text, i, __text.size());
