@@ -33,36 +33,73 @@ string GraphicalChatMenu::get_text_to_send()
 	should_send = false;
 	return text;
 }
-void GraphicalChatMenu::add_message(const string& text)
+void GraphicalChatMenu::add_message(const MessageToShow& msg)
 {	
 	auto box = make_default_message_box();
-	box->setText(split_text_if_required(text));
-	cout << box->getText()<<"::" << endl;
-	if (!messages.empty())
-	{
-		for (auto start = messages.begin(); start != (--messages.end());++start)
-		{
-			auto pos = (*start)->getPosition();
-			(*start)->setPosition(pos.x, pos.y - (*start)->getSize().y-30.0f);
-		}
-		auto last = get_last_message_box();
-		auto pos = last->getPosition();
+	box->setText(split_text_if_required(msg.text));
 
-		last->setPosition(pos.x, pos.y - last->getSize().y-30.0f);
-		box->setPosition(pos);
-	}
-	else
+
+	move_messages_up(my_messages, MsgAlign::Left);
+	move_messages_up(another_messages, MsgAlign::Right);
+
+	auto get_align = [&]() {return msg.mine ? MsgAlign::Left : MsgAlign::Right; };
+	auto get_y_pos = [&](float box_height, float y) { return y - box_height - step;};
+	if (my_messages.empty() && msg.mine)
 	{
-		//set first message
+		//set my first message
 		auto pos = text_input_ptr->getPosition();
-		box->setPosition(pos.x, pos.y - box->getSize().y-30.0f);
+		pos.x = get_message_box_x_pos(MsgAlign::Left, box->getSize().x);
+		box->setPosition(pos.x, get_y_pos(box->getSize().y,pos.y));
 	}
-	messages.push_back(box);
+	else if(!my_messages.empty() && msg.mine)
+	{
+		auto last = get_last_message_box(my_messages);
+		auto pos = last->getPosition();
+		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
+		last->setPosition(pos.x, pos.y);
+	}
+
+
+	if (another_messages.empty() && !msg.mine)
+	{
+		//set another first message
+		auto pos = text_input_ptr->getPosition();
+		pos.x = get_message_box_x_pos(MsgAlign::Right, box->getSize().x);
+		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
+	}
+	else if(!another_messages.empty() && !msg.mine)
+	{
+		auto last = get_last_message_box(another_messages);
+		auto pos = last->getPosition();
+		box->setPosition(pos.x, get_y_pos(box->getSize().y, pos.y));
+	}
+
+	if (msg.mine)
+		my_messages.push_back(box);
+	else
+		another_messages.push_back(box);
+
 	local_gui_ptr->add(box);
 	
 }
+void GraphicalChatMenu::move_messages_up(vector<Label::Ptr>& messages, MsgAlign align)
+{
+	if (!messages.empty())
+	{
+
+		//move previous messages up
+		for (auto start = messages.begin(); start != (messages.end()); ++start)
+		{
+			auto pos = (*start)->getPosition();
+			pos.x = get_message_box_x_pos(align, (*start)->getSize().x);
+			(*start)->setPosition(pos.x, pos.y - (*start)->getSize().y - step);
+		}
+	}
+}
 string GraphicalChatMenu::split_text_if_required(const string& _text)
 {
+	//split text into several lines
+
 	string text = _text;
 	if (text.size() > 20)
 	{
@@ -111,4 +148,15 @@ Label::Ptr GraphicalChatMenu::make_default_message_box()
 	box->setMouseCursor(tgui::Cursor::Type::Text);
 
 	return box;
+}
+float GraphicalChatMenu::get_message_box_x_pos(MsgAlign val, float box_size)
+{
+	if (val == MsgAlign::Left)
+	{
+		return text_input_ptr->getPosition().x;
+	}
+	else 
+	{
+		return text_input_ptr->getSize().x - box_size;
+	}
 }
