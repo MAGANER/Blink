@@ -111,6 +111,7 @@ public:
 			{
 				//show label of disability
 				result_label_ptr->setText(":can not enter room!");
+				room_passw->setText("");
 			}
 		}
 	}
@@ -135,6 +136,7 @@ public:
 			{
 				//show label of disability
 				result_label_ptr->setText(":can not start room!");
+				room_passw->setText("");
 			}
 		}
 	}
