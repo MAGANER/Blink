@@ -16,6 +16,8 @@ class GraphicalEnterMenu :public DataBaseProcessor,
 private:
 	bool _can_login = false;
 	string name, password;
+
+	EditBox::Ptr name_ptr, password_ptr;
 public:
 	GraphicalEnterMenu(bool fullscreen,
 					   const string & encr_key,
@@ -37,6 +39,7 @@ public:
 			user_name->setDefaultText("Username");
 			user_name->setAlignment(EditBox::Alignment((int)loader.get_text_align() - 1));
 			user_name->setMaximumCharacters(Blink::MAX_NAME_LEN);
+			name_ptr = user_name;
 			gui->add(user_name);
 
 			auto password = tgui::EditBox::copy(user_name);
@@ -45,6 +48,7 @@ public:
 			password->setDefaultText("Password");
 			password->getSharedRenderer()->setDefaultTextColor(loader.get_enter_menu_label_color());
 			password->setMaximumCharacters(Blink::MAX_PASSWORD_LEN);
+			password_ptr = password;
 			gui->add(password);
 
 			auto label = tgui::Label::create("Who you are?");
@@ -108,6 +112,8 @@ private:
 									name.size() > MAX_NAME_LEN;
 		if (name_is_more_or_less && ok)
 		{
+			name_ptr->setText("");
+			password_ptr->setText("");
 			result->setText(":name is too short/long!");
 			//create error window
 			ok = false;
@@ -117,6 +123,8 @@ private:
 										_password.size() > MAX_PASSWORD_LEN;
 		if (password_is_more_or_less && ok)
 		{
+			name_ptr->setText("");
+			password_ptr->setText("");
 			result->setText(":password is too short/long!");
 			//create error window
 			ok = false;
@@ -124,13 +132,16 @@ private:
 
 		if (!does_user_exist(name) && ok)
 		{
+			name_ptr->setText("");
+			password_ptr->setText("");
 			DataBaseProcessor::create_new_user(name, _password);
 			result->setText(":user is created!");
 		}
 		else
 		{
+			name_ptr->setText("");
+			password_ptr->setText("");
 			if (ok)result->setText(":can not create user!");
-			//create error window
 		}
 	}
 	void login(EditBox::Ptr username,
@@ -151,6 +162,8 @@ private:
 		}
 		else
 		{
+			name_ptr->setText("");
+			password_ptr->setText("");
 			result->setText("can not login!");
 		}
 	}
