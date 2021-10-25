@@ -248,7 +248,7 @@ void GraphicalMainMenu::_main_echo_function()
 	if (chat_menu->_should_send())
 	{
 		auto text_to_send = chat_menu->get_text_to_send();
-		MessageToShow msg(text_to_send, true);
+		MessageToShow msg(text_to_send,user_name, true);
 		chat_menu->add_message(msg);
 		client->set_text_to_send(text_to_send);
 	}
@@ -257,7 +257,7 @@ void GraphicalMainMenu::_main_echo_function()
 	if (client->has_message_to_show())
 	{
 		auto msg = client->get_message_to_show();
-		MessageToShow _msg(msg->text, false);
+		MessageToShow _msg(msg->text,msg->name, false);
 		chat_menu->add_message(_msg);
 	}
 }

@@ -36,7 +36,9 @@ string GraphicalChatMenu::get_text_to_send()
 void GraphicalChatMenu::add_message(const MessageToShow& msg)
 {	
 	auto box = make_default_message_box();
-	box->setText(split_text_if_required(msg.text));
+
+	auto name = msg.mine ? "you:\n " : msg.name + "\n";
+	box->setText(name + split_text_if_required(msg.text));
 
 
 	move_messages_up(my_messages, MsgAlign::Left);

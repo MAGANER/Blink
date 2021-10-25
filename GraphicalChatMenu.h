@@ -20,11 +20,14 @@ using namespace std;
 
 struct MessageToShow
 {
-	MessageToShow(const string& text, bool mine) :text(text), mine(mine)
+	MessageToShow(const string& text,
+				  const string& name,
+				  bool mine) :text(text), mine(mine),name(name)
 	{
 	}
 	~MessageToShow(){}
 	string text;
+	string name;
 	bool mine;//if true than left align, else right
 };
 class GraphicalChatMenu
