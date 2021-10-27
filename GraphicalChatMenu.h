@@ -1,3 +1,8 @@
+/*
+  This class process input, received messages.
+  Scroll them, add new ones e.t.c
+*/
+
 #ifndef GRAPHICAL_CHAT_MENU_H
 #define GRAPHICAL_CHAT_MENU_H
 #ifndef COMMON_HEADERS_H

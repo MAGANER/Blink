@@ -5,6 +5,7 @@ void GraphicalChatMenu::init(GuiBase* gui,
 							 Blink::ConfigLoader& loader,
 							 Blink::GraphicalDecentralysedServerClient* client)
 {
+	//create basical gui
 	local_gui_ptr = gui;
 
 	message_background_color = loader.get_message_background_color();
@@ -39,33 +40,37 @@ void GraphicalChatMenu::add_message(const MessageToShow& msg)
 
 	auto name = msg.mine ? "you:\n " : msg.name + ":\n";
 	box->setText(split_text_if_required(name + msg.text));
-	cout << box->getText() << ":" << endl;
+
 	MsgAlign align = msg.mine ? MsgAlign::Left : MsgAlign::Right;
 
 	auto pos  = text_input_ptr->getPosition();
 	auto size = box->getSize();
 	box->setPosition(get_message_box_x_pos(align, size.x), pos.y - size.y);
 	messages.push_back(box);
+
 	move_messages(STEP);
 
 	local_gui_ptr->add(box);	
 }
 void GraphicalChatMenu::move_messages(float step)
 {
+	//move messages when new one is added
 	for (int i = messages.size() - 1; i > -1; --i)
 	{
 		auto msg = messages[i];
 		if (i + 1 < messages.size())
 		{
 			auto next = messages[i + 1];
-			
-			auto size = next->getSize().y > messages[i]->getSize().y ? next->getSize().y :
-											messages[i]->getSize().y;
+			auto curr = messages[i];
+
+			auto curr_size = curr->getSize().y;
+			auto next_size = next->getSize().y;
+			auto size = next_size > curr_size ? next_size: curr_size;
 
 			auto y = next->getPosition().y-size -  step;
 
 
-			messages[i]->setPosition(messages[i]->getPosition().x, y);
+			messages[i]->setPosition(curr->getPosition().x, y);
 		}
 		else
 		{
@@ -122,6 +127,8 @@ string GraphicalChatMenu::split_text_if_required(const string& _text)
 }
 Label::Ptr GraphicalChatMenu::make_default_message_box()
 {
+	//prepare message box
+
 	auto box = Label::create();
 	box->getSharedRenderer()->setBackgroundColor(message_background_color);
 	box->setAutoSize(true);
@@ -132,26 +139,29 @@ Label::Ptr GraphicalChatMenu::make_default_message_box()
 }
 float GraphicalChatMenu::get_message_box_x_pos(MsgAlign val, float box_size)
 {
+	//current user messages must be aligned to left
+	//received ones must be aligned righter
 	if (val == MsgAlign::Left)
-	{
 		return text_input_ptr->getPosition().x;
-	}
 	else 
-	{
 		return text_input_ptr->getSize().x - box_size;
-	}
 }
 void GraphicalChatMenu::process_scroll(int direction)
 {
+	//move text up/or down
 
 	auto move = [&](float step)
 	{
 		for (auto& msg : messages)
 		{
+			//it must be "hidden" behind the input box
 			msg->moveToBack();
+
 			auto x = msg->getPosition().x;
 			auto y = msg->getPosition().y + step;
 
+			//if message is under text_input, than hide it
+			//else show it again
 			if (y > text_input_ptr->getPosition().y)
 				msg->setVisible(false);
 			else
@@ -160,17 +170,22 @@ void GraphicalChatMenu::process_scroll(int direction)
 			msg->setPosition(x, y);
 		}
 	};
+
+	auto input_high_y = text_input_ptr->getPosition().y;
 	if (direction > 0)
 	{
 		//move down
-		if (messages[0]->getPosition().y < text_input_ptr->getPosition().y)
+		auto first_msg_high_y = messages[0]->getPosition().y;
+		bool can_move = first_msg_high_y  < input_high_y;
+		if (can_move)
 			move(10.0f);
 	}
 	else
 	{
 		//move up
 		auto last = *--messages.end();
-		if(last->getPosition().y+last->getSize().y+STEP > text_input_ptr->getPosition().y)
+		auto last_msg_bottom_y = last->getPosition().y + last->getSize().y + STEP;
+		if(last_msg_bottom_y > input_high_y)
 			move(-10.0f);
 	}
 }
