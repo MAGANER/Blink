@@ -36,8 +36,12 @@ protected:
 
 	vector<function<void(sf::Event::EventType type)>> echo_functions;
 	vector<function<void()>> paramless_echo_functions;
+
 	bool should_run_paramless_echo_function = true;
 	function<void()> main_echo_function;
+
+	bool process_mouse_wheel = false;
+	function<void(int dir)> echo_mouse_wheel_function;
 
 	auto get_window_size() { return window->getSize(); }
 

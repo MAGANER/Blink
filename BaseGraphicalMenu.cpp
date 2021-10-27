@@ -53,6 +53,16 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
                 win_size = window->getSize();
             }
 
+            if (process_mouse_wheel)
+            {
+                if (event.type == sf::Event::MouseWheelMoved)
+                {
+                    int direction = event.mouseWheel.delta;
+                    if(direction != 0)echo_mouse_wheel_function(direction);
+                }
+                
+            }
+
             //process child event functions
             for (auto& fn : echo_functions)
             {

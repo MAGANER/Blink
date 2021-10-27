@@ -216,6 +216,9 @@ void GraphicalMainMenu::process_chat()
 		chat_menu = new GraphicalChatMenu();
 		chat_menu->init(gui, *loader,client);
 		should_run_paramless_echo_function = false;
+
+		process_mouse_wheel = true;
+		echo_mouse_wheel_function = [&](int direction) {chat_menu->process_scroll(direction); };
 	}
 }
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
