@@ -21,6 +21,7 @@ private:
 
 	Label::Ptr result_label_ptr;
 	EditBox::Ptr inv_link_ptr;
+
 public:
 	GraphicalConnectingSubMenu()
 	{
@@ -66,7 +67,8 @@ public:
 	void check_can_connect(bool& init_chat)
 	{
 		string path = inv_link_ptr->getText().toStdString();
-		if (ConnectionChecker::connect_with_filelink(conn_data,encr_data,path))
+
+		if (ConnectionChecker::connect_with_filelink(conn_data, encr_data, path))
 		{
 			can_connect_flag = true;
 			init_chat = true;

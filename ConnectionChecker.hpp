@@ -101,15 +101,14 @@ namespace ConnectionChecker
 		using namespace inner;
 
 		ifstream link_file;
-		while (true)
+
+		link_file.open(path, ios::binary);
+		if (!link_file)
 		{
-			link_file.open(path, ios::binary);
-			if (!link_file)
-			{
-				cout << "can not open " << path << "!" << endl;
-			}
-			else break;
+			cout << "can not open " << path << "!" << endl;
+			return false;
 		}
+
 
 
 		string link;
