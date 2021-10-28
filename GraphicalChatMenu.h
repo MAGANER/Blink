@@ -69,13 +69,15 @@ public:
 	bool _should_send() { return should_send; }
 	void _should_send(bool flag) { should_send = flag; }
 	string get_text_to_send();
-
+	void load_messages(vector<MessageToShow>& messages);
 	void process_scroll(int direction);
 private:
 	Label::Ptr make_default_message_box();
 	float get_message_box_x_pos(MsgAlign val, float box_size);
 	string split_text_if_required(const string& _text);
 	void move_messages(float step);	
+
+	
 };
 };
 #endif

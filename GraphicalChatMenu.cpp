@@ -189,3 +189,10 @@ void GraphicalChatMenu::process_scroll(int direction)
 			move(-10.0f);
 	}
 }
+void GraphicalChatMenu::load_messages(vector<MessageToShow>& messages)
+{
+	for (auto& msg : messages)
+	{
+		add_message(msg);
+	}
+}
