@@ -215,6 +215,11 @@ void GraphicalMainMenu::process_chat()
 
 		chat_menu = new GraphicalChatMenu();
 		chat_menu->init(gui, *loader,client);
+
+		auto msgs = get_saved_messages();
+		chat_menu->load_messages(msgs);
+
+
 		should_run_paramless_echo_function = false;
 
 		process_mouse_wheel = true;
@@ -263,4 +268,19 @@ void GraphicalMainMenu::_main_echo_function()
 		MessageToShow _msg(msg->text,msg->name, false);
 		chat_menu->add_message(_msg);
 	}
+}
+vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
+{
+	vector<MessageToShow> messages;
+	auto loaded = get_messages(room_gate_menu->get_room_name_password().first);
+	for (auto& msg : loaded)
+	{
+		cout << msg.first << ":" << msg.second << endl;
+		auto name = msg.first;
+		bool mine = name == user_name ? true : false;
+		auto text = msg.second;
+		MessageToShow _msg(text, name, mine);
+		messages.push_back(_msg);
+	}
+	return messages;
 }

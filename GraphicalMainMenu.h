@@ -66,6 +66,8 @@ private:
 
 	void process_chat();
 	void _main_echo_function();
+
+	vector<MessageToShow> get_saved_messages();
 };
 };
 #endif
