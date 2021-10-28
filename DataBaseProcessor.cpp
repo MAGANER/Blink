@@ -237,6 +237,7 @@ void DataBaseProcessor::add_message(const string& room_name,
 	chats["room_name"] = new sql::Text(room_name);
 	chats["user_name"] = new sql::Text(user_name);
 	chats["message"] = new sql::Text(message);
+
 	string req = sql::make_insert_request(chats, "chats");
 	db.run_set_request(req);
 }
