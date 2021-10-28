@@ -15,7 +15,6 @@
 #include"DataBaseProcessor.h"
 #include"RoomClient.hpp"
 #include"StringOperations.hpp"
-#include<set>
 
 namespace Blink
 {
@@ -161,7 +160,9 @@ protected:
 			string jmessage = convert_message_to_json(message, user_name, msg);
 			pack << encr::AES::encrypt(key_iv, jmessage);
 			socket.send(pack);
-			add_message(room_name, user_name, message);
+
+			if(MessageType::Text == msg)
+				add_message(room_name, user_name, message);
 		}
 	}
 	void send_jmessage(TcpSocket& socket,
@@ -328,7 +329,13 @@ protected:
 					string corr_pass = fp::slice(name, plus_pos+1, name.size());
 					correct_room_name = new string(corr_name);
 					correct_password  = new string(corr_pass);
+
+					room_name = *correct_room_name;
 					return "";
+				}
+				if(type_to_int(parsed) == (int)MessageType::Text)
+				{
+					add_message(room_name, parsed["name"], parsed["data"]);
 				}
 			}
 			return data;
