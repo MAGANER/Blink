@@ -93,7 +93,18 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
             window->close();
             return menu_to_run;
         }
+
+        if (menu_to_return != CurrentMenu::Nothing)
+        {
+            should_break = true;
+            window->close();
+            menu_to_run = menu_to_return;
+            menu_to_return = CurrentMenu::Nothing;
+            return menu_to_run;
+        }
     }
+
+
     return CurrentMenu::Nothing;
 }
 void BaseGraphicalMenu::run()

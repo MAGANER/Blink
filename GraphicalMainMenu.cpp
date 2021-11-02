@@ -68,6 +68,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	auto exit_button = Button::create(" exit ");
 	exit_button->setPosition(0, conn_button_y_pos);
 	exit_button->setSize(connect_button->getSizeLayout());
+	exit_button->onPress([&]() {exit(); });
 	gui->add(exit_button);
 
 	if (no_rooms)

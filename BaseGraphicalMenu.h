@@ -46,6 +46,8 @@ protected:
 	auto get_window_size() { return window->getSize(); }
 
 	void update_win();
+
+	CurrentMenu menu_to_return = CurrentMenu::Nothing;
 public:
 	BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_size);
 	virtual ~BaseGraphicalMenu();
@@ -63,6 +65,8 @@ public:
 	//there is no ability to make this class abstract
 	virtual void create(Blink::ConfigLoader& loader) {/*do nothing, child classes do only*/};
 	void prepare_menu(Blink::ConfigLoader& loader);
+
+	CurrentMenu get_menu_to_return() { return menu_to_return; };
 };
 }
 #endif //BASE_GRAPHICAL_MENU_H

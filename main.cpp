@@ -91,6 +91,8 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		db_name = enter_menu->get_db_name();
 		user_name = enter_menu->get_user_name();
 		if(enter_menu != nullptr)delete enter_menu;
+
+		cout<<":"<<(int)change<<endl;
 		return change;
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
@@ -107,6 +109,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		auto change = process_menu_running(main_menu, fullscreen, loader);
 
 		if(main_menu != nullptr)delete main_menu;
+
 		return change;
 	}
 }
@@ -145,11 +148,13 @@ void run_graphical_mode(Blink::ConfigLoader& loader)
 	using namespace GraphicalBlink;
 
 	string key, db_name;
-	while (true)
-	{
+
 		auto start = BaseGraphicalMenu::CurrentMenu::EnterMenu;;
-		run_menu(run_menu(start,key,db_name,loader, loader.is_fullscreen()),key,db_name,loader, loader.is_fullscreen());
-	}
+		auto result = run_menu(start, key, db_name, loader, loader.is_fullscreen());
+		while (true)
+		{
+			result = run_menu(result, key, db_name, loader, loader.is_fullscreen());
+		}
 }
 
 void run_console_mode()

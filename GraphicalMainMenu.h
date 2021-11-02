@@ -45,6 +45,8 @@ private:
 	string user_name;
 
 	GraphicalDecentralysedServerClient* client = nullptr;
+
+	bool should_exit = false;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -66,6 +68,8 @@ private:
 
 	void process_chat();
 	void _main_echo_function();
+
+	void exit() { menu_to_return = CurrentMenu::EnterMenu; };
 
 	vector<MessageToShow> get_saved_messages();
 };
