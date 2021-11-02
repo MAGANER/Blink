@@ -258,6 +258,14 @@ void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 			conn_menu = nullptr;
 			create(loader);
 		}
+		if (conn_menu->get_back())
+		{
+			update_win();
+			gui->removeAllWidgets();
+			delete conn_menu;
+			conn_menu = nullptr;
+			create(loader);
+		}
 	}
 }
 void GraphicalMainMenu::_main_echo_function()
