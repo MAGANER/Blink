@@ -62,6 +62,14 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	connect_button->setSize(create_room_button->getSizeLayout());
 	gui->add(connect_button);
 
+
+	auto conn_button_y_pos = connect_button->getPositionLayout().y +
+							 connect_button->getSize().y;
+	auto exit_button = Button::create(" exit ");
+	exit_button->setPosition(0, conn_button_y_pos);
+	exit_button->setSize(connect_button->getSizeLayout());
+	gui->add(exit_button);
+
 	if (no_rooms)
 	{
 		auto no_rooms_label = Label::create("no rooms");
@@ -97,7 +105,7 @@ void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 	ptr->setSize(size);
 	tgui::Layout2d pos;
 	pos.x = 0;
-	pos.y = 42;
+	pos.y = 66;
 	ptr->setPosition(pos);
 }
 void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
