@@ -48,6 +48,8 @@ protected:
 	void update_win();
 
 	CurrentMenu menu_to_return = CurrentMenu::Nothing;
+
+	int get_window_width() { return window->getSize().x; }
 public:
 	BaseGraphicalMenu(bool fullscreen, const sf::Vector2u& win_size);
 	virtual ~BaseGraphicalMenu();

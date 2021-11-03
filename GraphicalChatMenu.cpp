@@ -3,7 +3,9 @@ using namespace GraphicalBlink;
 
 void GraphicalChatMenu::init(GuiBase* gui,
 							 Blink::ConfigLoader& loader,
-							 Blink::GraphicalDecentralysedServerClient* client)
+							 Blink::GraphicalDecentralysedServerClient* client,
+							 int win_width,
+							 const string& room_name)
 {
 	//create basical gui
 	local_gui_ptr = gui;
@@ -11,21 +13,43 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	message_background_color = loader.get_message_background_color();
 
 	auto input = TextArea::create();
-	input->setSize({ "70%","10%" });
-	input->setPosition({ "3%","80%" });
+	input->setSize({ "80%","10%" });
+	input->setPosition({ "5%","80%" });
 	input->setUserData(-1);
 	gui->add(input);
 	text_input_ptr = input;
 
 	auto send = Button::create("send");
-	send->setSize({ "20%","5%" });
-	send->setPosition({ "75%","80%" });
+	send->setSize({ "10%","4%" });
+	send->setPosition({ "88%","80%" });
 	send->setUserData(-1);
 	send->onPress([&]() {
 		should_send = true;
 		});
 	gui->add(send);
 
+	auto exit = Button::create("exit");
+	exit->setSize({ "10%","4%" });
+	exit->setPosition({ "88%","85%" });
+	exit->setUserData(-1);
+	gui->add(exit);
+
+
+
+	auto background = Label::create();
+	background->getSharedRenderer()->setBackgroundColor(message_background_color);
+	background->setUserData(-1);
+	background->setMouseCursor(tgui::Cursor::Type::Arrow);
+	background->setWidth(win_width);
+	background->setHeight(40);
+	gui->add(background);
+
+	auto _room_name = Label::create();
+	auto name = "`" + room_name + "`" + " room";
+	_room_name->setText(name);
+	_room_name->setTextSize(24);
+	_room_name->setPosition((win_width / 2)-_room_name->getSize().x, 5);
+	gui->add(_room_name);
 }
 string GraphicalChatMenu::get_text_to_send()
 {
@@ -133,7 +157,7 @@ Label::Ptr GraphicalChatMenu::make_default_message_box()
 	box->getSharedRenderer()->setBackgroundColor(message_background_color);
 	box->setAutoSize(true);
 	box->setUserData(-1);
-	box->setMouseCursor(tgui::Cursor::Type::Text);
+	box->setMouseCursor(tgui::Cursor::Type::Arrow);
 
 	return box;
 }

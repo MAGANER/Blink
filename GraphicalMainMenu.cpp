@@ -223,7 +223,7 @@ void GraphicalMainMenu::process_chat()
 		}
 
 		chat_menu = new GraphicalChatMenu();
-		chat_menu->init(gui, *loader,client);
+		chat_menu->init(gui, *loader,client,get_window_width(), room_gate_menu->get_room_name_password().first);
 
 		auto msgs = get_saved_messages();
 		chat_menu->load_messages(msgs);

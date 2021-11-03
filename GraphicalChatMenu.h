@@ -62,7 +62,9 @@ public:
 
 	void init(GuiBase* gui,
 			  Blink::ConfigLoader& loader,
-			  Blink::GraphicalDecentralysedServerClient* client);
+			  Blink::GraphicalDecentralysedServerClient* client,
+			  int win_width,
+			  const string& room_name);
 
 	void add_message(const MessageToShow& msg);
 
