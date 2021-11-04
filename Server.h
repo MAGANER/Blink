@@ -31,7 +31,7 @@ namespace Blink
 			   const string& password,
 			   const NetBaseData& data,
 			   bool inherited = false);
-		~Server();
+		virtual ~Server();
 
 	private:
 

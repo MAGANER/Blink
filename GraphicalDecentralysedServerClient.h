@@ -58,6 +58,9 @@ public:
 
 	bool has_message_to_show();
 	message_store* get_message_to_show();
+	void exit() { disconnect = true; }
+
+	void save_offline_clients();
 private:
 	void send_text_to_all(const string& text);
 };

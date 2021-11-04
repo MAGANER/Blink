@@ -95,6 +95,7 @@ class NetBase :public DataBaseProcessor
 {
 protected:
 	encr::AES::key_iv key_iv;
+	bool disconnect = false;
 private:
 	function<void(string)> input_callback;
 
@@ -102,7 +103,6 @@ private:
 	string input_buffer;
 	bool ready_to_send_message = false;
 	bool dollar_printed = false;
-	bool disconnect = false;
 
 	bool is_user = false;
 	bool can_show = true;
@@ -136,7 +136,7 @@ protected:
 	bool received_additional_info = false;
 	Received_additional_info* additional_info = nullptr;
 
-	~NetBase() {}
+	virtual ~NetBase() {}
 
 	virtual void send_message(TcpSocket& socket,
 							  const string& message)

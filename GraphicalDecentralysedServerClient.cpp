@@ -82,13 +82,19 @@ void GraphicalDecentralysedServerClient::run_in_window()
 		//save offline clients
 		//because if you don't do that you lost all data  about potential
 		//clients
-		cout << offline_clients.size() << "is offline clients!" << endl;
-		for (auto& client : offline_clients)
-		{
-			add_offline_client(room_name, client.first.toString(), client.second);
-		}
-
+		save_offline_clients();
+		listener.close();
+		socket->disconnect();
+		
 		return;
+	}
+}
+void GraphicalDecentralysedServerClient::save_offline_clients()
+{
+	cout << offline_clients.size() << "is offline clients!" << endl;
+	for (auto& client : offline_clients)
+	{
+		add_offline_client(room_name, client.first.toString(), client.second);
 	}
 }
 void GraphicalDecentralysedServerClient::send_text_to_all(const string& text)
