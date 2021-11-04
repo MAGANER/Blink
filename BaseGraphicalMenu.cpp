@@ -80,7 +80,6 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
             if(!paramless_echo_functions.empty())
                 paramless_echo_functions.clear();
 
-
             main_echo_function();
         }
 
