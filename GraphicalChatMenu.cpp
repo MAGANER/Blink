@@ -32,6 +32,7 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	exit->setSize({ "10%","4%" });
 	exit->setPosition({ "88%","85%" });
 	exit->setUserData(-1);
+	exit->onPress([&]() {this->exit = true; });
 	gui->add(exit);
 
 
@@ -154,7 +155,7 @@ Label::Ptr GraphicalChatMenu::make_default_message_box()
 	//prepare message box
 
 	auto box = Label::create();
-	box->getSharedRenderer()->setBackgroundColor(message_background_color);
+	box->getRenderer()->setBackgroundColor(message_background_color);
 	box->setAutoSize(true);
 	box->setUserData(-1);
 	box->setMouseCursor(tgui::Cursor::Type::Arrow);

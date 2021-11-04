@@ -52,6 +52,7 @@ private:
 	GuiBase* local_gui_ptr = nullptr;
 	sf::Color message_background_color;
 
+	bool exit = false;
 public:
 	GraphicalChatMenu()
 	{
@@ -73,6 +74,8 @@ public:
 	string get_text_to_send();
 	void load_messages(vector<MessageToShow>& messages);
 	void process_scroll(int direction);
+
+	bool should_exit() { return exit; }
 private:
 	Label::Ptr make_default_message_box();
 	float get_message_box_x_pos(MsgAlign val, float box_size);
