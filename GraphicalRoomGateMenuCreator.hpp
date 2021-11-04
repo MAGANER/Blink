@@ -69,6 +69,8 @@ public:
 		result_label->setPosition({ "30%","55%" });
 		result_label->setTextSize(20);
 		result_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
+		result_label->setVisible(false);
+		result_label->getSharedRenderer()->setBackgroundColor(tgui::Color::Transparent);
 		result_label_ptr = result_label;
 		gui->add(result_label);
 
@@ -110,6 +112,7 @@ public:
 			else
 			{
 				//show label of disability
+				result_label_ptr->setVisible(true);
 				result_label_ptr->setText(":can not enter room!");
 				room_passw->setText("");
 			}
@@ -135,6 +138,7 @@ public:
 			else
 			{
 				//show label of disability
+				result_label_ptr->setVisible(true);
 				result_label_ptr->setText(":can not start room!");
 				room_passw->setText("");
 			}
