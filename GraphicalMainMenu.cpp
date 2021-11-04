@@ -27,6 +27,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
 	this->loader = &loader;
+
 	room_gate_menu->init(gui, *this->loader,init_chat, start_room);
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
@@ -86,7 +87,6 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	paramless_echo_functions.push_back([&]() {process_chat(); });
 	paramless_echo_functions.push_back([&]() {create_link(); });
 	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
-
 }
 void GraphicalMainMenu::create_link()
 {
@@ -270,20 +270,39 @@ void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::_main_echo_function()
 {
-	if (chat_menu->_should_send())
+	if (client != nullptr)
 	{
-		auto text_to_send = chat_menu->get_text_to_send();
-		MessageToShow msg(text_to_send,user_name, true);
-		chat_menu->add_message(msg);
-		client->set_text_to_send(text_to_send);
-	}
-	client->run_in_window();
+		if (chat_menu->_should_send())
+		{
+			auto text_to_send = chat_menu->get_text_to_send();
+			MessageToShow msg(text_to_send, user_name, true);
+			chat_menu->add_message(msg);
+			client->set_text_to_send(text_to_send);
+		}
+		client->run_in_window();
 
-	if (client->has_message_to_show())
-	{
-		auto msg = client->get_message_to_show();
-		MessageToShow _msg(msg->text,msg->name, false);
-		chat_menu->add_message(_msg);
+		if (client->has_message_to_show())
+		{
+			auto msg = client->get_message_to_show();
+			MessageToShow _msg(msg->text, msg->name, false);
+			chat_menu->add_message(_msg);
+		}
+		if (chat_menu->should_exit())
+		{
+			//this function will not be running
+			client->exit();
+			paramless_echo_functions.clear();
+			echo_functions.clear();
+			should_run_paramless_echo_function = true;
+			process_mouse_wheel = false;
+
+			client->save_offline_clients();
+			gui->removeAllWidgets();
+
+			delete chat_menu;
+			chat_menu = nullptr;
+			create(*loader);
+		}
 	}
 }
 vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
