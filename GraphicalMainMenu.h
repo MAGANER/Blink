@@ -41,6 +41,7 @@ private:
 	RoomGateMenu* room_gate_menu = nullptr;
 	GraphicalConnectingSubMenu* conn_menu = nullptr;
 	GraphicalChatMenu* chat_menu = nullptr;
+	CreateRoomMenu* create_room_menu = nullptr;
 
 	string user_name;
 

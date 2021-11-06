@@ -23,6 +23,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 	if (conn_menu != nullptr) delete conn_menu;
 	if (client != nullptr)    delete client;
 	if (chat_menu != nullptr) delete chat_menu;
+	if (create_room_menu != nullptr) delete create_room_menu;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
@@ -87,6 +88,17 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	paramless_echo_functions.push_back([&]() {process_chat(); });
 	paramless_echo_functions.push_back([&]() {create_link(); });
 	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
+	paramless_echo_functions.push_back([&]() {
+		if (create_room_menu != nullptr)
+		{
+			if (create_room_menu->can_leave())
+			{
+				create_room_menu->clear();
+				delete create_room_menu;
+				create_room_menu = nullptr;
+			}
+		}
+		});
 }
 void GraphicalMainMenu::create_link()
 {
@@ -141,28 +153,11 @@ void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 }
 void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 {
-	CreateRoomMenu* menu = new CreateRoomMenu(get_encr_key(),
-											  get_db_name());
-	menu->prepare_menu(loader);
-	menu->create(loader);
-	menu->run();
-	if (menu->should_update())
+	if (create_room_menu == nullptr)
 	{
-		auto rooms = get_rooms(get_encr_key());
-		int counter = this->rooms.size() + 1;
-		for (auto& room : rooms)
-		{
-			bool added = find(this->rooms.begin(), this->rooms.end(), room) != this->rooms.end();
-			if (!added)
-			{
-				no_rooms_label_ptr->setText("");
-				rooms_ptr->addItem(get<0>(room), tgui::String(counter));
-				this->rooms.push_back(room);
-				counter++;
-			}
-		}
+		create_room_menu = new CreateRoomMenu(get_encr_key(), get_db_name());
+		create_room_menu->init(gui, loader,rooms_ptr);
 	}
-	delete menu;
 }
 void GraphicalMainMenu::process_chat()
 {

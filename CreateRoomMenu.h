@@ -9,28 +9,36 @@
 #include"Constants.hpp"
 #include"TGUI/Widgets/EditBox.hpp"
 #include"TGUI/Widgets/Label.hpp"
+#include"TGUI/Widgets/Button.hpp"
+#include"TGUI/Widgets/ListBox.hpp"
 #include"NetRandom.hpp"
 namespace GraphicalBlink
 {
 using namespace Blink;
-class CreateRoomMenu: public BaseGraphicalMenu,
-					  public DataBaseProcessor
+class CreateRoomMenu: public DataBaseProcessor
 {
 private:
 	EditBox::Ptr name_ptr, password_ptr;
 	Label::Ptr result_ptr;
+	Button::Ptr create_ptr;
+
+	ListBox::Ptr rooms_ptr;
 
 	void create_room();
+	tgui::GuiBase* gui = nullptr;
 
-	bool enter_pressed = false;
-	bool update = false;
+	void create(Blink::ConfigLoader& loader);
+
+	bool leave = false;
 public:
 	CreateRoomMenu(const string& encr_key,
 				   const string& db_name);
 	~CreateRoomMenu();
 
-	void create(Blink::ConfigLoader& loader);
-	bool should_update() { return update; }
+	void clear();
+	bool can_leave() { return leave; }
+
+	void init(tgui::GuiBase* gui, Blink::ConfigLoader& loader, ListBox::Ptr rooms_ptr);
 };
 };
 #endif
