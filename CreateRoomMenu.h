@@ -19,7 +19,7 @@ class CreateRoomMenu: public DataBaseProcessor
 {
 private:
 	EditBox::Ptr name_ptr, password_ptr;
-	Label::Ptr result_ptr;
+	Label::Ptr result_ptr, no_rooms_ptr;
 	Button::Ptr create_ptr;
 
 	ListBox::Ptr rooms_ptr;
@@ -30,6 +30,7 @@ private:
 	void create(Blink::ConfigLoader& loader);
 
 	bool leave = false;
+	string room_name;
 public:
 	CreateRoomMenu(const string& encr_key,
 				   const string& db_name);
@@ -38,7 +39,10 @@ public:
 	void clear();
 	bool can_leave() { return leave; }
 
-	void init(tgui::GuiBase* gui, Blink::ConfigLoader& loader, ListBox::Ptr rooms_ptr);
+	void init(tgui::GuiBase* gui, 
+			  Blink::ConfigLoader& loader);
+
+	string get_room_name() { return room_name; }
 };
 };
 #endif

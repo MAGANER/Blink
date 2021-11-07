@@ -68,6 +68,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	auto conn_button_y_pos = connect_button->getPositionLayout().y +
 							 connect_button->getSize().y;
 	auto exit_button = Button::create(" exit ");
+	exit_button->setUserData(default_id);
 	exit_button->setPosition(0, conn_button_y_pos);
 	exit_button->setSize(connect_button->getSizeLayout());
 	exit_button->onPress([&]() {exit(); });
@@ -77,11 +78,14 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	{
 		auto no_rooms_label = Label::create("no rooms");
 		no_rooms_label->setUserData(no_rooms_id);
-		no_rooms_label->setPosition({ "50%" },{ "50%" });
+		no_rooms_label->setPosition({ "45%" },{ "50%" });
+		no_rooms_label_ptr = no_rooms_label;
 		gui->add(no_rooms_label);
 		echo_functions.push_back([&](sf::Event::EventType type)
 			{set_no_rooms_label_to_center(type); });
-		no_rooms_label_ptr = no_rooms_label;
+		
+		
+
 	}
 	
 	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
@@ -94,6 +98,17 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 			if (create_room_menu->can_leave())
 			{
 				create_room_menu->clear();
+				for (auto& widget : gui->getWidgets())
+				{
+					if(widget->getUserData<int>() == no_rooms_id)
+					{
+						widget->setVisible(false);
+					}
+					if (widget->getUserData<int>() == room_list_id)
+					{
+						widget->cast<ListBox>()->addItem(create_room_menu->get_room_name());
+					}
+				}
 				delete create_room_menu;
 				create_room_menu = nullptr;
 			}
@@ -156,7 +171,7 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 	if (create_room_menu == nullptr)
 	{
 		create_room_menu = new CreateRoomMenu(get_encr_key(), get_db_name());
-		create_room_menu->init(gui, loader,rooms_ptr);
+		create_room_menu->init(gui, loader);
 	}
 }
 void GraphicalMainMenu::process_chat()
@@ -184,12 +199,15 @@ void GraphicalMainMenu::process_chat()
 						data,
 						room_gate_menu->get_link_creator_additional_data(),
 						true,
-						room_gate_menu->_save_link());
+						room_gate_menu->_save_link(),
+						room_gate_menu->get_recepient_name());
 			}
 			else
 			{
 				auto name_passw = room_gate_menu->get_room_name_password();
 				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
+
+				auto recepient_name = room_gate_menu->get_recepient_name();
 				auto none = command_hash();
 				client =
 					new GraphicalDecentralysedServerClient(none, name_passw.second, data, false, false);
@@ -237,7 +255,7 @@ void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 	if (conn_menu == nullptr)
 	{
 		conn_menu =  new GraphicalConnectingSubMenu();
-		conn_menu->init_menu(gui, loader,init_chat);
+		conn_menu->init_menu(gui, loader,init_chat,user_name);
 	}
 }
 void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
@@ -306,7 +324,6 @@ vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
 	auto loaded = get_messages(room_gate_menu->get_room_name_password().first);
 	for (auto& msg : loaded)
 	{
-		cout << msg.first << ":" << msg.second << endl;
 		auto name = msg.first;
 		bool mine = name == user_name ? true : false;
 		auto text = msg.second;

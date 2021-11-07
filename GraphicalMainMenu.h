@@ -72,6 +72,7 @@ private:
 
 	void exit() { menu_to_return = CurrentMenu::EnterMenu; };
 
+	
 	vector<MessageToShow> get_saved_messages();
 };
 };
