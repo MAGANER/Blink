@@ -96,7 +96,8 @@ namespace ConnectionChecker
 	}
 	bool connect_with_filelink(ConnectionData& data,
 							   EncryptionData& encr_data,
-							   const string& path)
+							   const string& path,
+							   const string& my_name)
 	{
 		using namespace inner;
 
@@ -118,7 +119,7 @@ namespace ConnectionChecker
 		copy(inputIt, emptyInputIt, stringInsert);
 
 
-		link = decrypt_invite_link(link);
+		link = decrypt_invite_link(link,my_name);
 
 		json jlink = json::parse(link);
 		data.ip	  = jlink["ip"];

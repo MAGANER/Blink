@@ -16,8 +16,6 @@
 #include"NoiseGenerator.hpp"
 #include"BitProcessor.h"
 #include"gzip.h"
-#define SEPARATOR "+++"+encr::SHA::sha256("<du-deg00dwe-ed-ha----te-niggers-hail-hitler-fuck-jewish-scum-hail-white-race-1488-rahowa-fuck-you-assheadisyourrealnamesoiloveanalcuntuhategovernmentihateyouandfuckoffdouchebag>")+"---"
-
 
 namespace Blink
 {
@@ -33,8 +31,8 @@ string create_invite_link(const string& ip,
 						  const string& password,
 						  bool decentralysed);
 
-string encrypt_invite_link(const string& link);
-string decrypt_invite_link(const string& link);
+string encrypt_invite_link(const string& link, const string& recepient_name);
+string decrypt_invite_link(const string& link, const string& my_name);
 string get_curr_time();
 
 namespace inner 
