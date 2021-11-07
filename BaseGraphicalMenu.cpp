@@ -71,7 +71,7 @@ BaseGraphicalMenu::CurrentMenu BaseGraphicalMenu::run(bool& make_fullscreen, sf:
         }
 
         if (should_run_paramless_echo_function)
-            for (auto& fn : paramless_echo_functions)
+            for (auto fn : paramless_echo_functions)
             {
                 fn();
             }
