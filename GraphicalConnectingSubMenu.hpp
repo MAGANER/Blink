@@ -23,6 +23,7 @@ private:
 	Label::Ptr result_label_ptr;
 	EditBox::Ptr inv_link_ptr;
 
+	string user_name;
 public:
 	GraphicalConnectingSubMenu()
 	{
@@ -30,8 +31,13 @@ public:
 	~GraphicalConnectingSubMenu()
 	{
 	}
-	void init_menu(GuiBase* gui, Blink::ConfigLoader& loader,bool& init_chat)
+	void init_menu(GuiBase* gui, 
+				   Blink::ConfigLoader& loader,
+				   bool& init_chat,
+				   const string& user_name)
 	{
+		this->user_name = user_name;
+
 		auto inv_link = EditBox::create();
 		inv_link->setDefaultText("inviting link path");
 		inv_link->setSize({ "40.00%", "5.0%" });
@@ -78,7 +84,7 @@ public:
 	{
 		string path = inv_link_ptr->getText().toStdString();
 
-		if (ConnectionChecker::connect_with_filelink(conn_data, encr_data, path))
+		if (ConnectionChecker::connect_with_filelink(conn_data, encr_data, path,user_name))
 		{
 			can_connect_flag = true;
 			init_chat = true;

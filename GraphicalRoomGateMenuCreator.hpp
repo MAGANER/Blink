@@ -21,7 +21,7 @@ using namespace std;
 class RoomGateMenu:public Blink::DataBaseProcessor
 {
 private:
-	EditBox::Ptr room_passw;
+	EditBox::Ptr room_passw, recepient_name;
 	Label::Ptr entering_room_label_ptr, result_label_ptr;
 	Button::Ptr enter_room_ptr, start_room_ptr;
 
@@ -54,6 +54,15 @@ public:
 		enter_room_password->setPasswordCharacter('*');
 		room_passw = enter_room_password;
 		gui->add(enter_room_password);
+
+
+		auto recepient_name_box = EditBox::create();
+		recepient_name_box->setDefaultText("recepient name");
+		recepient_name_box->setSize({ "40%","5.0%" });
+		recepient_name_box->setUserData(-1);
+		recepient_name_box->setVisible(false);
+		recepient_name = recepient_name_box;
+		gui->add(recepient_name_box);
 
 		auto entering_room_label = Label::create();
 		entering_room_label->setUserData(-1);
@@ -95,7 +104,7 @@ public:
 	void can_enter_room(bool& init_chat)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
-		if (active_input_box)
+		if (active_input_box && !recepient_name->getText().empty())
 		{
 			//don't change it fixes bug, when password is link path!
 			if(first_state)
@@ -167,13 +176,20 @@ public:
 		room_passw->setText("");
 		room_passw->setPasswordCharacter(0);
 		room_passw->setDefaultText("invite link path/recepient");
+		room_passw->setPosition({"30%","30%"});
 		enter_room_ptr->setText("save");
+		enter_room_ptr->setPosition({ "52%","44%" });
 		enter_room_ptr->onPress([&]() {link_callback_fn(true, init_chat); });
 
+		recepient_name->setPosition({ "30%","36%" });
+		recepient_name->setVisible(true);
+
 		start_room_ptr->setText("send");
+		start_room_ptr->setPosition({ "30%","44%" });
 		start_room_ptr->onPress([&]() {link_callback_fn(false, init_chat); });
 
 		entering_room_label_ptr->setText("save/send invite link:");
+		entering_room_label_ptr->setPosition({ "30%","25%" });
 		result_label_ptr->setText("");
 	}
 	bool _save_link() { return save_link; }
@@ -182,6 +198,7 @@ public:
 	{
 		return link_creator_additional_data;
 	}
+	string get_recepient_name() { return recepient_name->getText().toStdString(); }
 
 	pair<string, string> get_room_name_password()
 	{
