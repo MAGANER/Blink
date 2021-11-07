@@ -3,7 +3,8 @@ using namespace Blink;
 
 
 MainMenu::MainMenu(const string& encr_key,
-				   const string& db_name):DataBaseProcessor(encr_key,db_name)
+				   const string& db_name,
+				   const string& user_name):DataBaseProcessor(encr_key,db_name)
 {
 	commands["exit"]    = function<void()>([&]() { _exit = true; });
 	commands["create"]  = function<void()>([&]() { create();     });
@@ -16,7 +17,7 @@ MainMenu::MainMenu(const string& encr_key,
 			string path;
 			cout << "enter path to link:";
 			cin >> path;
-			if (ConnectionChecker::connect_with_filelink(data, _data,path))
+			if (ConnectionChecker::connect_with_filelink(data, _data,path,user_name))
 			{
 				can_connect_to_room = true;
 				encr_data = new EncryptionData();
@@ -24,7 +25,7 @@ MainMenu::MainMenu(const string& encr_key,
 				connecting_with_conflink_command = true;
 			}
 		});
-	commands["rooms"] = function<void()>([&]() {show_rooms(); });;
+	commands["rooms"] = function<void()>([&]() {show_rooms(); });
 }
 void MainMenu::create()
 {

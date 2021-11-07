@@ -370,6 +370,8 @@ protected:
 	{
 		dollar_printed = false;
 	}
+
+	string get_user_name() { return user_name; }
 public:
 	bool should_disconnect() { return disconnect; }
 };

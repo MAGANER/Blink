@@ -13,7 +13,6 @@ Server::Server(command_hash& commands,
 		{
 			//if inherited, than decentralysed
 			create_invite_link(port, data.room_name, password, inherited);
-
 		});
 
 	if(!inherited)key_iv = encr::AES::get_random_key();
@@ -28,6 +27,10 @@ void Server::create_invite_link(int port,
 								bool decentralysed)
 {
 	string inv_link;
+	string nickname;
+	cout << "before we start...";
+	cout << "say recepient's nickname:";
+	cin >> nickname;
 	while (true)
 	{
 		string _mode;
@@ -47,7 +50,7 @@ void Server::create_invite_link(int port,
 		};
 		if (mode != -1)
 		{
-			inv_link = get_invite_link_str(port, room_name, room_password,decentralysed);
+			inv_link = get_invite_link_str(port, room_name, room_password,decentralysed,nickname);
 		}
 		if (mode == 1)
 		{
@@ -61,7 +64,7 @@ void Server::create_invite_link(int port,
 		else if (mode == 2)
 		{
 			string recepient;
-			cout << "enter recepient:";
+			cout << "enter recepient's e-mail:";
 			cin >> recepient;
 			write_link_to_file("link");
 			string command = "sender.exe " + recepient;
@@ -79,9 +82,14 @@ void Server::create_invite_link_to_send(int port,
 								const string& room_name,
 								const string& room_password,
 								bool decentralysed,
-								const string& additional_data)
+								const string& additional_data,
+								const string& recepient_name)
 {
-	string inv_link = get_invite_link_str(port, room_name, room_password, decentralysed);
+	string inv_link = get_invite_link_str(port, 
+						room_name, 
+						room_password, 
+						decentralysed,
+						recepient_name);
 	auto write_link_to_file = [&](const string& path)
 	{
 		ofstream file;
@@ -99,9 +107,14 @@ void Server::create_invite_link_to_save(int port,
 								const string& room_name,
 								const string& room_password,
 								bool decentralysed,
-								const string& additional_data)
+								const string& additional_data,
+								const string& recepient_name)
 {
-	string inv_link = get_invite_link_str(port, room_name, room_password, decentralysed);
+	string inv_link = get_invite_link_str(port, 
+								room_name, 
+								room_password, 
+								decentralysed,
+								recepient_name);
 
 	auto write_link_to_file = [&](const string& path)
 	{
@@ -117,7 +130,8 @@ void Server::create_invite_link_to_save(int port,
 string Server::get_invite_link_str(int port,
 								   const string& room_name,
 								   const string& room_password,
-								   bool decentralysed)
+								   bool decentralysed,
+								   const string& recepient_name)
 {
 	string key = encr::AES::convert_bytes(key_iv.first);
 	string iv = encr::AES::convert_bytes(key_iv.second);
@@ -128,7 +142,8 @@ string Server::get_invite_link_str(int port,
 		key,
 		room_password,
 		decentralysed);
-	inv_link = ::encrypt_invite_link(inv_link);
+	
+	inv_link = ::encrypt_invite_link(inv_link, recepient_name);
 	return inv_link;
 }
 

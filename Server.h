@@ -38,7 +38,8 @@ namespace Blink
 		string get_invite_link_str(int port,
 								   const string& room_name,
 								   const string& room_password,
-								   bool decentralysed);
+								   bool decentralysed,
+								   const string& recepient_name);
 
 	protected:
 	void create_invite_link(int port,
@@ -49,12 +50,14 @@ namespace Blink
 							const string& room_name,
 							const string& room_password,
 							bool decentralysed,
-							const string& additional_data);
+							const string& additional_data,
+							const string& recepient_name);
 	void create_invite_link_to_save(int port,
 							const string& room_name,
 							const string& room_password,
 							bool decentralysed,
-							const string& additional_data);
+							const string& additional_data,
+							const string& recepient_name);
 
 	bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 

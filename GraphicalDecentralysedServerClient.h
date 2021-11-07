@@ -12,6 +12,7 @@ private:
 
 	list<message_store*> received_messages;
 public:
+
 	GraphicalDecentralysedServerClient(command_hash& commands,
 		const string& password,
 		const NetBaseData& data,
@@ -33,6 +34,7 @@ public:
 		const string& link_creator_data,
 		bool starting_room,
 		bool save_link,
+		const string& recepient_name,
 		bool inherited=false):
 		DecentralysedServerClient(commands, 
 								  password,
@@ -40,6 +42,7 @@ public:
 			link_creator_data,
 			starting_room,
 			save_link,
+			recepient_name,
 			inherited)
 	{
 

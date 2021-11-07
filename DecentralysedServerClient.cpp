@@ -8,6 +8,8 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 	bool starting_room,
 	bool inherited) :Server(commands,password,data,inherited)
 {
+	//console mode
+
 	while (true)
 	{
 		if (connecting_with_conflink_command)
@@ -77,8 +79,11 @@ DecentralysedServerClient(command_hash& commands,
 						  const string& link_creator_data,
 						  bool starting_room,
 						  bool save_link,
+						  const string& recepient_name,
 						  bool inherited) :Server(commands, password, data, inherited)
 {
+	//graphical mode
+
 	string mode = starting_room ? "1" : "2";
 
 	if (mode == "1")
@@ -90,9 +95,9 @@ DecentralysedServerClient(command_hash& commands,
 		save_own_port(data.room_name, port);
 
 		if (save_link)
-			create_invite_link_to_save(port, data.room_name, password, true, link_creator_data);
+			create_invite_link_to_save(port, data.room_name, password, true, link_creator_data,recepient_name);
 		else
-			create_invite_link_to_send(port, data.room_name, password, true, link_creator_data);
+			create_invite_link_to_send(port, data.room_name, password, true, link_creator_data,recepient_name);
 
 		auto key = encr::AES::convert_bytes(key_iv.first);
 		auto iv = encr::AES::convert_bytes(key_iv.second);

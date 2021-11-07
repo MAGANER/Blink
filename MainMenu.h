@@ -22,7 +22,8 @@ namespace Blink
     {
     public:
         MainMenu(const string& encr_key,
-                 const string& db_name);
+                 const string& db_name,
+                 const string& user_name);
         ~MainMenu()
         {
             if (encr_data != nullptr) delete encr_data;

@@ -195,7 +195,7 @@ void run_console_mode()
 				key = enter_menu->get_correct_user_password();
 				db_name = enter_menu->get_db_name();
 				delete enter_menu;
-				main_menu = new MainMenu(key, db_name);
+				main_menu = new MainMenu(key, db_name, current_user_name);
 			}
 		}
 		if (current == state::MAIN)
@@ -261,7 +261,7 @@ void run_console_mode()
 			if (room_menu->should_exit())
 			{
 				current = state::MAIN;
-				main_menu = new MainMenu(key, db_name);
+				main_menu = new MainMenu(key, db_name,current_user_name);
 				delete room_menu;
 				connecting_with_conflink_command = false;
 				starting_room = false;

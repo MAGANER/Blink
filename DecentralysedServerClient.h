@@ -46,6 +46,7 @@ public:
 							  const string& link_creator_data,
 							  bool starting_room,
 							  bool save_link,
+							  const string& recepient_name,
 							  bool inherited = false);
 	virtual ~DecentralysedServerClient();
 
