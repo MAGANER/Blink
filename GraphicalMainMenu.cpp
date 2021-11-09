@@ -30,10 +30,12 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	this->loader = &loader;
 
 	room_gate_menu->init(gui, *this->loader,init_chat, start_room);
+
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
+
 	echo_functions.push_back([&](sf::Event::EventType type)
 		{resize_room_list_box(type); });
 
@@ -81,11 +83,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		no_rooms_label->setPosition({ "45%" },{ "50%" });
 		no_rooms_label_ptr = no_rooms_label;
 		gui->add(no_rooms_label);
+
 		echo_functions.push_back([&](sf::Event::EventType type)
 			{set_no_rooms_label_to_center(type); });
 		
-		
-
 	}
 	
 	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
@@ -100,7 +101,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 				create_room_menu->clear();
 				for (auto& widget : gui->getWidgets())
 				{
-					if(widget->getUserData<int>() == no_rooms_id)
+					if (widget->getUserData<int>() == no_rooms_id)
 					{
 						widget->setVisible(false);
 					}
@@ -113,7 +114,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 				create_room_menu = nullptr;
 			}
 		}
-		});
+	});
 }
 void GraphicalMainMenu::create_link()
 {
@@ -269,7 +270,9 @@ void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 			gui->removeAllWidgets();
 			delete conn_menu;
 			conn_menu = nullptr;
-			create(loader);
+			paramless_echo_functions.clear();
+
+			GraphicalMainMenu::create(loader);
 		}
 		if (conn_menu->get_back())
 		{
@@ -277,7 +280,9 @@ void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 			gui->removeAllWidgets();
 			delete conn_menu;
 			conn_menu = nullptr;
-			create(loader);
+			paramless_echo_functions.clear();
+
+			GraphicalMainMenu::create(loader);
 		}
 	}
 }

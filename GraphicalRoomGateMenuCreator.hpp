@@ -104,7 +104,7 @@ public:
 	void can_enter_room(bool& init_chat)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
-		if (active_input_box && !recepient_name->getText().empty())
+		if (active_input_box)
 		{
 			//don't change it fixes bug, when password is link path!
 			if(first_state)
@@ -130,7 +130,7 @@ public:
 	void can_start_room(bool& init_chat,bool& start)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
-		if (active_input_box)
+		if (active_input_box && !recepient_name->getText().empty())
 		{
 			//don't change it fixes bug, when password is link path!
 			if(first_state)
