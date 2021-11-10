@@ -11,11 +11,8 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 {
 	room_gate_menu = new RoomGateMenu(encr_key, db_name);
 	
+	this->encr_key = encr_key;
 	this->user_name = user_name;
-
-	rooms = get_rooms(encr_key);
-	if (rooms.empty())no_rooms = true;
-	else no_rooms = false;
 }
 GraphicalMainMenu::~GraphicalMainMenu()
 {
@@ -36,6 +33,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
 
+
+	rooms = get_rooms(encr_key);
+	if (rooms.empty())no_rooms = true;
+	else no_rooms = false;
 
 	int counter = 0;
 	for (auto& room : rooms)

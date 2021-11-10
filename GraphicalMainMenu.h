@@ -44,6 +44,7 @@ private:
 	CreateRoomMenu* create_room_menu = nullptr;
 
 	string user_name;
+	string encr_key;
 
 	GraphicalDecentralysedServerClient* client = nullptr;
 
