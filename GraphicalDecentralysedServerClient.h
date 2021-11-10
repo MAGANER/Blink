@@ -64,6 +64,8 @@ public:
 	void exit() { disconnect = true; }
 
 	void save_offline_clients();
+
+	string get_room_name() { return room_name; }
 private:
 	void send_text_to_all(const string& text);
 };
