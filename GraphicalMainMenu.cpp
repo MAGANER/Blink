@@ -124,6 +124,8 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 						widget->cast<ListBox>()->addItem(create_room_menu->get_room_name());
 					}
 				}
+
+				curr_sub_menu = ActiveSubMenu::none;
 				delete create_room_menu;
 				create_room_menu = nullptr;
 			}
@@ -192,11 +194,13 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::process_chat()
 {
+	if (room_gate_menu->is_starting_room() && !room_gate_menu->can_make_link())
+		init_chat = false;
+
 	if (init_chat)
 	{
 		gui->removeAllWidgets();
 		init_chat = false;
-
 		bool can_connect_with_link = false;
 		if (conn_menu != nullptr)
 		{
@@ -223,7 +227,6 @@ void GraphicalMainMenu::process_chat()
 				auto name_passw = room_gate_menu->get_room_name_password();
 				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
 
-				auto recepient_name = room_gate_menu->get_recepient_name();
 				auto none = command_hash();
 				client =
 					new GraphicalDecentralysedServerClient(none, name_passw.second, data, false, false);
@@ -316,6 +319,10 @@ void GraphicalMainMenu::_main_echo_function()
 		}
 		client->run_in_window();
 
+		if (!client->get_room_name().empty())
+		{
+			chat_menu->set_room_name(client->get_room_name());
+		}
 		if (client->has_message_to_show())
 		{
 			auto msg = client->get_message_to_show();

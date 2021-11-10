@@ -37,6 +37,8 @@ private:
 
 	bool first_state = true;//first state means entering/starting menu
 	//so second one is where you save/send link
+
+	bool can_save_send_link = false;
 public:
 	RoomGateMenu(const string& encr_key,
 				 const string& db_name):Blink::DataBaseProcessor(encr_key,db_name)
@@ -130,7 +132,7 @@ public:
 	void can_start_room(bool& init_chat,bool& start)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
-		if (active_input_box && !recepient_name->getText().empty())
+		if (active_input_box)
 		{
 			//don't change it fixes bug, when password is link path!
 			if(first_state)
@@ -183,6 +185,7 @@ public:
 
 		recepient_name->setPosition({ "30%","36%" });
 		recepient_name->setVisible(true);
+		recepient_name->setText("");
 
 		start_room_ptr->setText("send");
 		start_room_ptr->setPosition({ "30%","44%" });
@@ -215,12 +218,19 @@ public:
 		start_room_ptr->setVisible(false);
 
 	}
+	bool can_make_link() { return can_save_send_link; }
 private:
 	void link_callback_fn(bool flag,bool& init_chat)
 	{
-		save_link = flag;
-		link_creator_additional_data = room_passw->getText().toStdString();
-		init_chat = true;
+		bool not_empty = !recepient_name->getText().empty() &&
+						 !room_passw->getText().empty();
+		if (not_empty)
+		{
+			save_link = flag;
+			link_creator_additional_data = room_passw->getText().toStdString();
+			init_chat = true;
+			can_save_send_link = true;
+		}
 	}
 };
 };

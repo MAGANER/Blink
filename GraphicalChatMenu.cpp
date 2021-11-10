@@ -51,6 +51,7 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	_room_name->setTextSize(24);
 	_room_name->setPosition((win_width / 2)-_room_name->getSize().x, 5);
 	gui->add(_room_name);
+	room_name_ptr = _room_name;
 }
 string GraphicalChatMenu::get_text_to_send()
 {

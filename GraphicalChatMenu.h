@@ -13,7 +13,6 @@
 #include"TGUI/Widgets/TextArea.hpp"
 #include"TGUI/Widgets/Label.hpp"
 #include"TGUI/Widgets/Button.hpp"
-#include<iostream>
 #include<string>
 #include"GraphicalDecentralysedServerClient.h"
 #include"StringOperations.hpp"
@@ -52,6 +51,8 @@ private:
 	GuiBase* local_gui_ptr = nullptr;
 	sf::Color message_background_color;
 
+	Label::Ptr room_name_ptr;
+
 	bool exit = false;
 public:
 	GraphicalChatMenu()
@@ -76,6 +77,11 @@ public:
 	void process_scroll(int direction);
 
 	bool should_exit() { return exit; }
+
+	void set_room_name(const string& room_name)
+	{
+		room_name_ptr->setText("`" + room_name + "` room");
+	}
 private:
 	Label::Ptr make_default_message_box();
 	float get_message_box_x_pos(MsgAlign val, float box_size);
