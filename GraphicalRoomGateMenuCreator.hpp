@@ -204,6 +204,17 @@ public:
 	{
 		return make_pair(room_name.toStdString(), room_password.toStdString());
 	}
+
+	void clear(GuiBase* gui)
+	{
+		room_passw->setVisible(false);
+		recepient_name->setVisible(false);
+		entering_room_label_ptr->setVisible(false);
+		result_label_ptr->setVisible(false);
+		enter_room_ptr->setVisible(false);
+		start_room_ptr->setVisible(false);
+
+	}
 private:
 	void link_callback_fn(bool flag,bool& init_chat)
 	{

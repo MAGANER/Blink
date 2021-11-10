@@ -36,10 +36,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
 
-	echo_functions.push_back([&](sf::Event::EventType type)
-		{resize_room_list_box(type); });
 
-	
 	int counter = 0;
 	for (auto& room : rooms)
 	{
@@ -52,13 +49,21 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 	auto create_room_button = Button::create("create room");
 	create_room_button->setUserData(default_id);
-	auto creating_lambda = [&]() { run_create_room_menu(loader); };
+	auto creating_lambda = [&]() {
+		if (curr_sub_menu == ActiveSubMenu::none)
+		{
+			run_create_room_menu(loader);
+			curr_sub_menu = ActiveSubMenu::creating;
+		}
+	};
 	create_room_button->onClick(creating_lambda);
 	gui->add(create_room_button);
 
 	auto connect_button = Button::create(" connect ");
 	connect_button->setUserData(default_id);
-	connect_button->onPress([&]() {connect_link(loader); });
+	connect_button->onPress([&]() {
+			connect_link(loader);
+		});
 
 	auto create_button_y_pos = create_room_button->getPositionLayout().y +
 							   create_room_button->getSizeLayout().y;
@@ -89,7 +94,16 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		
 	}
 	
-	paramless_echo_functions.push_back([&]() {room_gate_menu->enter_room(rooms_ptr); });
+	echo_functions.push_back([&](sf::Event::EventType type)
+		{resize_room_list_box(type); });
+	paramless_echo_functions.push_back([&]() {
+		if (curr_sub_menu == ActiveSubMenu::none &&
+			rooms_ptr->getSelectedItem() != "")
+		{
+			room_gate_menu->enter_room(rooms_ptr);
+			curr_sub_menu = ActiveSubMenu::entering;
+		}
+		});
 	paramless_echo_functions.push_back([&]() {process_chat(); });
 	paramless_echo_functions.push_back([&]() {create_link(); });
 	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
@@ -115,6 +129,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 			}
 		}
 	});
+	paramless_echo_functions.push_back([&]() {clear_sub_menu(); });
 }
 void GraphicalMainMenu::create_link()
 {
@@ -243,6 +258,8 @@ void GraphicalMainMenu::process_chat()
 		chat_menu->load_messages(msgs);
 
 
+		curr_sub_menu = ActiveSubMenu::none;
+
 		should_run_paramless_echo_function = false;
 
 		process_mouse_wheel = true;
@@ -336,4 +353,22 @@ vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
 		messages.push_back(_msg);
 	}
 	return messages;
+}
+void GraphicalMainMenu::clear_sub_menu()
+{
+	if (Keyboard::isKeyPressed(Keyboard::Escape))
+	{
+		if (curr_sub_menu == ActiveSubMenu::entering)
+		{
+			room_gate_menu->clear(gui);
+			curr_sub_menu = ActiveSubMenu::none;
+		}
+		if (curr_sub_menu == ActiveSubMenu::creating)
+		{
+			create_room_menu->clear();
+			delete create_room_menu;
+			create_room_menu = nullptr;
+			curr_sub_menu = ActiveSubMenu::none;
+		}
+	}
 }

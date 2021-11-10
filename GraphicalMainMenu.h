@@ -48,6 +48,9 @@ private:
 	GraphicalDecentralysedServerClient* client = nullptr;
 
 	bool should_exit = false;
+
+	enum class ActiveSubMenu {creating, entering, none};
+	ActiveSubMenu curr_sub_menu = ActiveSubMenu::none;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -71,9 +74,9 @@ private:
 	void _main_echo_function();
 
 	void exit() { menu_to_return = CurrentMenu::EnterMenu; };
-
-	
 	vector<MessageToShow> get_saved_messages();
+
+	void clear_sub_menu();
 };
 };
 #endif
