@@ -98,7 +98,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	{
 		auto no_rooms_label = Label::create("no rooms");
 		no_rooms_label->setUserData(no_rooms_id);
-		no_rooms_label->setPosition({ "46%" },{ "50%" });
+		no_rooms_label->setPosition({ "48%" },{ "50%" });
 		no_rooms_label_ptr = no_rooms_label;
 		gui->add(no_rooms_label);
 
