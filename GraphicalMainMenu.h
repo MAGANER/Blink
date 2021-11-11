@@ -57,7 +57,7 @@ private:
 
 	//This enum is needed to has ability to return from menu
 	//if it is not required with pressing ESC key
-	enum class ActiveSubMenu { creating, entering, none };
+	enum class ActiveSubMenu { creating, entering, connecting, none };
 	ActiveSubMenu curr_sub_menu = ActiveSubMenu::none;
 
 	string user_name;
@@ -80,7 +80,6 @@ private:
 	void run_create_room_menu(Blink::ConfigLoader& loader);
 	void create_link();
 	void connect_link(Blink::ConfigLoader& loader);
-	void recreate_this_menu(Blink::ConfigLoader& loader);
 
 	void process_chat();
 	void _main_echo_function();

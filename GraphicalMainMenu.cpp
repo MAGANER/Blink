@@ -121,7 +121,6 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		});
 	paramless_echo_functions.push_back([&]() {process_chat(); });
 	paramless_echo_functions.push_back([&]() {create_link(); });
-	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
 	paramless_echo_functions.push_back([&]() {
 		//TODO: write method
 		if (create_room_menu != nullptr)
@@ -302,40 +301,11 @@ void GraphicalMainMenu::process_chat()
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 {
 	//call back function for connect button
-	gui->removeAllWidgets();
 	if (conn_menu == nullptr)
 	{
 		conn_menu =  new GraphicalConnectingSubMenu();
 		conn_menu->init_menu(gui, loader,init_chat,user_name);
-	}
-}
-void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
-{
-	//get back from connecting menu
-	//TODO: make conn_menu look like every another menu
-	if (conn_menu != nullptr)
-	{
-		if (conn_menu->return_to_prev_menu())
-		{
-			update_win();
-			sf::sleep(sf::Time(sf::seconds(2.0f))); //wait to show it
-			gui->removeAllWidgets();
-			delete conn_menu;
-			conn_menu = nullptr;
-			paramless_echo_functions.clear();
-
-			GraphicalMainMenu::create(loader);
-		}
-		if (conn_menu->get_back())
-		{
-			update_win();
-			gui->removeAllWidgets();
-			delete conn_menu;
-			conn_menu = nullptr;
-			paramless_echo_functions.clear();
-
-			GraphicalMainMenu::create(loader);
-		}
+		curr_sub_menu = ActiveSubMenu::connecting;
 	}
 }
 void GraphicalMainMenu::_main_echo_function()
@@ -418,5 +388,19 @@ void GraphicalMainMenu::clear_sub_menu()
 			create_room_menu = nullptr;
 			curr_sub_menu = ActiveSubMenu::none;
 		}
+		if (curr_sub_menu == ActiveSubMenu::connecting)
+		{
+			conn_menu->clear(gui);
+			delete conn_menu;
+			conn_menu = nullptr;
+			curr_sub_menu = ActiveSubMenu::none;
+		}
 	}
+
+	if(create_room_menu != nullptr)
+		if (create_room_menu->can_leave())
+		{
+			delete create_room_menu;
+			create_room_menu = nullptr;
+		}
 }

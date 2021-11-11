@@ -17,11 +17,11 @@ private:
 	Blink::ConnectionData conn_data;
 
 	bool can_connect_flag = false;
-	bool should_return_to_prev_menu = false;
 	bool back = false;
 
 	Label::Ptr result_label_ptr;
 	EditBox::Ptr inv_link_ptr;
+	Button::Ptr conn_button_ptr;
 
 	string user_name;
 public:
@@ -30,6 +30,12 @@ public:
 	}
 	~GraphicalConnectingSubMenu()
 	{
+	}
+	void clear(GuiBase* gui)
+	{
+		gui->remove(result_label_ptr);
+		gui->remove(inv_link_ptr);
+		gui->remove(conn_button_ptr);
 	}
 	void init_menu(GuiBase* gui, 
 				   Blink::ConfigLoader& loader,
@@ -59,18 +65,10 @@ public:
 		conn_button->setSize({ "18%","5%" });
 		conn_button->setPosition({ "40%","48%" });
 		conn_button->onPress([&]() {check_can_connect(init_chat); });
+		conn_button_ptr = conn_button;
 		gui->add(conn_button);
-
-
-		auto back_button = Button::create(" back ");
-		back_button->setUserData(-1);
-		back_button->setSize({ "18%","5%" });
-		back_button->setPosition({ "40%","55%" });
-		back_button->onPress([&]() {back = true; });
-		gui->add(back_button);
 	}
 	bool can_connect() { return can_connect_flag; }
-	bool return_to_prev_menu() { return should_return_to_prev_menu; }
 	bool get_back() { return back; }
 	Blink::EncryptionData& get_encrpyption_data()
 	{
@@ -92,7 +90,7 @@ public:
 		}
 		else
 		{
-			should_return_to_prev_menu = true;
+			back = true;
 			result_label_ptr->setText("link is denyied! will be leaving in 2 seconds!");
 		}
 	}
