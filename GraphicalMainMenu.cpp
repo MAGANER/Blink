@@ -9,6 +9,7 @@ GraphicalMainMenu::GraphicalMainMenu(bool fullscreen,
 	BaseGraphicalMenu(fullscreen,win_size),
 	DataBaseProcessor(encr_key,db_name)
 {
+	//this menu always active, but it must be changed to decrease used RAM
 	room_gate_menu = new RoomGateMenu(encr_key, db_name);
 	
 	this->encr_key = encr_key;
@@ -18,26 +19,27 @@ GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
 	if (conn_menu != nullptr) delete conn_menu;
-	if (client != nullptr)    delete client;
+	//if (client != nullptr)    delete client; //CHECK: it crushes programm
 	if (chat_menu != nullptr) delete chat_menu;
 	if (create_room_menu != nullptr) delete create_room_menu;
 }
 void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 {
 	this->loader = &loader;
-
 	room_gate_menu->init(gui, *this->loader,init_chat, start_room);
 
+
+	//init rooms' list widget
 	auto room_box = ListBox::create();
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
 
 
+	//load rooms
 	rooms = get_rooms(encr_key);
 	if (rooms.empty())no_rooms = true;
 	else no_rooms = false;
-
 	int counter = 0;
 	for (auto& room : rooms)
 	{
@@ -47,7 +49,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		counter++;
 	}
 	rooms_ptr = room_box;
+	//**
 
+
+	//set first button to create room
 	auto create_room_button = Button::create("create room");
 	create_room_button->setUserData(default_id);
 	auto creating_lambda = [&]() {
@@ -59,7 +64,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	};
 	create_room_button->onClick(creating_lambda);
 	gui->add(create_room_button);
+	//**
 
+
+	//connecting button is based on previous button
 	auto connect_button = Button::create(" connect ");
 	connect_button->setUserData(default_id);
 	connect_button->onPress([&]() {
@@ -71,8 +79,10 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	connect_button->setPosition({"0"},create_button_y_pos);
 	connect_button->setSize(create_room_button->getSizeLayout());
 	gui->add(connect_button);
+	//**
 
 
+	//third and last button is based on previous connecting button
 	auto conn_button_y_pos = connect_button->getPositionLayout().y +
 							 connect_button->getSize().y;
 	auto exit_button = Button::create(" exit ");
@@ -82,11 +92,13 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	exit_button->onPress([&]() {exit(); });
 	gui->add(exit_button);
 
+
+	//set 'no rooms' label, if there is no any rooms
 	if (no_rooms)
 	{
 		auto no_rooms_label = Label::create("no rooms");
 		no_rooms_label->setUserData(no_rooms_id);
-		no_rooms_label->setPosition({ "45%" },{ "50%" });
+		no_rooms_label->setPosition({ "46%" },{ "50%" });
 		no_rooms_label_ptr = no_rooms_label;
 		gui->add(no_rooms_label);
 
@@ -95,6 +107,8 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		
 	}
 	
+
+	//init every echo functions
 	echo_functions.push_back([&](sf::Event::EventType type)
 		{resize_room_list_box(type); });
 	paramless_echo_functions.push_back([&]() {
@@ -109,6 +123,7 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	paramless_echo_functions.push_back([&]() {create_link(); });
 	paramless_echo_functions.push_back([&]() {recreate_this_menu(loader); });
 	paramless_echo_functions.push_back([&]() {
+		//TODO: write method
 		if (create_room_menu != nullptr)
 		{
 			if (create_room_menu->can_leave())
@@ -146,6 +161,7 @@ void GraphicalMainMenu::create_link()
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 {
+	//set default data for room's list widget
 	tgui::Layout2d size;
 	size.x = 96;
 	size.y = get_window_size().y;
@@ -157,6 +173,7 @@ void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 }
 void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
 {
+	//resize if user change the size of window
 	if (type == sf::Event::EventType::Resized)
 	{
 		auto widgets = gui->getWidgets();
@@ -173,8 +190,10 @@ void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
 }
 void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 {
+	//if user resizes window, then this widget must be changed
 	if (type == sf::Event::EventType::Resized)
 	{
+		//get all widgets and find required one
 		auto widgets = gui->getWidgets();
 		for (auto& wid : widgets)
 		{
@@ -187,6 +206,7 @@ void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 }
 void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 {
+	//create room menu if it's not created yet
 	if (create_room_menu == nullptr)
 	{
 		create_room_menu = new CreateRoomMenu(get_encr_key(), get_db_name());
@@ -195,18 +215,24 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::process_chat()
 {
+	//user can not start room if all fields required to make link are empty
+	//so don't start chat
 	if (room_gate_menu->is_starting_room() && !room_gate_menu->can_make_link())
 		init_chat = false;
 
 	if (init_chat)
 	{
+		//remove everything and don't allow to come here again!
 		gui->removeAllWidgets();
 		init_chat = false;
+
+		//check first case if user connects  with link
 		bool can_connect_with_link = false;
 		if (conn_menu != nullptr)
 		{
 			can_connect_with_link = conn_menu->can_connect();
 		}
+
 		if (!can_connect_with_link)
 		{
 			if (room_gate_menu->is_starting_room())
@@ -255,6 +281,7 @@ void GraphicalMainMenu::process_chat()
 			main_echo_function = [&]() {_main_echo_function(); };
 		}
 
+		//prepare chat menu
 		chat_menu = new GraphicalChatMenu();
 		chat_menu->init(gui, *loader,client,get_window_width(), room_gate_menu->get_room_name_password().first);
 
@@ -262,10 +289,12 @@ void GraphicalMainMenu::process_chat()
 		chat_menu->load_messages(msgs);
 
 
+		//no more sub menu is used
 		curr_sub_menu = ActiveSubMenu::none;
 
 		should_run_paramless_echo_function = false;
 
+		//to scroll text
 		process_mouse_wheel = true;
 		echo_mouse_wheel_function = [&](int direction) {chat_menu->process_scroll(direction); };
 	}
@@ -282,6 +311,8 @@ void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::recreate_this_menu(Blink::ConfigLoader& loader)
 {
+	//get back from connecting menu
+	//TODO: make conn_menu look like every another menu
 	if (conn_menu != nullptr)
 	{
 		if (conn_menu->return_to_prev_menu())
@@ -320,26 +351,32 @@ void GraphicalMainMenu::_main_echo_function()
 		}
 		client->run_in_window();
 
+
+		//room name is sent by user who invited current user
 		if (!client->get_room_name().empty())
 		{
 			chat_menu->set_room_name(client->get_room_name());
 		}
+
 		if (client->has_message_to_show())
 		{
 			auto msg = client->get_message_to_show();
 			MessageToShow _msg(msg->text, msg->name, false);
 			chat_menu->add_message(_msg);
 		}
+
 		if (chat_menu->should_exit())
 		{
 			//this function will not be running
 			client->exit();
+			client->save_offline_clients();
+
 			paramless_echo_functions.clear();
 			echo_functions.clear();
 			should_run_paramless_echo_function = true;
 			process_mouse_wheel = false;
 
-			client->save_offline_clients();
+			
 			gui->removeAllWidgets();
 
 			delete chat_menu;
@@ -350,6 +387,8 @@ void GraphicalMainMenu::_main_echo_function()
 }
 vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
 {
+	//get messages from DB
+
 	vector<MessageToShow> messages;
 	auto loaded = get_messages(room_gate_menu->get_room_name_password().first);
 	for (auto& msg : loaded)
@@ -364,6 +403,7 @@ vector<MessageToShow> GraphicalMainMenu::get_saved_messages()
 }
 void GraphicalMainMenu::clear_sub_menu()
 {
+	//just erase this menu
 	if (Keyboard::isKeyPressed(Keyboard::Escape))
 	{
 		if (curr_sub_menu == ActiveSubMenu::entering)

@@ -1,3 +1,8 @@
+/*
+	From this menu user has ability to enter/start/connect/create room.
+	So it creates every sub menu
+*/
+
 #ifndef GRAPHICAL_MAIN_MENU_H
 #define GRAPHICAL_MAIN_MENU_H
 #ifndef COMMON_HEADERS_H
@@ -23,35 +28,42 @@ class GraphicalMainMenu :public DataBaseProcessor,
 {
 private:
 	vector<str3> rooms;
+
+
 	bool no_rooms = true;
 	bool init_chat = false;
 	bool start_room = false;
+	bool should_exit = false;
 	
 	//user data for widgets
 	const int no_rooms_id  = 3;
 	const int default_id   = 0;
 	const int room_list_id = 1;
 
-	Blink::ConfigLoader* loader = nullptr;
-
 	ListBox::Ptr rooms_ptr;
 	Label::Ptr no_rooms_label_ptr;
 	EditBox::Ptr room_passw;
 
-	RoomGateMenu* room_gate_menu = nullptr;
-	GraphicalConnectingSubMenu* conn_menu = nullptr;
-	GraphicalChatMenu* chat_menu = nullptr;
-	CreateRoomMenu* create_room_menu = nullptr;
+
+	//local ptr, it will be needed to recreate menu again
+	Blink::ConfigLoader* loader = nullptr;
+
+	//* every sub menu
+	RoomGateMenu* room_gate_menu				= nullptr;
+	GraphicalConnectingSubMenu* conn_menu		= nullptr;
+	GraphicalChatMenu* chat_menu				= nullptr;
+	CreateRoomMenu* create_room_menu			= nullptr;
+	//**
+
+	//This enum is needed to has ability to return from menu
+	//if it is not required with pressing ESC key
+	enum class ActiveSubMenu { creating, entering, none };
+	ActiveSubMenu curr_sub_menu = ActiveSubMenu::none;
 
 	string user_name;
 	string encr_key;
 
 	GraphicalDecentralysedServerClient* client = nullptr;
-
-	bool should_exit = false;
-
-	enum class ActiveSubMenu {creating, entering, none};
-	ActiveSubMenu curr_sub_menu = ActiveSubMenu::none;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,
@@ -61,7 +73,6 @@ public:
 	~GraphicalMainMenu();
 
 	void create(Blink::ConfigLoader& loader);
-
 private:
 	void set_room_box_pos_and_size(ListBox::Ptr ptr);
 	void resize_room_list_box(sf::Event::EventType type);
