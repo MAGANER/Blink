@@ -64,7 +64,7 @@ std::string Encryption::AES::encrypt(const key_iv& key_iv, const string& text)
 	}
 	catch (const Exception& e)
 	{
-		cout << e.what();
+		//cout << e.what();
 	}
 }
 std::string Encryption::AES::decrypt(const key_iv& key_iv, const string& cipher)
@@ -85,7 +85,7 @@ std::string Encryption::AES::decrypt(const key_iv& key_iv, const string& cipher)
 	}
 	catch (const Exception& e)
 	{
-		cout << e.what();
+		//cout << e.what();
 	}
 }
 std::string Encryption::SHA::sha256(const string& data)
