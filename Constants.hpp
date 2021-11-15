@@ -1,5 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
+//TODO:: probably move it somewhere else
 namespace Blink
 {
 	static const int MAX_PASSWORD_LEN = 256;
