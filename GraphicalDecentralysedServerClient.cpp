@@ -91,7 +91,6 @@ void GraphicalDecentralysedServerClient::run_in_window()
 }
 void GraphicalDecentralysedServerClient::save_offline_clients()
 {
-	cout << offline_clients.size() << "is offline clients!" << endl;
 	for (auto& client : offline_clients)
 	{
 		add_offline_client(room_name, client.first.toString(), client.second);

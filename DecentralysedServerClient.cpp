@@ -131,6 +131,7 @@ DecentralysedServerClient(command_hash& commands,
 DecentralysedServerClient::~DecentralysedServerClient()
 {
 	if (socket != nullptr)delete socket;
+	if (entering_socket != nullptr) delete entering_socket;
 }
 
 void DecentralysedServerClient::prepare()
