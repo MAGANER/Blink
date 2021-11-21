@@ -139,7 +139,7 @@ namespace ConnectionChecker
 		auto creation_time = parse_time(time + " d");
 		int creation_seconds = get_seconds(creation_time[3]);
 
-		int eq_counter = 0;
+		/*int eq_counter = 0;
 		for (size_t i = 0; i < curr_time.size(); i++)
 		{
 			if (i != 3)
@@ -148,20 +148,20 @@ namespace ConnectionChecker
 			}
 		}
 		bool date_is_correct = eq_counter == 4;
-		bool time_diff_is_correct = abs(curr_seconds - creation_seconds) < (5 * 60);
-		if (date_is_correct && time_diff_is_correct)
-		{
+		bool time_diff_is_correct = abs(curr_seconds - creation_seconds) < (5 * 60);*/
+		//if (date_is_correct && time_diff_is_correct)
+		//{
 			if (ConnectionChecker::can_connect(data))
 			{
 				cout << "link is accepted!" << endl;
 				return true;
 			}
 			else cout << "link is denyied!" << endl;
-		}
-		else
-		{
-			cout << "link is denyied!" << endl;
-		}
+		//}
+		//else
+		//{
+		//	cout << "link is denyied!: data is incorrect or time is out!" << endl;
+		//}
 
 		return false;
 	}
