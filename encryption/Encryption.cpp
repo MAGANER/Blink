@@ -42,6 +42,25 @@ CryptoPP::SecByteBlock Encryption::AES::convert_to_bytes(const string& key)
 	SecByteBlock _key(reinterpret_cast<CryptoPP::byte*>(&bytes[0]), CryptoPP::AES::DEFAULT_KEYLENGTH);
 	return _key;
 }
+CryptoPP::SecByteBlock Encryption::AES::_convert_to_bytes(const string& key)
+{
+	string bytes;
+
+	string curr_ch;
+	for (auto& ch : key)
+	{
+		if (ch != '|')curr_ch += ch;
+		else
+		{
+			bytes += (char)atoi(curr_ch.c_str());
+			curr_ch.clear();
+		}
+	}
+	if (bytes.empty())bytes = curr_ch;
+
+	SecByteBlock _key(reinterpret_cast<CryptoPP::byte*>(&bytes[0]), CryptoPP::AES::DEFAULT_KEYLENGTH);
+	return _key;
+}
 
 std::string Encryption::AES::encrypt(const key_iv& key_iv, const string& text)
 {
@@ -51,20 +70,24 @@ std::string Encryption::AES::encrypt(const key_iv& key_iv, const string& text)
 		CBC_Mode<CryptoPP::AES>::Encryption e;
 		e.SetKeyWithIV(key_iv.first, key_iv.first.size(), key_iv.second);
 
+		string _text = text;
+		//while ((_text.size() % 16) != 0)_text +=(char)0;
+
 		string cipher;
-		StringSource s(text, true,
+		StringSource s(_text, true,
+			//new HexEncoder(
 			new StreamTransformationFilter(e,
 				new StringSink(cipher)
 			) // StreamTransformationFilter
+		//)
 		); // StringSource
-
-		while ((cipher.size() % 16) != 0)cipher += (char)0;
 
 		return cipher;
 	}
 	catch (const Exception& e)
 	{
-		//cout << e.what();
+		cout <<"AES::encryption:"<< e.what();
+		exit(-1);
 	}
 }
 std::string Encryption::AES::decrypt(const key_iv& key_iv, const string& cipher)
@@ -77,15 +100,18 @@ std::string Encryption::AES::decrypt(const key_iv& key_iv, const string& cipher)
 
 		string recovered;
 		StringSource s(cipher, true,
+			//new CryptoPP::HexDecoder(
 			new StreamTransformationFilter(d,
 				new StringSink(recovered)
 			) // StreamTransformationFilter
+		//)
 		); // StringSource
 		return recovered;
 	}
 	catch (const Exception& e)
 	{
-		//cout << e.what();
+		cout << "AES::decryption:" << e.what();
+		exit(-1);
 	}
 }
 std::string Encryption::SHA::sha256(const string& data)
@@ -109,149 +135,6 @@ std::string Encryption::SHA::sha256(const string& data)
 		encoder.Get((CryptoPP::byte*)&hex_result[0], hex_result.size());
 	}
 	return hex_result;
-}
-rsa::spair rsa::get_random_keys()
-{
-	AutoSeededRandomPool rng;
-	InvertibleRSAFunction params;
-	params.GenerateRandomWithKeySize(rng, 3072);
-
-	RSA::PrivateKey private_key(params);
-	RSA::PublicKey public_key(params);
-	
-	ByteQueue priv_key_queue, pub_key_queue;
-	private_key.Save(priv_key_queue);
-	public_key.Save(pub_key_queue);
-
-	string priv_key, pub_key;
-
-	StringSink priv_key_sink(priv_key);
-	priv_key_queue.CopyTo(priv_key_sink);
-	priv_key_sink.MessageEnd();
-
-	StringSink pub_key_sink(pub_key);
-	pub_key_queue.CopyTo(pub_key_sink);
-	pub_key_sink.MessageEnd();
-
-	string encoded_priv_key;
-	StringSource priv_key_ss(priv_key, true,
-		new HexEncoder(
-			new StringSink(encoded_priv_key)
-		) 
-	); 
-
-	string encoded_pub_key;
-	StringSource pub_key_ss(pub_key, true,
-		new HexEncoder(
-			new StringSink(encoded_pub_key))
-	);
-
-	return make_pair(encoded_priv_key, encoded_pub_key);
-}
-rsa::keys rsa::spair_to_keys(const rsa::spair& k)
-{
-	string decoded_priv_key, decoded_pub_key;
-	StringSource ss_priv_key(k.first, true,
-		new HexDecoder(
-			new StringSink(decoded_priv_key)
-		) 
-	); 
-	StringSource ss_pub_key(k.second, true,
-		new HexDecoder(
-			new StringSink(decoded_pub_key)
-		)
-	);
-
-	StringSource ss_pub(decoded_pub_key, true);
-	StringSource ss_priv(decoded_priv_key, true);
-
-	RSA::PrivateKey pkey;
-	pkey.Load(ss_priv);
-
-	RSA::PublicKey pukey;
-	pukey.Load(ss_pub);
-
-	return make_pair(pkey,pukey);
-}
-vector<string> rsa::encrypt(const RSA::PublicKey& key,
-							const string& data)
-{
-	RSAES_OAEP_SHA_Encryptor e(key);
-	AutoSeededRandomPool rng;
-
-	vector<string> encrypted_strs;
-	auto encrypt = [&](const string& chunk)
-	{
-		string cipher;
-		StringSource ss1(chunk, true,
-			new PK_EncryptorFilter(rng, e,
-				new StringSink(cipher)
-			) // PK_EncryptorFilter
-		); // StringSource
-		return cipher;
-	};
-
-	if (data.size() < 10)
-	{
-		string cipher = encrypt(data);
-		encrypted_strs.push_back(cipher);
-	}
-	else
-	{
-		auto copied_data = data;
-		while ((copied_data.size() % 10) == 0)copied_data.push_back(' ');
-
-		int end = 10;
-		int begin = 0;
-		for (size_t i = 0; i < copied_data.size() / 10; i++)
-		{
-			if (i + 1 == copied_data.size() / 10)end = copied_data.size();
-			string slice     = Functools::slice(copied_data, begin, end);
-			string encrypted = encrypt(slice);
-			encrypted_strs.push_back(encrypted);
-			end   += 10;
-			begin += 10;
-		}
-	}
-
-	return encrypted_strs;
-}
-string rsa::decrypt(const RSA::PrivateKey& key,
-					const vector<string>& _cipher)
-{
-	RSAES_OAEP_SHA_Decryptor d(key);
-	AutoSeededRandomPool rng;
-
-	auto decrypt = [&](const string& chunk)
-	{
-		string decoded;
-		StringSource ss(chunk, true,
-			new PK_DecryptorFilter(rng, d,
-				new StringSink(decoded)
-			) // PK_DecryptorFilter
-		); // StringSource
-		return decoded;
-	};
-
-	string whole_string;
-	for (auto& chunk : _cipher)whole_string += decrypt(chunk);
-
-	return whole_string;
-}
-RSA::PrivateKey rsa::str_to_priv_key(const string& data)
-{
-	string decoded_priv_key;
-	StringSource ss_pub_key(data, true,
-		new HexDecoder(
-			new StringSink(decoded_priv_key)
-		)
-	);
-
-	StringSource ss_priv(decoded_priv_key, true);
-	RSA::PrivateKey pkey;
-	pkey.Load(ss_priv);
-	
-	return pkey;
 }
 string Encryption::str_to_hex(const string& str)
 {
