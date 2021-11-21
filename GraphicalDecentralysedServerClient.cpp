@@ -84,7 +84,7 @@ void GraphicalDecentralysedServerClient::run_in_window()
 		//clients
 		save_offline_clients();
 		listener.close();
-		socket->disconnect();
+		socket.disconnect();
 		
 		return;
 	}

@@ -15,7 +15,7 @@ protected:
 	bool connecting = false;
 	bool connect_to_saved_clients = false;
 
-	TcpSocket* socket = nullptr;
+	TcpSocket socket;
 
 	list<RoomClient*> clients;
 

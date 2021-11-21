@@ -130,7 +130,6 @@ DecentralysedServerClient(command_hash& commands,
 }
 DecentralysedServerClient::~DecentralysedServerClient()
 {
-	if (socket != nullptr)delete socket;
 	if (entering_socket != nullptr) delete entering_socket;
 }
 
@@ -315,27 +314,25 @@ void DecentralysedServerClient::connect_to_known_clients()
 	for (auto& client_data : info)
 	{
 
-		socket = new TcpSocket();
-		auto s = socket->connect(IpAddress(get<1>(client_data)), get<2>(client_data));
+		auto s = socket.connect(IpAddress(get<1>(client_data)), get<2>(client_data));
 
 		auto message = convert_message_to_json("fuck", "fuck", MessageType::ComeInAsFriend);
 		Packet p;
 		p << message;
-		socket->send(p);
+		socket.send(p);
 
 		//anyway you always get access 
-		auto echo = get_raw_message(*socket);
-		delete socket;
+		auto echo = get_raw_message(socket);
+		//delete socket;
 		if (echo == "1")
 		{
-			socket = new TcpSocket();
-			auto s = socket->connect(IpAddress(get<1>(client_data)), get<2>(client_data));
+			auto s = socket.connect(IpAddress(get<1>(client_data)), get<2>(client_data));
 			Packet pack;
 			pack << "motherfucker";
-			socket->send(pack);
+			socket.send(pack);
 
 
-			make_client(clients, client_counter, socket, get<2>(client_data));
+			make_client(clients, client_counter, &socket, get<2>(client_data));
 		}
 	
 	}
@@ -350,12 +347,11 @@ void DecentralysedServerClient::connnect_finally()
 	//connect again if you are not "holder"
 	if (connecting && !connect_to_saved_clients)
 	{
-		socket = new TcpSocket();
 		auto address = IpAddress(conn_ip.c_str());
 		auto port = atoi(conn_port.c_str());
-		socket->connect(address, port);
+		socket.connect(address, port);
 
-		auto nothing = get_message(*socket);
+		auto nothing = get_message(socket);
 		//update correct room name
 		if (received_room_name)
 		{
@@ -382,10 +378,10 @@ void DecentralysedServerClient::connnect_finally()
 		//send your listner port
 		Packet pack;
 		pack << to_string(this->port);
-		socket->send(pack);
+		socket.send(pack);
 
 		//save connected as client
-		make_client(clients, client_counter, socket, port);
+		make_client(clients, client_counter, &socket, port);
 	}
 }
 void DecentralysedServerClient::process_received_clients_info()
