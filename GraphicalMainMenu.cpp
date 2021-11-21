@@ -19,7 +19,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
 	if (conn_menu != nullptr) delete conn_menu;
-	//if (client != nullptr)    delete client; //CHECK: it crushes programm
+	if (client != nullptr)    delete client; 
 	if (chat_menu != nullptr) delete chat_menu;
 	if (create_room_menu != nullptr) delete create_room_menu;
 }
@@ -71,7 +71,11 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	auto connect_button = Button::create(" connect ");
 	connect_button->setUserData(default_id);
 	connect_button->onPress([&]() {
+		if (curr_sub_menu == ActiveSubMenu::none)
+		{
 			connect_link(loader);
+			curr_sub_menu = ActiveSubMenu::connecting;
+		}
 		});
 
 	auto create_button_y_pos = create_room_button->getPositionLayout().y +
@@ -305,7 +309,6 @@ void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 	{
 		conn_menu =  new GraphicalConnectingSubMenu();
 		conn_menu->init_menu(gui, loader,init_chat,user_name);
-		curr_sub_menu = ActiveSubMenu::connecting;
 	}
 }
 void GraphicalMainMenu::_main_echo_function()
@@ -351,6 +354,10 @@ void GraphicalMainMenu::_main_echo_function()
 
 			delete chat_menu;
 			chat_menu = nullptr;
+
+			delete client;
+			client = nullptr;
+
 			create(*loader);
 		}
 	}
