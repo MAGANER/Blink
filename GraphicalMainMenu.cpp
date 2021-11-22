@@ -115,42 +115,55 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 	//init every echo functions
 	echo_functions.push_back([&](sf::Event::EventType type)
 		{resize_room_list_box(type); });
-	paramless_echo_functions.push_back([&]() {
-		if (curr_sub_menu == ActiveSubMenu::none &&
-			rooms_ptr->getSelectedItem() != "")
-		{
-			room_gate_menu->enter_room(rooms_ptr);
-			curr_sub_menu = ActiveSubMenu::entering;
-		}
-		});
+	echo_functions.push_back([&](sf::Event::EventType type)
+		{resize_chat_widgets(type); });
+	paramless_echo_functions.push_back([&]() {enter_room();   });
 	paramless_echo_functions.push_back([&]() {process_chat(); });
-	paramless_echo_functions.push_back([&]() {create_link(); });
-	paramless_echo_functions.push_back([&]() {
-		//TODO: write method
-		if (create_room_menu != nullptr)
-		{
-			if (create_room_menu->can_leave())
-			{
-				create_room_menu->clear();
-				for (auto& widget : gui->getWidgets())
-				{
-					if (widget->getUserData<int>() == no_rooms_id)
-					{
-						widget->setVisible(false);
-					}
-					if (widget->getUserData<int>() == room_list_id)
-					{
-						widget->cast<ListBox>()->addItem(create_room_menu->get_room_name());
-					}
-				}
-
-				curr_sub_menu = ActiveSubMenu::none;
-				delete create_room_menu;
-				create_room_menu = nullptr;
-			}
-		}
-	});
+	paramless_echo_functions.push_back([&]() {create_link();  });
+	paramless_echo_functions.push_back([&]() {leave_creating_room_menu(); });
 	paramless_echo_functions.push_back([&]() {clear_sub_menu(); });
+}
+void GraphicalMainMenu::resize_chat_widgets(sf::Event::EventType type)
+{
+	//resize if chat is active
+	if (type == sf::Event::Resized && client != nullptr)
+	{
+		chat_menu->resize(get_window_width());
+	}
+}
+void GraphicalMainMenu::enter_room()
+{
+	if (curr_sub_menu == ActiveSubMenu::none &&
+		rooms_ptr->getSelectedItem() != "")
+	{
+		room_gate_menu->enter_room(rooms_ptr);
+		curr_sub_menu = ActiveSubMenu::entering;
+	}
+}
+void GraphicalMainMenu::leave_creating_room_menu()
+{
+	if (create_room_menu != nullptr)
+	{
+		if (create_room_menu->can_leave())
+		{
+			create_room_menu->clear();
+			for (auto& widget : gui->getWidgets())
+			{
+				if (widget->getUserData<int>() == no_rooms_id)
+				{
+					widget->setVisible(false);
+				}
+				if (widget->getUserData<int>() == room_list_id)
+				{
+					widget->cast<ListBox>()->addItem(create_room_menu->get_room_name());
+				}
+			}
+
+			curr_sub_menu = ActiveSubMenu::none;
+			delete create_room_menu;
+			create_room_menu = nullptr;
+		}
+	}
 }
 void GraphicalMainMenu::create_link()
 {
@@ -177,7 +190,8 @@ void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
 void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
 {
 	//resize if user change the size of window
-	if (type == sf::Event::EventType::Resized)
+	//resize it only when it's not active chat
+	if (type == sf::Event::EventType::Resized && client == nullptr)
 	{
 		auto widgets = gui->getWidgets();
 		for (auto& wid : widgets)
@@ -194,7 +208,8 @@ void GraphicalMainMenu::resize_room_list_box(sf::Event::EventType type)
 void GraphicalMainMenu::set_no_rooms_label_to_center(sf::Event::EventType type)
 {
 	//if user resizes window, then this widget must be changed
-	if (type == sf::Event::EventType::Resized)
+	//resize it only when it's not active chat
+	if (type == sf::Event::EventType::Resized && client == nullptr)
 	{
 		//get all widgets and find required one
 		auto widgets = gui->getWidgets();
