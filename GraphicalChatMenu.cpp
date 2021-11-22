@@ -43,6 +43,7 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	background->setMouseCursor(tgui::Cursor::Type::Arrow);
 	background->setWidth(win_width);
 	background->setHeight(40);
+	name_background_ptr = background;
 	gui->add(background);
 
 	auto _room_name = Label::create();
@@ -221,4 +222,24 @@ void GraphicalChatMenu::load_messages(vector<MessageToShow>& messages)
 	{
 		add_message(msg);
 	}
+}
+void GraphicalChatMenu::resize(int win_width)
+{
+	//move received messages lefter
+	for (auto& msg : messages)
+	{
+		//it message's x == input's x, than it's user's  own messages
+		if (msg->getText().toStdString().find("you:") == string::npos)
+		{
+			auto x= get_message_box_x_pos(MsgAlign::Right, msg->getSize().x);
+			msg->setPosition(x, msg->getPosition().y);
+		}
+		else
+		{
+			msg->setPosition(text_input_ptr->getPosition().x, msg->getPosition().y);
+		}
+	}
+
+	name_background_ptr->setSize(win_width, name_background_ptr->getSize().y);
+	room_name_ptr->setPosition((win_width / 2) - room_name_ptr->getSize().x, 5)
 }
