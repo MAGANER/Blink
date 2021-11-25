@@ -278,7 +278,6 @@ void GraphicalMainMenu::process_chat()
 			}
 			
 			client->prepare();
-			main_echo_function = [&]() {_main_echo_function(); };
 		}
 		else
 		{
@@ -296,7 +295,6 @@ void GraphicalMainMenu::process_chat()
 			client->set_key_iv(keys.data);
 
 			client->prepare();
-			main_echo_function = [&]() {_main_echo_function(); };
 		}
 
 		//prepare chat menu
@@ -305,7 +303,8 @@ void GraphicalMainMenu::process_chat()
 
 		auto msgs = get_saved_messages();
 		chat_menu->load_messages(msgs);
-
+		chat_menu->set_link_data(client->get_link_data());
+		chat_menu->set_client_ptr(client);
 
 		//no more sub menu is used
 		curr_sub_menu = ActiveSubMenu::none;
@@ -315,6 +314,7 @@ void GraphicalMainMenu::process_chat()
 		//to scroll text
 		process_mouse_wheel = true;
 		echo_mouse_wheel_function = [&](int direction) {chat_menu->process_scroll(direction); };
+		main_echo_function = [&]() {_main_echo_function(); };
 	}
 }
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
@@ -330,6 +330,9 @@ void GraphicalMainMenu::_main_echo_function()
 {
 	if (client != nullptr)
 	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			chat_menu->hide_additional_link_creating_menu();
+
 		if (chat_menu->_should_send())
 		{
 			auto text_to_send = chat_menu->get_text_to_send();

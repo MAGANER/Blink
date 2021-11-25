@@ -8,8 +8,6 @@ void GraphicalChatMenu::init(GuiBase* gui,
 							 const string& room_name)
 {
 	//create basical gui
-	local_gui_ptr = gui;
-
 	message_background_color = loader.get_message_background_color();
 
 	auto input = TextArea::create();
@@ -26,6 +24,7 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	send->onPress([&]() {
 		should_send = true;
 		});
+	send_ptr = send;
 	gui->add(send);
 
 	auto exit = Button::create("exit");
@@ -33,9 +32,17 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	exit->setPosition({ "88%","85%" });
 	exit->setUserData(-1);
 	exit->onPress([&]() {this->exit = true; });
+	exit_ptr = exit;
 	gui->add(exit);
 
 
+	auto make_link = Button::create("make link");
+	make_link->setSize({ "10%","4%" });
+	make_link->setPosition({ "88%","90%" });
+	make_link->setUserData(-1);
+	make_link->onPress([&]() {make_additional_link(); });
+	make_ptr = make_link;
+	gui->add(make_link);
 
 	auto background = Label::create();
 	background->getSharedRenderer()->setBackgroundColor(message_background_color);
@@ -53,6 +60,9 @@ void GraphicalChatMenu::init(GuiBase* gui,
 	_room_name->setPosition((win_width / 2)-_room_name->getSize().x, 5);
 	gui->add(_room_name);
 	room_name_ptr = _room_name;
+
+	local_gui_ptr = gui;
+	this->loader = &loader;
 }
 string GraphicalChatMenu::get_text_to_send()
 {
@@ -241,5 +251,129 @@ void GraphicalChatMenu::resize(int win_width)
 	}
 
 	name_background_ptr->setSize(win_width, name_background_ptr->getSize().y);
-	room_name_ptr->setPosition((win_width / 2) - room_name_ptr->getSize().x, 5)
+	room_name_ptr->setPosition((win_width / 2) - room_name_ptr->getSize().x, 5);
+}
+void GraphicalChatMenu::hide(bool flag)
+{
+	for (auto& wid : local_gui_ptr->getWidgets())
+		if (flag)
+			wid->setVisible(true);
+		else
+			wid->setVisible(false);
+}
+void GraphicalChatMenu::make_additional_link()
+{
+	hide(false);
+	additional_link_creating_menu_is_active = true;
+	//make link gui init
+
+	if (!add_link_cr_m_created)
+	{
+		add_link_cr_m_created = true;
+		auto label = Label::create("make additional link");
+		label->setUserData(-1);
+		label->setPosition({ "30%","35%" });
+		label->setTextSize(20);
+		label->getSharedRenderer()->setTextColor(loader->get_enter_menu_label_color());
+		label->getSharedRenderer()->setBackgroundColor(tgui::Color::Transparent);
+		local_gui_ptr->add(label);
+		label_ptr = label;
+
+		auto __name = EditBox::create();
+		__name->setDefaultText("invite link path/recepient's e-mail");
+		__name->setSize({ "40%","5.0%" });
+		__name->setPosition({ "30%", "40%" });
+		__name->setUserData(-1);
+		local_gui_ptr->add(__name);
+		name_path_ptr = __name;
+
+
+		auto nick = EditBox::create();
+		nick->setDefaultText("recepient name");
+		nick->setSize({ "40%","5.0%" });
+		nick->setPosition({ "30%", "48%" });
+		nick->setUserData(-1);
+		local_gui_ptr->add(nick);
+		recepient_name_ptr = nick;
+
+		auto save = Button::create("save");
+		save->setUserData(-1);
+		save->setSize({ "18%","5%" });
+		save->setPosition({ "30%","54%" });
+		save->onPress([&]() { save_link(); });
+		local_gui_ptr->add(save);
+		save_link_ptr = save;
+
+		auto send = Button::create("send");
+		send->setUserData(-1);
+		send->setSize({ "18%","5%" });
+		send->setPosition({ "52%","54%" });
+		send->onPress([&]() {send_link(); });
+		local_gui_ptr->add(send);
+		send_link_ptr = send;
+	}
+	else
+	{
+		label_ptr->setVisible(true);
+		name_path_ptr->setVisible(true);
+		recepient_name_ptr->setVisible(true);
+		save_link_ptr->setVisible(true);
+		send_link_ptr->setVisible(true);
+	}
+}
+void GraphicalChatMenu::save_link()
+{
+
+	auto additional_data = name_path_ptr->getText().toStdString();
+	auto recepient_name = recepient_name_ptr->getText().toStdString();
+	bool not_empty = !additional_data.empty() and !recepient_name.empty();
+	if(not_empty)
+		client->create_invite_link_to_save(link_data->port,
+								link_data->room_name,
+						     	link_data->password,
+								true,
+								additional_data,
+								recepient_name);
+
+	if (not_empty)
+	{
+		hide_link_creating_menu();
+	}
+}
+void GraphicalChatMenu::send_link()
+{
+	auto additional_data = name_path_ptr->getText().toStdString();
+	auto recepient_name = recepient_name_ptr->getText().toStdString();
+	bool not_empty = !additional_data.empty() and !recepient_name.empty();
+	if (not_empty)
+		client->create_invite_link_to_send(link_data->port,
+			link_data->room_name,
+			link_data->password,
+			true,
+			additional_data,
+			recepient_name);
+
+	if (not_empty)
+	{
+		hide_link_creating_menu();
+	}
+}
+void GraphicalChatMenu::hide_link_creating_menu()
+{
+	if (additional_link_creating_menu_is_active)
+	{
+		additional_link_creating_menu_is_active = false;
+
+		hide(true);
+		label_ptr->setVisible(false);
+		name_path_ptr->setText("");
+		name_path_ptr->setVisible(false);
+		recepient_name_ptr->setText("");
+		recepient_name_ptr->setVisible(false);
+		send_link_ptr->setVisible(false);
+		save_link_ptr->setVisible(false);
+
+		name_background_ptr->getSharedRenderer()->setBackgroundColor(message_background_color);
+		name_background_ptr->setVisible(true);
+	}
 }

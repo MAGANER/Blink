@@ -13,6 +13,7 @@
 #include"TGUI/Widgets/TextArea.hpp"
 #include"TGUI/Widgets/Label.hpp"
 #include"TGUI/Widgets/Button.hpp"
+#include"TGUI/Widgets/EditBox.hpp"
 #include<string>
 #include"GraphicalDecentralysedServerClient.h"
 #include"StringOperations.hpp"
@@ -44,17 +45,31 @@ public:
 	};
 private:
 	TextArea::Ptr text_input_ptr;
+	Button::Ptr send_ptr, exit_ptr, make_ptr;
+
 	bool should_send = false;
 
 	vector<Label::Ptr> messages;
 
-	GuiBase* local_gui_ptr = nullptr;
+	GuiBase* local_gui_ptr      = nullptr;
+	Blink::ConfigLoader* loader = nullptr;
+
 	sf::Color message_background_color;
 
-	Label::Ptr room_name_ptr;
-	Label::Ptr name_background_ptr;
+	Label::Ptr room_name_ptr, name_background_ptr;
+
+	//making additional link gui
+	Label::Ptr label_ptr;
+	EditBox::Ptr name_path_ptr, recepient_name_ptr;
+	Button::Ptr send_link_ptr, save_link_ptr;
+	//
 
 	bool exit = false;
+	bool additional_link_creating_menu_is_active = false;
+	bool add_link_cr_m_created = false;
+
+	Blink::LinkData* link_data = nullptr;
+	Blink::GraphicalDecentralysedServerClient* client = nullptr;//now owner
 public:
 	GraphicalChatMenu()
 	{
@@ -68,6 +83,14 @@ public:
 			  Blink::GraphicalDecentralysedServerClient* client,
 			  int win_width,
 			  const string& room_name);
+	void set_link_data(Blink::LinkData* link_data)
+	{
+		this->link_data = link_data;
+	}
+	void set_client_ptr(Blink::GraphicalDecentralysedServerClient* client)
+	{
+		this->client = client;
+	}
 
 	void add_message(const MessageToShow& msg);
 
@@ -84,6 +107,12 @@ public:
 		room_name_ptr->setText("`" + room_name + "` room");
 	}
 	void resize(int win_width);
+
+	void hide_additional_link_creating_menu()
+	{
+		if(additional_link_creating_menu_is_active)
+			hide_link_creating_menu();
+	}
 private:
 	Label::Ptr make_default_message_box();
 	float get_message_box_x_pos(MsgAlign val, float box_size);
@@ -91,6 +120,12 @@ private:
 	void move_messages(float step);	
 
 	
+	void hide(bool flag);
+	void make_additional_link();
+
+	void send_link();
+	void save_link();
+	void hide_link_creating_menu();
 };
 };
 #endif
