@@ -1,7 +1,6 @@
 /*
 	Module implements special algorithm to encrypt inviting link.
 */
-
 #pragma once
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
@@ -33,11 +32,5 @@ string create_invite_link(const string& ip,
 string encrypt_invite_link(const string& link, const string& recepient_name);
 string decrypt_invite_link(const string& link, const string& my_name);
 string get_curr_time();
-
-namespace inner 
-{
-string compress(const string& data);
-string decompress(const string& data);
-};
 };
 

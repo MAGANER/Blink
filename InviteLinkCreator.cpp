@@ -35,9 +35,8 @@ std::string Blink::encrypt_invite_link(const string& link, const string& recepie
 {
 	namespace e = encr::AES;
 	
-	auto key = e::convert_to_bytes(encr::SHA::sha256(recepient_name));
-	auto iv = e::convert_to_bytes(encr::SHA::sha256(to_string(recepient_name.size())));
-
+	auto key = e::_convert_to_bytes(encr::SHA::sha256("test"));
+	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(4)));
 	auto key_iv = make_pair(key, iv);
 	auto cipher = e::encrypt(key_iv, link);
 
@@ -47,34 +46,10 @@ string Blink::decrypt_invite_link(const string& link, const string& my_name)
 {
 	namespace e = encr::AES;
 
-	auto key = e::convert_to_bytes(encr::SHA::sha256(my_name));
-	auto iv = e::convert_to_bytes(encr::SHA::sha256(to_string(my_name.size())));
-
+	auto key = e::_convert_to_bytes(encr::SHA::sha256("test"));
+	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(4)));
 	auto key_iv = make_pair(key, iv);
 
 	auto decipher = e::decrypt(key_iv, link);
 	return decipher;
-}
-
-string Blink::inner::compress(const string& data)
-{
-	string compressed;
-
-	using namespace CryptoPP;
-	StringSource ss(data, true,
-		new Gzip(
-			new StringSink(compressed)
-		));
-	return compressed;
-}
-string Blink::inner::decompress(const string& data)
-{
-	string decompressed;
-
-	using namespace CryptoPP;
-	StringSource ss(data, true,
-		new Gunzip(
-			new StringSink(decompressed)
-		));
-	return decompressed;
 }

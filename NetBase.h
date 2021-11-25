@@ -108,7 +108,7 @@ private:
 	bool can_show = true;
 
 	string user_name, room_name;
-protected:
+public:
 	command_hash commands;
 
 	NetBase(const command_hash& commands,
