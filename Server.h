@@ -33,6 +33,19 @@ namespace Blink
 			   bool inherited = false);
 		virtual ~Server();
 
+
+		void create_invite_link_to_send(int port,
+			const string& room_name,
+			const string& room_password,
+			bool decentralysed,
+			const string& additional_data,
+			const string& recepient_name);
+		void create_invite_link_to_save(int port,
+			const string& room_name,
+			const string& room_password,
+			bool decentralysed,
+			const string& additional_data,
+			const string& recepient_name);
 	private:
 
 		string get_invite_link_str(int port,
@@ -46,18 +59,6 @@ namespace Blink
 							const string& room_name,
 							const string& room_password,
 							bool decentralysed);
-	void create_invite_link_to_send(int port,
-							const string& room_name,
-							const string& room_password,
-							bool decentralysed,
-							const string& additional_data,
-							const string& recepient_name);
-	void create_invite_link_to_save(int port,
-							const string& room_name,
-							const string& room_password,
-							bool decentralysed,
-							const string& additional_data,
-							const string& recepient_name);
 
 	bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
 
