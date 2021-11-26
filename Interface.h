@@ -87,10 +87,10 @@ namespace Blink
 								   const string& password)
 		{
 			bool correct_name_len = name.size() > MIN_NAME_LEN &&
-				name.size() < MAX_NAME_LEN;
+									name.size() < MAX_NAME_LEN;
 
 			bool correct_pasw_len = password.size() > MIN_PASSWORD_LEN &&
-				password.size() < MIN_PASSWORD_LEN;
+									password.size() < MAX_PASSWORD_LEN;
 			return correct_name_len && correct_pasw_len;
 		}
 
