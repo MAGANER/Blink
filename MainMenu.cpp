@@ -35,8 +35,15 @@ void MainMenu::create()
 	string password = input.second;
 	string port = to_string(NetRandom::get_random_port());
 
-	if (!does_room_exists(name))create_new_room(name, password, port);
-	else cout << "room" << " `" + name + "`" << " already exists!" << endl;
+	if (is_name_passw_correct(name, password))
+	{
+		if (!does_room_exists(name))create_new_room(name, password, port);
+		else cout << "room" << " `" + name + "`" << " already exists!" << endl;
+	}
+	else
+	{
+		cout << "name/password is too short/long!" << endl;
+	}
 
 }
 void MainMenu::_start_room()

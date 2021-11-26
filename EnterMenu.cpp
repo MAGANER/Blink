@@ -15,8 +15,15 @@ void EnterMenu::create_user()
 	cout << "enter password:"; 
 	password = get_secret_data();
 
-	if (!does_user_exist(name)) create_new_user(name, password);
-	else cout << "can not create user!" << endl;
+	if (is_name_passw_correct(name,password))
+	{
+		if (!does_user_exist(name)) create_new_user(name, password);
+		else cout << "can not create user!" << endl;
+	}
+	else
+	{
+		cout << "name/password is too short/long!"<<endl;
+	}
 }
 void EnterMenu::login()
 {

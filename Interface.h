@@ -8,6 +8,7 @@
 #include<string>
 #include<iostream>
 #include"AsyncInput.hpp"
+#include"Constants.hpp"
 namespace Blink
 {
 	using namespace std;
@@ -82,6 +83,16 @@ namespace Blink
 			);
 		}
 		~Interface(){}
+		bool is_name_passw_correct(const string& name,
+								   const string& password)
+		{
+			bool correct_name_len = name.size() > MIN_NAME_LEN &&
+				name.size() < MAX_NAME_LEN;
+
+			bool correct_pasw_len = password.size() > MIN_PASSWORD_LEN &&
+				password.size() < MIN_PASSWORD_LEN;
+			return correct_name_len && correct_pasw_len;
+		}
 
 		command_hash commands;
 	private:
