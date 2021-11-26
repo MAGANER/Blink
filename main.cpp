@@ -23,7 +23,11 @@
 
 		And there is third menu. RoomMenu. Users moves to this one after
 		he/she/it enters room or connect to the one.
-	
+
+	Graphical Mode:
+	Graphical Mode is splitted into 2 global menus. Enter one and Main one.
+	Main one contains of different sub menus.
+	Chat,Room Creator, Room Entering.
 */
 
 #include"RoomMenu.h"
@@ -34,22 +38,30 @@
 #include"GraphicalMainMenu.h"
 #include"ConfigLoader.h"
 
+
+//These variables make easy to work
+//don't touch em!
 static bool currently_fullscreen = false;
 static sf::Vector2u win_size(720,640);//default value
 static string user_name; //should be passed to MainMenu
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
+
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu
+
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 	     string& key,
 	     string& db_name,
 		 Blink::ConfigLoader& loader,
 		 bool fullscreen = false);
+
 void process_fullscreen(GraphicalBlink::BaseGraphicalMenu* menu,
 						GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 						Blink::ConfigLoader& loader);
+
 GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
+
 process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu, 
 					 bool fullscreen,
 					 Blink::ConfigLoader& loader);
@@ -60,7 +72,9 @@ int main(int argc, char** argv)
 	ConfigLoader config_loader;
 	win_size = config_loader.get_win_size();
 
-
+	//you can run console mode with direct command
+	//also you can set console/graphical flag at data/config.json
+	//true is console, false is graphical
 	bool console_mode1 = argc == 2 && string(argv[1]) == "-t";
 	bool console_mode2 = config_loader.get_mode();
 	if (console_mode1 || console_mode2)
@@ -91,8 +105,6 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 		db_name = enter_menu->get_db_name();
 		user_name = enter_menu->get_user_name();
 		if(enter_menu != nullptr)delete enter_menu;
-
-		cout<<":"<<(int)change<<endl;
 		return change;
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
@@ -117,6 +129,7 @@ void process_fullscreen(GraphicalBlink::BaseGraphicalMenu* menu,
 						GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 						Blink::ConfigLoader& loader)
 {
+	//set fullscreen or set Windowed mode
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::MakeFullscreen)
 	{
@@ -134,6 +147,7 @@ process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu,
 					 bool fullscreen,
 					  Blink::ConfigLoader& loader)
 { 
+	//endlessly run menu, if  it's changed than start it again
 	auto change = GraphicalBlink::BaseGraphicalMenu::CurrentMenu::Nothing;
 	while (true)
 	{
@@ -159,6 +173,9 @@ void run_graphical_mode(Blink::ConfigLoader& loader)
 
 void run_console_mode()
 {
+	//prepare data
+	//init all stuff
+	//clear console
 	using namespace Blink;
 	system("cls");
 	string key, db_name;
@@ -185,11 +202,16 @@ void run_console_mode()
 	bool starting_room = false;
 	while (true)
 	{
+		//match current menu and run required
 		if (current == state::ENTER)
 		{
 			enter_menu->run();
 			if (enter_menu->change())
 			{
+				//after enter menu user gets to main menu
+				//so we get data about user name and encryption key
+				//also we compute the path to data base name
+				//it's user_name.db
 				current = state::MAIN;
 				current_user_name = enter_menu->get_user_name();
 				key = enter_menu->get_correct_user_password();
@@ -203,28 +225,35 @@ void run_console_mode()
 			main_menu->run();
 			if (main_menu->exit())
 			{
+				//if user gets out, then delete current menu and create previous one
 				cout << "farewell!" << endl;
 				current = state::ENTER;
 				delete main_menu;
 				enter_menu = new EnterMenu(key, db_name);
 			}
 			else if (main_menu->enter_room() ||
-				main_menu->start_room())
+					 main_menu->start_room())
 			{
+				/*
+					User enters room if it's already created.
+					If user starts, then this room is just created.
+
+					So get all data required to connect.
+				*/
+
 				room_menu = new RoomMenu(key, db_name);
 
 				ConnectionData data = main_menu->get_connection_data();
 
 				room_menu->set_room_data(data.port,
-					data.ip,
-					current_user_name,
-					data.room,
-					data.password);
+										 data.ip,
+										 current_user_name,
+										 data.room,
+										 data.password);
 
 				if (main_menu->start_room())starting_room = true;
 
 				delete main_menu;
-
 				current = state::ROOM;
 			}
 			else if (main_menu->_connect())
@@ -234,10 +263,10 @@ void run_console_mode()
 				ConnectionData data = main_menu->get_connection_data();
 
 				room_menu->set_room_data(data.port,
-					data.ip,
-					current_user_name,
-					data.room,
-					data.password);
+										 data.ip,
+										 current_user_name,
+										 data.room,
+										 data.password);
 
 
 				//init 
@@ -247,7 +276,6 @@ void run_console_mode()
 				connecting_with_conflink_command = main_menu->is_connecting_with_conflink_command();
 
 				delete main_menu;
-
 				current = state::ROOM;
 			}
 		}
@@ -271,6 +299,7 @@ void run_console_mode()
 
 
 
+	//delete everything before exit
 	if (enter_menu != nullptr) delete enter_menu;
 	if (main_menu != nullptr) delete main_menu;
 	if (room_menu != nullptr) delete room_menu;

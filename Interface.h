@@ -61,6 +61,7 @@ namespace Blink
 	protected:
 		Interface() 
 		{
+//commands to clear screen are different in various OSes
 #ifdef WIN32
 			commands["cls"] = function<void()>
 				(
@@ -98,6 +99,8 @@ namespace Blink
 	private:
 		void run_command(const string& command)
 		{
+			//match command with existing ones and run it
+			//else say command doesn't exist
 			if (commands.find(command) == commands.end())
 			{
 				cout << "command " <<'`'+ command+'`' << " doesn't exist!" << endl;
