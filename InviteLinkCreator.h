@@ -13,7 +13,6 @@
 #include"json.hpp"
 #include"sql/Functools.hpp"
 #include"BitProcessor.h"
-#include"gzip.h"
 
 namespace Blink
 {
