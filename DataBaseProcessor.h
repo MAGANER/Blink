@@ -10,7 +10,6 @@
 #include<vector>
 #include<tuple>
 #include"Interface.h"
-#include"RoomNetworkMode.h"
 #include"RoomClient.hpp"
 using namespace std;
 namespace Blink

@@ -1,6 +1,5 @@
 #pragma once
 #include<string>
-#include"RoomNetworkMode.h"
 namespace Blink
 {
     struct ConnectionData

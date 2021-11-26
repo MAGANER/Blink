@@ -1,3 +1,9 @@
+/*
+	This class reads common config from data directory.
+	This .json file contains data about style.
+	Also about console or window mode.
+*/
+
 #ifndef CONFIG_LOADER
 #define CONFIG_LOADER
 #include"json.hpp"

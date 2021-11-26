@@ -12,6 +12,12 @@ Encryption::AES::key_iv Encryption::AES::get_random_key()
 	
 	return make_pair(key, iv);
 }
+
+/////////////////
+///**************
+//these 2 functions were taken from my old project
+//so i think it's better to keep it as is,
+//but they could be better
 string Encryption::AES::convert_bytes(const SecByteBlock& bytes)
 {
 	string curr = (const char*)bytes.data();
@@ -42,6 +48,8 @@ CryptoPP::SecByteBlock Encryption::AES::convert_to_bytes(const string& key)
 	SecByteBlock _key(reinterpret_cast<CryptoPP::byte*>(&bytes[0]), CryptoPP::AES::DEFAULT_KEYLENGTH);
 	return _key;
 }
+///**************
+/////////////////
 CryptoPP::SecByteBlock Encryption::AES::_convert_to_bytes(const string& key)
 {
 	string bytes;

@@ -1,3 +1,8 @@
+/*
+	Little module. It contains only 2 functions to split strings.
+	To split simply without clearing, and to split and save only printable characters.
+*/
+
 #pragma once
 #include<iostream>
 #include<string>
@@ -13,6 +18,7 @@ namespace
 	{
 		vector<string> split(const string& s, char delim)
 		{
+			//function with shit clearing
 			std::stringstream ss(s);
 			std::string item;
 			std::vector<std::string> elems;
@@ -27,6 +33,7 @@ namespace
 				return true;
 			};
 
+			//save only printable characters
 			function<bool(char)> filter_elem_pd = [&](char ch) { return isprint(ch)>0; };
 			function<string(string)> filter_str = [&](const string& str)
 			{
@@ -36,6 +43,7 @@ namespace
 		}
 		vector<string> simple_split(const string& s, char delim)
 		{
+			//function without shit clearing
 			std::stringstream ss(s);
 			std::string item;
 			std::vector<std::string> elems;

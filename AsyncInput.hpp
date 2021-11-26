@@ -10,6 +10,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include<vector>
+#include<iostream>
 #include"sql/Functools.hpp"
 #include"SFML/Window/Keyboard.hpp"
 using namespace std;
