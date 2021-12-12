@@ -34,11 +34,16 @@ public:
 			gui->removeAllWidgets();
 
 			auto user_name = EditBox::create();
-			user_name->setSize({ "60.00%", "10.0%" });
-			user_name->setPosition({ "16.67%", "16.67%" });
+			user_name->setSize({ "60.00%", "6.0%" });
+			user_name->setPosition({ "16.67%", "26.67%" });
 			user_name->setDefaultText("Username");
 			user_name->setAlignment(EditBox::Alignment((int)loader.get_text_align() - 1));
 			user_name->setMaximumCharacters(Blink::MAX_NAME_LEN);
+			user_name->getSharedRenderer()->setBackgroundColor(loader.get_input_field_background_color());
+			user_name->getSharedRenderer()->setBackgroundColorHover(loader.get_input_field_hover_color());
+			user_name->getSharedRenderer()->setTextColor(loader.get_input_field_text_color());
+			user_name->getSharedRenderer()->setSelectedTextBackgroundColor(loader.get_selection_color());
+			user_name->getSharedRenderer()->setSelectedTextColor(loader.get_selected_text_color());
 			name_ptr = user_name;
 			gui->add(user_name);
 
@@ -52,27 +57,29 @@ public:
 			gui->add(password);
 
 			auto label = tgui::Label::create("Who you are?");
-			label->setPosition({ "16.67%","10.00%" });
+			label->setPosition({ "16.67%","20.00%" });
 			label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 			gui->add(label);
 
 			auto result_label = tgui::Label::create("");
-			result_label->setPosition({ "16.67%","60.00%" });
+			result_label->setPosition({ "16.67%","54.00%" });
 			result_label->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 			gui->add(result_label);
 
 			auto login_button = tgui::Button::create("Login");
-			login_button->setSize({ "26%", "10.0%" });
-			login_button->setPosition({ "16.7%", "50%" });
+			login_button->setSize({ "26%", "7.0%" });
+			login_button->setPosition({ "16.7%", "45%" });
+			login_button->getSharedRenderer()->setBackgroundColor(loader.get_input_field_background_color());
+			login_button->getSharedRenderer()->setBackgroundColorHover(loader.get_input_field_hover_color());
 			login_button->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
 			gui->add(login_button);
 
 
 			//set_text doesn't  work, so repeat all code about for New button
 			auto new_button = tgui::Button::create("New");
-			new_button->setSize({ "26%", "10.0%" });
+			new_button->setSize({ "26%", "7.0%" });
 			new_button->getSharedRenderer()->setTextColor(loader.get_enter_menu_label_color());
-			new_button->setPosition({ "50.5%","50%" });
+			new_button->setPosition({ "50.5%","45%" });
 			gui->add(new_button);
 
 
@@ -136,6 +143,10 @@ private:
 			password_ptr->setText("");
 			DataBaseProcessor::create_new_user(name, _password);
 			result->setText(":user is created!");
+			//login because user is created successfully
+			_can_login = true;
+			should_break = true;
+			menu_to_run = CurrentMenu::MainMenu;
 		}
 		else
 		{
