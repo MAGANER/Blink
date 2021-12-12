@@ -31,12 +31,17 @@ std::string Blink::create_invite_link(const string& ip,
 
 	return link.dump();
 }
+
+/*
+	name is used like key to create unique link
+	also to make key better it must be hashed
+*/
 std::string Blink::encrypt_invite_link(const string& link, const string& recepient_name)
 {
 	namespace e = encr::AES;
 	
-	auto key = e::_convert_to_bytes(encr::SHA::sha256("test"));
-	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(4)));
+	auto key = e::_convert_to_bytes(encr::SHA::sha256(recepient_name));
+	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(recepient_name.size())));
 	auto key_iv = make_pair(key, iv);
 	auto cipher = e::encrypt(key_iv, link);
 
@@ -46,8 +51,8 @@ string Blink::decrypt_invite_link(const string& link, const string& my_name)
 {
 	namespace e = encr::AES;
 
-	auto key = e::_convert_to_bytes(encr::SHA::sha256("test"));
-	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(4)));
+	auto key = e::_convert_to_bytes(encr::SHA::sha256(my_name));
+	auto iv = e::_convert_to_bytes(encr::SHA::sha256(to_string(my_name.size())));
 	auto key_iv = make_pair(key, iv);
 
 	auto decipher = e::decrypt(key_iv, link);
