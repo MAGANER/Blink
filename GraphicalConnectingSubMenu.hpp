@@ -19,7 +19,15 @@ private:
 	bool can_connect_flag = false;
 	bool back = false;
 
-	Label::Ptr result_label_ptr;
+
+	/*
+	   if this label was visible, so it stay the same
+	   after this menu isn't used anymore.
+	   Anyway, when this menu is active 
+	   label must be not visible
+	*/
+	bool no_rooms_label_ptr_was_visible = true;
+	Label::Ptr result_label_ptr, no_rooms_label_ptr;
 	EditBox::Ptr inv_link_ptr;
 	Button::Ptr conn_button_ptr;
 
@@ -36,12 +44,18 @@ public:
 		gui->remove(result_label_ptr);
 		gui->remove(inv_link_ptr);
 		gui->remove(conn_button_ptr);
+		if (no_rooms_label_ptr_was_visible)
+			no_rooms_label_ptr->setVisible(true);
 	}
 	void init_menu(GuiBase* gui, 
 				   Blink::ConfigLoader& loader,
 				   bool& init_chat,
-				   const string& user_name)
+				   const string& user_name,
+				   Label::Ptr no_rooms_label_ptr)
 	{
+		this->no_rooms_label_ptr = no_rooms_label_ptr;
+		no_rooms_label_ptr_was_visible = no_rooms_label_ptr->isVisible();
+		no_rooms_label_ptr->setVisible(false);
 		this->user_name = user_name;
 
 		auto inv_link = EditBox::create();
@@ -81,7 +95,6 @@ public:
 	void check_can_connect(bool& init_chat)
 	{
 		string path = inv_link_ptr->getText().toStdString();
-
 		if (ConnectionChecker::connect_with_filelink(conn_data, encr_data, path,user_name))
 		{
 			can_connect_flag = true;
