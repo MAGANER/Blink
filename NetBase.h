@@ -108,7 +108,7 @@ private:
 	bool can_show = true;
 
 	string user_name, room_name;
-public:
+protected:
 	command_hash commands;
 
 	NetBase(const command_hash& commands,
@@ -319,20 +319,6 @@ public:
 					received_info = new Received_decentralysed_info(room_name, room_password, clients);
 					return "";
 				}
-				if (type_to_int(parsed) == (int)MessageType::RoomName)
-				{
-					received_room_name = true;
-					string name = parsed["data"];
-					name = fp::slice(name, 0, name.size());
-					auto plus_pos = name.find('+');
-					string corr_name = fp::slice(name, 0, plus_pos);
-					string corr_pass = fp::slice(name, plus_pos+1, name.size());
-					correct_room_name = new string(corr_name);
-					correct_password  = new string(corr_pass);
-
-					room_name = *correct_room_name;
-					return "";
-				}
 				if(type_to_int(parsed) == (int)MessageType::Text)
 				{
 					add_message(room_name, parsed["name"], parsed["data"]);
@@ -370,8 +356,6 @@ public:
 	{
 		dollar_printed = false;
 	}
-
-	string get_user_name() { return user_name; }
 public:
 	bool should_disconnect() { return disconnect; }
 };
