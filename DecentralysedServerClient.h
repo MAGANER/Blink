@@ -8,19 +8,19 @@
 namespace Blink
 {
 
-
-struct LinkData
-{
-	LinkData(int port, const string& password, const string& room_name)
+	struct LinkData
 	{
-		this->port = port;
-		this->password = password;
-		this->room_name = room_name;
-	}
-	~LinkData(){}
-	int port;
-	string password, room_name;
-};
+		LinkData(int port, const string& password, const string& room_name)
+		{
+			this->port = port;
+			this->password = password;
+			this->room_name = room_name;
+		}
+		~LinkData() {}
+		int port;
+		string password, room_name;
+	};
+
 class DecentralysedServerClient:public Server
 {
 protected:
@@ -28,22 +28,20 @@ protected:
 	string conn_port, conn_ip;
 	bool connecting = false;
 	bool connect_to_saved_clients = false;
+	bool starting_room = false;
 
-	TcpSocket socket;
+	TcpSocket* socket = nullptr;
 
 	list<RoomClient*> clients;
 
 	typedef pair<IpAddress, int> ip_port;
 	vector<ip_port> offline_clients;
 
-	//TODO::unite these vectors into vector of pairs
 	vector<IpAddress> allowed;
-	vector<int> allowed_ports;
 
 	int client_counter = 0;
 
 	Clock timer;
-
 	TcpSocket* entering_socket = new TcpSocket;
 public:
 	DecentralysedServerClient(command_hash& commands,
@@ -59,8 +57,8 @@ public:
 						      const NetBaseData& data,
 							  const string& link_creator_data,
 							  bool starting_room,
-							  bool save_link,
 							  const string& recepient_name,
+							  bool save_link,
 							  bool inherited = false);
 	virtual ~DecentralysedServerClient();
 
@@ -71,12 +69,6 @@ public:
 	void set_ip_and_port_to_connect(const string& ip, const string& port);
 	void is_connecting(bool flag);
 	void set_key_iv(const encr::AES::key_iv& key_iv);
-
-	LinkData* get_link_data()
-	{
-		LinkData* data = new LinkData(port, password, room_name);
-		return data;
-	}
 protected:
 	void connnect_finally();
 	void process_received_clients_info();
@@ -88,12 +80,11 @@ protected:
 	void send_clients_info(list<RoomClient*>& clients,
 						   TcpSocket* socket);
 
-	int get_random_port();
 	void connect_to_known_clients();
 
 	void check_offline_clients();
-
-	bool is_port_allowed(vector<int>& ports, int port);
+private:
+	void load_allowed_long_known_clients();
 };
 };
 

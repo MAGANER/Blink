@@ -8,13 +8,10 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 	bool starting_room,
 	bool inherited) :Server(commands,password,data,inherited)
 {
-	//console mode
-
 	while (true)
 	{
 		if (connecting_with_conflink_command)
 		{
-			port = get_random_port();
 			_cant_connect = false;
 			break;
 		}
@@ -30,9 +27,7 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 			if (!does_conn_info_exist(data.room_name))
 				create_room_connections_info(data.room_name);
 
-			port = get_room_port(data.room_name, data.db_key, data.db_name);
-			save_own_port(data.room_name, port);
-			create_invite_link(port, data.room_name, password,true);
+			create_invite_link(PORT, data.room_name, password,true);
 			
 			auto key = encr::AES::convert_bytes(key_iv.first);
 			auto iv = encr::AES::convert_bytes(key_iv.second);
@@ -42,12 +37,6 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 		}
 		else if (mode == "2")
 		{
-			//use the same port as it was used at first session
-			port = get_own_port(data.room_name);
-			if (port == -1 && !connecting_with_conflink_command)
-				_cant_connect = true;
-
-
 			//keys are still the same
 			auto key_iv_val = get_key_iv(data.room_name);
 			key_iv.first  = encr::AES::convert_to_bytes(key_iv_val.first);
@@ -78,26 +67,22 @@ DecentralysedServerClient(command_hash& commands,
 						  const NetBaseData& data,
 						  const string& link_creator_data,
 						  bool starting_room,
-						  bool save_link,
 						  const string& recepient_name,
+						  bool save_link,
 						  bool inherited) :Server(commands, password, data, inherited)
 {
-	//graphical mode
+	this->starting_room = starting_room;
 
 	string mode = starting_room ? "1" : "2";
-
 	if (mode == "1")
 	{
 		if (!does_conn_info_exist(data.room_name))
 			create_room_connections_info(data.room_name);
 
-		port = get_room_port(data.room_name, data.db_key, data.db_name);
-		save_own_port(data.room_name, port);
-
 		if (save_link)
-			create_invite_link_to_save(port, data.room_name, password, true, link_creator_data,recepient_name);
+			create_invite_link_to_save(PORT, data.room_name, password, true, link_creator_data, recepient_name);
 		else
-			create_invite_link_to_send(port, data.room_name, password, true, link_creator_data,recepient_name);
+			create_invite_link_to_send(PORT, data.room_name, password, true, link_creator_data,recepient_name);
 
 		auto key = encr::AES::convert_bytes(key_iv.first);
 		auto iv = encr::AES::convert_bytes(key_iv.second);
@@ -105,12 +90,6 @@ DecentralysedServerClient(command_hash& commands,
 	}
 	else if (mode == "2")
 	{
-		//use the same port as it was used at first session
-		port = get_own_port(data.room_name);
-		if (port == -1)
-			_cant_connect = true;
-
-
 		//keys are still the same
 		auto key_iv_val = get_key_iv(data.room_name);
 		key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
@@ -123,29 +102,33 @@ DecentralysedServerClient(command_hash& commands,
 			offline_clients.push_back(client);
 		}
 
-
-		connect_to_saved_clients = true;
+		connect_to_saved_clients = !get_connections_info(room_name).empty();
 		_cant_connect = false;
 	}
 }
 DecentralysedServerClient::~DecentralysedServerClient()
 {
-	if (entering_socket != nullptr) delete entering_socket;
+	if (socket != nullptr)delete socket;
 }
 
 void DecentralysedServerClient::prepare()
 {
+	load_allowed_long_known_clients();
+
 	listener.setBlocking(false);
-	listener.listen(port);
+	listener.listen(PORT);
 
-
-	connnect_finally();
 
 	if (connect_to_saved_clients)
 	{
 		connect_to_known_clients();
 		connect_to_saved_clients = false;
 	}
+	else
+	{
+		if(!starting_room)connnect_finally();
+	}
+	
 }
 bool DecentralysedServerClient::run_in_console()
 {
@@ -160,19 +143,13 @@ bool DecentralysedServerClient::run_in_console()
 			{
 				return is_addres_allowed(addresses, entering_socket->getRemoteAddress());
 			};
-			auto check2 = [&](vector<int>& ports)
-			{
-				return is_port_allowed(ports, entering_socket->getLocalPort());
-			};
 
 			if (check1(allowed) &&
-				check2(allowed_ports) &&
-				true &&
 				can_accept_new_connection(client_counter))
 			{
 				// send room name, because room name from file link is hashed
-				auto data = room_name + "+" + password;
-				send_message(*entering_socket, data, MessageType::RoomName);
+				//auto data = room_name + "+" + password;
+				//send_message(*entering_socket, data, MessageType::RoomName);
 
 				//retrieve port, cos it's needed to create clients' info
 				int listner_port = -1;
@@ -201,7 +178,7 @@ bool DecentralysedServerClient::run_in_console()
 			}
 			else
 			{
-				check_access(*entering_socket, allowed,allowed_ports);
+				check_access(*entering_socket, allowed);
 			}
 		}
 
@@ -265,13 +242,12 @@ void DecentralysedServerClient::make_client(list<RoomClient*>& clients,
 	client_counter++;
 
 	auto ip_port = make_pair(client->socket->getRemoteAddress().toString(),
-							 to_string(listner_port));
+							 to_string(PORT));
 
 	//save only if it's not saved and port is correct value
 	bool are_saved = !are_ip_port_saved(ip_port, room_name);
-	bool is_port_correct = listner_port != -1 && listner_port != 0;
 	bool is_ip_ok = client->socket->getRemoteAddress().toInteger() != 0;
-	if (are_saved && is_port_correct && is_ip_ok)
+	if (are_saved &&  is_ip_ok)
 	{
 		add_connection_info(room_name, ip_port);
 	}
@@ -284,104 +260,21 @@ void DecentralysedServerClient::send_clients_info(list<RoomClient*>& clients,
 	send_jmessage(*socket, message);
 	socket->setBlocking(false);
 }
-int DecentralysedServerClient::get_random_port()
-{
-	random_device rd;   
-	mt19937 gen(rd());  
-	uniform_int_distribution<> dist(1, 9);
-						
-	string port;
-	for (int i = 0; i < 5; ++i) 
-	{
-		port += to_string(dist(gen));
-	}
-	return atoi(port.c_str());
-}
 void DecentralysedServerClient::connect_to_known_clients()
 {
-	auto info = get_connections_info(room_name);
-	if (info.empty())
+	for (auto& ip : allowed)
 	{
-		return;
-		//because there is no one
-	}
-
-	//just to erase duplicated stuff
-	set<friendly_connection> conn(info.begin(), info.end());
-	info.assign(conn.begin(), conn.end());
-
-
-	for (auto& client_data : info)
-	{
-
-		auto s = socket.connect(IpAddress(get<1>(client_data)), get<2>(client_data));
-
-		auto message = convert_message_to_json("fuck", "fuck", MessageType::ComeInAsFriend);
-		Packet p;
-		p << message;
-		socket.send(p);
-
-		//anyway you always get access 
-		auto echo = get_raw_message(socket);
-		//delete socket;
-		if (echo == "1")
+		socket = new TcpSocket();
+		
+		auto conn_result = socket->connect(ip, PORT);
+		if (conn_result == TcpSocket::Done)
 		{
-			auto s = socket.connect(IpAddress(get<1>(client_data)), get<2>(client_data));
-			Packet pack;
-			pack << "motherfucker";
-			socket.send(pack);
-
-
-			make_client(clients, client_counter, &socket, get<2>(client_data));
+			password = get_raw_message(*socket);
+			Packet p; p << "motherfucker";
+			socket->send(p);
+		
+			make_client(clients, client_counter, socket, PORT);
 		}
-	
-	}
-}
-bool DecentralysedServerClient::is_port_allowed(vector<int>& ports, int port)
-{
-	auto is_inside = find(ports.begin(), ports.end(), port) != ports.end();
-	return is_inside;
-}
-void DecentralysedServerClient::connnect_finally()
-{
-	//connect again if you are not "holder"
-	if (connecting && !connect_to_saved_clients)
-	{
-		auto address = IpAddress(conn_ip.c_str());
-		auto port = atoi(conn_port.c_str());
-		socket.connect(address, port);
-
-		auto nothing = get_message(socket);
-		//update correct room name
-		if (received_room_name)
-		{
-			room_name = *correct_room_name;
-			password = *correct_password;
-			received_room_name = false;
-			delete correct_room_name;
-			delete correct_password;
-
-			save_own_port(room_name, this->port);
-
-			//create it at connected side
-			if (!does_conn_info_exist(room_name))
-			{
-				create_room_connections_info(room_name);
-			}
-
-			//save it if it's not saved
-			auto key = encr::AES::convert_bytes(key_iv.first);
-			auto iv = encr::AES::convert_bytes(key_iv.second);
-			save_room_key(room_name, make_pair(key, iv));
-		}
-
-		//send your listner port
-		Packet pack;
-		pack << to_string(this->port);
-		socket.send(pack);
-
-		//save connected as client
-		make_client(clients, client_counter, &socket, port);
 	}
 }
 void DecentralysedServerClient::process_received_clients_info()
@@ -394,17 +287,17 @@ void DecentralysedServerClient::process_received_clients_info()
 		ConnectionData conn_data;
 		//should hash data, cos the same data is hashed in links
 		conn_data.password = encr::SHA::sha256(received_info->room_password);
-		conn_data.room = encr::SHA::sha256(received_info->room_name);
+		conn_data.room = received_info->room_name;
 		for (auto& client : received_info->clients)
 		{
 			conn_data.ip = client.first.toString();
-			conn_data.port = to_string(client.second);
+			conn_data.port = to_string(PORT);
 
 			if (ConnectionChecker::can_connect(conn_data))
 			{
 				TcpSocket* socket = new TcpSocket;
 				socket->setBlocking(false);
-				socket->connect(client.first, client.second);
+				socket->connect(client.first, PORT);
 
 				//send the key word to say
 				//don't resend client info
@@ -412,12 +305,10 @@ void DecentralysedServerClient::process_received_clients_info()
 				pack << "motherfucker";
 				socket->send(pack);
 
-				int listner_port = atoi(conn_data.port.c_str());
-				make_client(clients, client_counter, socket, listner_port);
+				make_client(clients, client_counter, socket, PORT);
 			}
 			else
 			{
-				cout << "save  offline client!" << endl;
 				//save offline client
 				offline_clients.push_back(client);
 			}
@@ -425,10 +316,9 @@ void DecentralysedServerClient::process_received_clients_info()
 		//create room
 		if (!does_room_exists(received_info->room_name))
 		{
-			cout << received_info->room_password << endl;
 			create_new_room(received_info->room_name,
 							received_info->room_password,
-							to_string(port));
+							to_string(PORT));
 		}
 
 		received_clients_info = false;
@@ -441,7 +331,7 @@ void DecentralysedServerClient::check_offline_clients()
 	ConnectionData conn_data;
 	//should hash data, cos the same data is hashed in links
 	conn_data.password = encr::SHA::sha256(password);
-	conn_data.room = encr::SHA::sha256(room_name);
+	conn_data.room =room_name;
 	for (size_t i = 0;i<offline_clients.size();++i)
 	{
 		auto& client = offline_clients[i];
@@ -460,11 +350,48 @@ void DecentralysedServerClient::check_offline_clients()
 			pack << "motherfucker";
 			socket->send(pack);
 
-			int listner_port = atoi(conn_data.port.c_str());
-			make_client(clients, client_counter, socket, listner_port);
+			make_client(clients, client_counter, socket, PORT);
 			offline_clients.erase(offline_clients.begin() + i);
 			//also erase them from DB
-			erase_offline_client(room_name, client.first.toString(), listner_port);
+			erase_offline_client(room_name, client.first.toString(), PORT);
 		}
+	}
+}
+void DecentralysedServerClient::connnect_finally()
+{
+	//connect again if you are not "holder"
+	if (connecting && !connect_to_saved_clients)
+	{
+		auto address = IpAddress(conn_ip.c_str());
+		socket = new TcpSocket();
+
+		if (socket->connect(address, PORT) == TcpSocket::Done)
+		{	
+			password = get_raw_message(*socket);
+
+			///shit comment:send your listner port
+			Packet pack;
+			pack << "motherfucker";
+			socket->send(pack);
+
+			if (!does_room_exists(room_name))
+			{
+				create_new_room(room_name, password, to_string(PORT));
+				create_room_connections_info(room_name);
+			}
+
+			//save connected as client
+			make_client(clients, client_counter, socket, PORT);
+		}
+	}
+}
+void DecentralysedServerClient::load_allowed_long_known_clients()
+{
+	auto info = get_connections_info(room_name);
+	for (auto& elem : info)
+	{
+		auto ip_str = get<1>(elem);
+		IpAddress ip(ip_str);
+		if(ip.toInteger() != 0)allowed.push_back(ip);
 	}
 }
