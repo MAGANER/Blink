@@ -5,6 +5,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 #define _s(str) string(str)
+#define PORT 8189
 #include<string>
 #include<iostream>
 #include<fstream>
@@ -25,7 +26,7 @@ namespace Blink
 	protected:
 		TcpListener listener;
 		string password, room_name;
-		int port;
+		//int port;
 	public:
 		Server(command_hash& commands,
 			   const string& password,
@@ -46,6 +47,8 @@ namespace Blink
 			bool decentralysed,
 			const string& additional_data,
 			const string& recepient_name);
+
+		void set_room_name(const string& name) { room_name = name; }
 	private:
 
 		string get_invite_link_str(int port,
@@ -61,12 +64,7 @@ namespace Blink
 							bool decentralysed);
 
 	bool is_addres_allowed(vector<IpAddress>& allowed, const IpAddress& ip);
-
-
 	void check_access(TcpSocket& socket,vector<IpAddress>& allowed);
-	void check_access(TcpSocket& socket, 
-					  vector<IpAddress>& allowed,
-					  vector<int>& port);
 
 	void update_clients(list<RoomClient*>& clients);
 	};

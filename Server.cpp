@@ -12,7 +12,7 @@ Server::Server(command_hash& commands,
 	this->commands["makelink"] = function<void()>([&]()
 		{
 			//if inherited, than decentralysed
-			create_invite_link(port, data.room_name, password, inherited);
+			create_invite_link(PORT, data.room_name, password, inherited);
 		});
 
 	if(!inherited)key_iv = encr::AES::get_random_key();
@@ -160,39 +160,13 @@ void Server::check_access(TcpSocket& socket, vector<IpAddress>& allowed)
 	string check = get_raw_message(socket);
 	Packet p;
 	string _password = password.size()!= 64? encr::SHA::sha256(password):password;
-	string _room_name= room_name.size()!=64? encr::SHA::sha256(room_name):room_name;
+	string _room_name= room_name;
 	if (ConnectionChecker::can_come_in(check, _password,_room_name))
 	{
 		auto address = socket.getRemoteAddress();
 		if (address != IpAddress::None)
 			allowed.push_back(address);
 		
-		p << "1";
-		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
-	}
-	else
-	{
-		p << "0";
-		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
-	}
-}
-void Server::check_access(TcpSocket& socket,
-						  vector<IpAddress>& allowed,
-						  vector<int>& port)
-{
-	string check = get_raw_message(socket);
-	string _password = password.size() != 64 ? encr::SHA::sha256(password) : password;
-	string _room_name = room_name.size() != 64 ? encr::SHA::sha256(room_name) : room_name;
-
-	Packet p;
-	if (ConnectionChecker::can_come_in(check, _password, _room_name))
-	{
-		auto address = socket.getRemoteAddress();
-		if (address != IpAddress::None)
-		{
-			allowed.push_back(address);
-			port.push_back(socket.getLocalPort());
-		}
 		p << "1";
 		if (socket.send(p) == TcpSocket::Done) socket.disconnect();
 	}
