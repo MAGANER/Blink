@@ -41,9 +41,10 @@
 
 //These variables make easy to work
 //don't touch em!
+bool shit = false;//ugly bugfix
 static bool currently_fullscreen = false;
 static sf::Vector2u win_size(720,640);//default value
-static string user_name; //should be passed to MainMenu
+static string user_name, _key, _db_name; //should be passed to MainMenu
 
 void run_graphical_mode(Blink::ConfigLoader& loader);
 void run_console_mode();
@@ -85,31 +86,32 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-GraphicalBlink::BaseGraphicalMenu::CurrentMenu 
+GraphicalBlink::BaseGraphicalMenu::CurrentMenu
 run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
-		 string& key,
-		 string& db_name,
-		 Blink::ConfigLoader& loader,
-		 bool fullscreen)
+	string& key,
+	string& db_name,
+	Blink::ConfigLoader& loader,
+	bool fullscreen)
 {
 	using namespace GraphicalBlink;
 	if (val == BaseGraphicalMenu::CurrentMenu::EnterMenu)
 	{
-		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen,key, db_name,win_size);
+		GraphicalEnterMenu* enter_menu = new GraphicalEnterMenu(fullscreen, key, db_name, win_size);
 		enter_menu->create(loader);
 		enter_menu->prepare_menu(loader);
 
-		auto change = process_menu_running(enter_menu, fullscreen,loader);
+		auto change = process_menu_running(enter_menu, fullscreen, loader);
 
-		key = enter_menu->get_user_password();
-		db_name = enter_menu->get_db_name();
+		_key = enter_menu->get_user_password();
+		_db_name = enter_menu->get_db_name();
 		user_name = enter_menu->get_user_name();
-		if(enter_menu != nullptr)delete enter_menu;
+		if (enter_menu != nullptr)delete enter_menu;
+
 		return change;
 	}
 	if (val == BaseGraphicalMenu::CurrentMenu::MainMenu)
 	{
-		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen,key, db_name, win_size,user_name);
+		GraphicalMainMenu* main_menu = new GraphicalMainMenu(fullscreen, _key, _db_name, win_size, user_name);
 		main_menu->create(loader);
 		if (currently_fullscreen)
 		{
@@ -120,7 +122,7 @@ run_menu(GraphicalBlink::BaseGraphicalMenu::CurrentMenu val,
 
 		auto change = process_menu_running(main_menu, fullscreen, loader);
 
-		if(main_menu != nullptr)delete main_menu;
+		if (main_menu != nullptr)delete main_menu;
 
 		return change;
 	}
@@ -153,8 +155,9 @@ process_menu_running(GraphicalBlink::BaseGraphicalMenu* menu,
 	{
 		change = menu->run(fullscreen,win_size);
 		process_fullscreen(menu, change,loader);
-		if (menu->is_end()) return change;
-	
+
+		if (menu->is_end())
+			return change;	
 	}
 }
 void run_graphical_mode(Blink::ConfigLoader& loader)
