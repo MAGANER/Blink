@@ -41,8 +41,8 @@ public:
 								  data,
 			link_creator_data,
 			starting_room,
-			save_link,
 			recepient_name,
+			save_link,
 			inherited)
 	{
 
@@ -62,6 +62,12 @@ public:
 	bool has_message_to_show();
 	message_store* get_message_to_show();
 	void exit() { disconnect = true; }
+
+	LinkData* get_link_data()
+	{
+		LinkData* data = new LinkData(PORT, password, room_name);
+		return data;
+	}
 
 	void save_offline_clients();
 

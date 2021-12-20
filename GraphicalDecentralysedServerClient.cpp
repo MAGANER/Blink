@@ -3,63 +3,42 @@ using namespace Blink;
 
 void GraphicalDecentralysedServerClient::run_in_window()
 {
-	//receive_input_and_send_message_to_all(clients);
 	if (should_send)
 	{
 		send_text_to_all(text_to_send);
 		text_to_send.clear();
 		should_send = false;
 	}
-
 	bool should_resend_clients_info = true;
 	if (listener.accept(*entering_socket) == sf::Socket::Done)
 	{
-		auto check1 = [&](vector<IpAddress>& addresses)
+		auto check_addres = [&](vector<IpAddress>& addresses)
 		{
 			return is_addres_allowed(addresses, entering_socket->getRemoteAddress());
 		};
-		auto check2 = [&](vector<int>& ports)
-		{
-			return is_port_allowed(ports, entering_socket->getLocalPort());
-		};
 
-		if (check1(allowed) &&
-			check2(allowed_ports) &&
-			true &&
+		if (check_addres(allowed) &&
 			can_accept_new_connection(client_counter))
 		{
-			// send room name, because room name from file link is hashed
-			auto data = room_name + "+" + password;
-			send_message(*entering_socket, data, MessageType::RoomName);
+			//send password because it was hashed
+			Packet pack;
+			pack << password;
+			entering_socket->send(pack);
 
-			//retrieve port, cos it's needed to create clients' info
-			int listner_port = -1;
 			string some_shit = get_raw_message(*entering_socket);
 			if (some_shit == "motherfucker") should_resend_clients_info = false;
-			else listner_port = atoi(some_shit.c_str());
 
 			//don't resend if you connect to user
 			//who already was connected to another one
 			if (should_resend_clients_info)
 				send_clients_info(clients, entering_socket);
 
-			make_client(clients, client_counter, entering_socket, listner_port);
-
-
-			//clear it, because there is no need to keep this data anymore
-			for (size_t i = 0; i < allowed.size(); i++)
-			{
-				auto curr = allowed[i];
-				if (curr.toString() == entering_socket->getRemoteAddress().toString())
-				{
-					allowed.erase(allowed.begin() + i);
-				}
-			}
+			make_client(clients, client_counter, entering_socket, PORT);
 			entering_socket = new TcpSocket();
 		}
 		else
 		{
-			check_access(*entering_socket, allowed, allowed_ports);
+			check_access(*entering_socket, allowed);
 		}
 	}
 
@@ -84,7 +63,7 @@ void GraphicalDecentralysedServerClient::run_in_window()
 		//clients
 		save_offline_clients();
 		listener.close();
-		socket.disconnect();
+		socket->disconnect();
 		
 		return;
 	}
@@ -93,7 +72,7 @@ void GraphicalDecentralysedServerClient::save_offline_clients()
 {
 	for (auto& client : offline_clients)
 	{
-		add_offline_client(room_name, client.first.toString(), client.second);
+		add_offline_client(room_name, client.first.toString(), PORT);
 	}
 }
 void GraphicalDecentralysedServerClient::send_text_to_all(const string& text)
