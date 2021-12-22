@@ -86,6 +86,8 @@ DecentralysedServerClient(command_hash& commands,
 
 		auto key = encr::AES::convert_bytes(key_iv.first);
 		auto iv = encr::AES::convert_bytes(key_iv.second);
+		cout << "key:" << encr::AES::convert_to_bytes(key) << endl;
+		cout << "iv:" << encr::AES::convert_to_bytes(iv) << endl;
 		save_room_key(data.room_name, make_pair(key, iv));
 	}
 	else if (mode == "2")
@@ -94,7 +96,8 @@ DecentralysedServerClient(command_hash& commands,
 		auto key_iv_val = get_key_iv(data.room_name);
 		key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
 		key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
-
+		cout << "got key:" << key_iv.first << endl;
+		cout << "got iv:" << key_iv.second << endl;
 		//get offline clients
 		auto saved_offline_clients = get_offline_clients(data.room_name);
 		for (auto& client : saved_offline_clients)
@@ -265,8 +268,9 @@ void DecentralysedServerClient::connect_to_known_clients()
 	for (auto& ip : allowed)
 	{
 		socket = new TcpSocket();
-		
-		auto conn_result = socket->connect(ip, PORT);
+
+		auto timeout = sf::seconds(2.0f);
+		auto conn_result = socket->connect(ip, PORT,timeout);
 		if (conn_result == TcpSocket::Done)
 		{
 			password = get_raw_message(*socket);
@@ -274,6 +278,10 @@ void DecentralysedServerClient::connect_to_known_clients()
 			socket->send(p);
 		
 			make_client(clients, client_counter, socket, PORT);
+		}
+		else
+		{
+			cout << "can not connect again. SFML code:" << conn_result << endl;
 		}
 	}
 }
@@ -380,6 +388,7 @@ void DecentralysedServerClient::connnect_finally()
 				create_room_connections_info(room_name);
 			}
 
+			allowed.push_back(address);
 			//save connected as client
 			make_client(clients, client_counter, socket, PORT);
 		}
