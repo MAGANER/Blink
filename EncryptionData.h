@@ -12,8 +12,8 @@ namespace Blink
         EncryptionData(const string& key,
             const string& iv)
         {
-            data = make_pair(encr::AES::convert_to_bytes(key),
-                             encr::AES::convert_to_bytes(iv));
+            data = make_pair(encr::AES::_convert_to_bytes(key),
+                             encr::AES::_convert_to_bytes(iv));
         }
         ~EncryptionData() {}
         encr::AES::key_iv data;

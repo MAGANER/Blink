@@ -39,8 +39,8 @@ DecentralysedServerClient::DecentralysedServerClient(command_hash& commands,
 		{
 			//keys are still the same
 			auto key_iv_val = get_key_iv(data.room_name);
-			key_iv.first  = encr::AES::convert_to_bytes(key_iv_val.first);
-			key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
+			key_iv.first  = encr::AES::_convert_to_bytes(key_iv_val.first);
+			key_iv.second = encr::AES::_convert_to_bytes(key_iv_val.second);
 
 			//get offline clients
 			auto saved_offline_clients = get_offline_clients(data.room_name);
@@ -92,7 +92,7 @@ DecentralysedServerClient(command_hash& commands,
 	{
 		//keys are still the same
 		auto key_iv_val = get_key_iv(data.room_name);
-		key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
+		key_iv.first = encr::AES::_convert_to_bytes(key_iv_val.first);
 		key_iv.second = encr::AES::_convert_to_bytes(key_iv_val.second);
 		//get offline clients
 		auto saved_offline_clients = get_offline_clients(data.room_name);

@@ -23,7 +23,7 @@ std::string Blink::create_invite_link(const string& ip,
 	link["port"] = port;
 	link["iv"]   = IV;
 	link["key"]  = KEY;
-	link["room"]     = Encryption::SHA::sha256(room);
+	link["room"]     = room;
 	link["password"] = Encryption::SHA::sha256(password);
 	link["decentralysed"] = (decentralysed ? "1" : "0");
 
