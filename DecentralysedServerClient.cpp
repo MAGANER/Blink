@@ -86,8 +86,6 @@ DecentralysedServerClient(command_hash& commands,
 
 		auto key = encr::AES::convert_bytes(key_iv.first);
 		auto iv = encr::AES::convert_bytes(key_iv.second);
-		cout << "key:" << encr::AES::convert_to_bytes(key) << endl;
-		cout << "iv:" << encr::AES::convert_to_bytes(iv) << endl;
 		save_room_key(data.room_name, make_pair(key, iv));
 	}
 	else if (mode == "2")
@@ -95,9 +93,7 @@ DecentralysedServerClient(command_hash& commands,
 		//keys are still the same
 		auto key_iv_val = get_key_iv(data.room_name);
 		key_iv.first = encr::AES::convert_to_bytes(key_iv_val.first);
-		key_iv.second = encr::AES::convert_to_bytes(key_iv_val.second);
-		cout << "got key:" << key_iv.first << endl;
-		cout << "got iv:" << key_iv.second << endl;
+		key_iv.second = encr::AES::_convert_to_bytes(key_iv_val.second);
 		//get offline clients
 		auto saved_offline_clients = get_offline_clients(data.room_name);
 		for (auto& client : saved_offline_clients)
