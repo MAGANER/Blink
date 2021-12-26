@@ -101,7 +101,6 @@ public:
 			login_button->onPress(login_lambda, user_name, password, result_label);
 
 		}
-	bool __can_login() { return _can_login; }
 	string get_user_name() { return name; }
 	string get_user_password() { return password; }
 private:
@@ -143,10 +142,10 @@ private:
 			password_ptr->setText("");
 			DataBaseProcessor::create_new_user(name, _password);
 			result->setText(":user is created!");
-			//login because user is created successfully
-			_can_login = true;
-			should_break = true;
-			menu_to_run = CurrentMenu::MainMenu;
+
+			this->name = name;
+			this->password = _password;
+			menu_to_return = CurrentMenu::MainMenu;
 		}
 		else
 		{
@@ -166,10 +165,9 @@ private:
 		{
 			this->name = name;
 			this->password = passw;
-			_can_login = true;
-			should_break = true;
-			menu_to_run = CurrentMenu::MainMenu;
 			result->setText("");
+
+			menu_to_return = CurrentMenu::MainMenu;
 		}
 		else
 		{
