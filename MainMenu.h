@@ -45,7 +45,6 @@ namespace Blink
             can_connect_to_room = false;
             can_start_room      = false;
             data.ip.clear();
-            data.port.clear();
             data.password.clear();
             data.room.clear();
         }

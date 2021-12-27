@@ -37,7 +37,7 @@ void MainMenu::create()
 
 	if (is_name_passw_correct(name, password))
 	{
-		if (!does_room_exists(name))create_new_room(name, password, port);
+		if (!does_room_exists(name))create_new_room(name, password);
 		else cout << "room" << " `" + name + "`" << " already exists!" << endl;
 	}
 	else
@@ -79,7 +79,6 @@ void MainMenu::init_room_data(const string& name, const string& password)
 {
 	data.room = name;
 	data.password = password;
-	data.port = to_string(get_room_port(name, get_encr_key(), get_db_name()));
 }
 void MainMenu::show_rooms()
 {
@@ -97,7 +96,6 @@ void MainMenu::show_rooms()
 		{
 			cout << "name:"     << get<0>(r)<<endl;
 			cout << "password:" << get<1>(r)<<endl;
-			cout << "port:"     << get<2>(r)<<endl;
 			cout << "----"<<endl;
 		}
 	}

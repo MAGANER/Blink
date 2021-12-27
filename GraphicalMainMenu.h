@@ -27,8 +27,7 @@ class GraphicalMainMenu :public DataBaseProcessor,
 						 public BaseGraphicalMenu
 {
 private:
-	vector<str3> rooms;
-
+	vector<str2> rooms;
 
 	bool no_rooms = true;
 	bool init_chat = false;
@@ -64,6 +63,7 @@ private:
 	string encr_key;
 
 	GraphicalDecentralysedServerClient* client = nullptr;
+	Server* server = nullptr;
 public:
 	GraphicalMainMenu(bool fullscreen,
 					  const string& encr_key,

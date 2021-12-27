@@ -248,8 +248,7 @@ void run_console_mode()
 
 				ConnectionData data = main_menu->get_connection_data();
 
-				room_menu->set_room_data(data.port,
-										 data.ip,
+				room_menu->set_room_data(data.ip,
 										 current_user_name,
 										 data.room,
 										 data.password);
@@ -265,8 +264,7 @@ void run_console_mode()
 
 				ConnectionData data = main_menu->get_connection_data();
 
-				room_menu->set_room_data(data.port,
-										 data.ip,
+				room_menu->set_room_data(data.ip,
 										 current_user_name,
 										 data.room,
 										 data.password);

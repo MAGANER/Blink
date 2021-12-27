@@ -16,7 +16,6 @@ void DataBaseProcessor::create_new_user(const string& name,
 
 		rooms["name"] = new sql::Text("");
 		rooms["password"] = new sql::Text("");
-		rooms["port"] = new sql::Text("");
 
 		chats["room_name"] = new sql::Text("");
 		chats["user_name"] = new sql::Text("");
@@ -87,7 +86,6 @@ void DataBaseProcessor::create_room_connections_info(const string& room_name)
 
 	conn_info["room_name"] = new sql::Text("");
 	conn_info["ip"] = new sql::Text("");
-	conn_info["port"] = new sql::Integer(0);
 	string req = sql::make_create_request(conn_info, "conn_data");
 	db.run_set_request(req);
 	conn_info["room_name"] = new sql::Text(room_name);
@@ -106,7 +104,7 @@ string DataBaseProcessor::replace(const string& str, char old, char _new)
 	return result;
 }
 void DataBaseProcessor::add_connection_info(const string& room_name,
-											const spair& ip_port)
+											const string& ip)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
@@ -118,18 +116,16 @@ void DataBaseProcessor::add_connection_info(const string& room_name,
 		table chunk;
 		chunk["room_name"] = new sql::Text(get<0>(data));
 		chunk["ip"] = new sql::Text(get<1>(data));
-		chunk["port"] = new sql::Integer(get<2>(data));
 		auto req = sql::make_insert_request(chunk, "conn_data");
 		db.run_set_request(req);
+		cout << "connection info:" << db.get_error_message() << endl;
 	};
 	for (auto& data : existing_data)
 	{
 		add(data);
 	}
 
-	auto new_one = make_tuple(room_name,
-							  ip_port.first,
-							  atoi(ip_port.second.c_str()));
+	auto new_one = make_tuple(room_name,ip);
 	add(new_one);
 }
 bool DataBaseProcessor::does_conn_info_exist(const string& room_name)
@@ -155,35 +151,31 @@ vector<friendly_connection> DataBaseProcessor::get_connections_info(const string
 	for (auto& chunk : result)
 	{
 		auto t = make_tuple(type_to_string(chunk["room_name"]), 
-							type_to_string(chunk["ip"]), 
-							atoi(type_to_string(chunk["port"]).c_str()));
+							type_to_string(chunk["ip"]));
 		info.push_back(t);
 	}
 	//return empty vector
 	return info;
 }
-bool DataBaseProcessor::are_ip_port_saved(const spair& ip_port,
-										  const string& room_name)
+bool DataBaseProcessor::is_ip_saved(const string& ip,
+								    const string& room_name)
 {
 	auto data = get_connections_info(room_name);
 	for (auto& chunk : data)
 	{
-		bool check1 = get<1>(chunk)			   == ip_port.first;
-		bool check2 = to_string(get<2>(chunk)) == ip_port.second;
-		if (check1 && check2)return true;
+		bool check2 = get<1>(chunk)			   == ip;
+		if (check2)return true;
 	}
 	return false;
 }
 void DataBaseProcessor::create_new_room(const string& name,
-										const string& password,
-										const string& port)
+										const string& password)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
 	table room;
 	room["name"]	 = new sql::Text(name);
 	room["password"] = new sql::Text(password);
-	room["port"]	 = new sql::Text(port);
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
@@ -191,11 +183,7 @@ void DataBaseProcessor::create_new_room(const string& name,
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
 	sql::DataBase db(db_name, encryption_key, false);
-	if (!db.is_password_correct())
-	{
-		cout << "password is incorrect!" << endl;
-		return false;
-	}
+
 
 	string req = sql::make_select_request("rooms");
 	auto result = db.run_get_request(req);
@@ -261,41 +249,9 @@ vector<message> DataBaseProcessor::get_messages(const string& room_name)
 
 	return messages;
 }
-int Blink::get_room_port(const string& room_name,
-						 const string& db_key,
-						 const string& db_name)
+vector<str2> DataBaseProcessor::get_rooms(const string& password)
 {
-	sql::DataBase db(db_name,db_key, false);
-
-	string req  = sql::make_select_request("rooms");
-	auto result = db.run_get_request(req);
-
-	//if you call this function, then room should exist
-	for (auto chunk : result)
-	{
-		if (sql::type_to_string(chunk["name"]) == room_name)
-		{
-			auto val = chunk["port"];
-
-			//sqlite3 has dynamic type casting
-			//so integer number can become Primary key
-			//and when room is created it can not get port as not number
-			if (val->type == sql::SQL_TYPES::PRIMARY_KEY)
-			{
-				auto result = static_cast<sql::PrimaryKey*>(val)->key;
-				return result;
-			}
-			else if (val->type == sql::SQL_TYPES::INTEGER)
-			{
-				auto result = static_cast<sql::Integer*>(val)->value;
-				return result;
-			}
-		}
-	}
-}
-vector<str3> DataBaseProcessor::get_rooms(const string& password)
-{
-	vector<str3> rooms;
+	vector<str2> rooms;
 
 	sql::DataBase db(db_name, encryption_key, false);
 	string req = sql::make_select_request("rooms");
@@ -317,9 +273,8 @@ vector<str3> DataBaseProcessor::get_rooms(const string& password)
 			}
 		};
 		
-		str3 room = { to_str(chunk["name"]),
-					  to_str(chunk["password"]),
-					  to_str(chunk["port"]) 
+		str2 room = { to_str(chunk["name"]),
+					  to_str(chunk["password"]) 
 					};
 		rooms.push_back(room);
 	}
@@ -379,42 +334,6 @@ spair DataBaseProcessor::get_key_iv(const string& room_name)
 	//should return anyway
 	return make_pair("", "");
 }
-void DataBaseProcessor::save_own_port(const string& room_name, int port)
-{
-	sql::DataBase db(db_name, encryption_key, false);
-
-	table own_port;
-	own_port["room_name"] = new sql::Text(room_name);
-	own_port["port"] = new sql::Integer(port);
-
-	auto req = sql::make_create_request(own_port, "own_port");
-	db.run_set_request(req);
-
-	req = sql::make_insert_request(own_port, "own_port");
-	db.run_set_request(req);
-}
-int DataBaseProcessor::get_own_port(const string& room_name)
-{
-	sql::DataBase db(db_name, encryption_key, false);
-
-	auto req = sql::make_select_request("own_port");
-	auto result = db.run_get_request(req);
-
-	for (auto& chunk : result)
-	{
-		bool eq = sql::type_to_string(chunk["room_name"]) == room_name;
-		if (eq)
-		{
-			auto val = chunk["port"];
-			if (val->type == sql::SQL_TYPES::INTEGER)
-			{
-				return static_cast<sql::Integer*>(val)->value;
-			}
-			return -1;
-		}
-	}
-	return -1;
-}
 void DataBaseProcessor::create_offline_clients_table()
 {
 	sql::DataBase db(db_name, encryption_key, false);
@@ -422,33 +341,30 @@ void DataBaseProcessor::create_offline_clients_table()
 	table offline_clients;
 	offline_clients["room_name"] = new sql::Text("");
 	offline_clients["ip"]		 = new sql::Text("");
-	offline_clients["port"]		 = new sql::Integer(0);
 
 	auto req = sql::make_create_request(offline_clients, "offline_clients");
 	db.run_set_request(req);
 }
 void DataBaseProcessor::add_offline_client(const string& room_name,
-										   const string& ip, 
-										   const int& port)
+										   const string& ip)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
 	table offline_clients;
 	offline_clients["room_name"] = new sql::Text(room_name);
 	offline_clients["ip"] = new sql::Text("'"+ip+"'");
-	offline_clients["port"] = new sql::Integer(port);
 
 	auto req = sql::make_insert_request(offline_clients, "offline_clients");
 	db.run_set_request(req);
 }
-vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& room_name)
+vector<string> DataBaseProcessor::get_offline_clients(const string& room_name)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
 	auto req = sql::make_select_request("offline_clients");
 	auto result = db.run_get_request(req);
 
-	vector<pair<string, int>> data;
+	vector<string> data;
 	for (auto& chunk : result)
 	{
 		bool same_room = sql::type_to_string(chunk["room_name"]) == room_name;
@@ -456,23 +372,20 @@ vector<pair<string, int>> DataBaseProcessor::get_offline_clients(const string& r
 		{
 			string ip = sql::type_to_string(chunk["ip"]);
 			ip = Functools::slice(ip, 1, ip.size() - 1);
-			int port  = atoi(sql::type_to_string(chunk["port"]).c_str());
-			data.push_back(make_pair(ip, port));
+			data.push_back(ip);
 		}
 	}
 
 	return data;
 }
 void DataBaseProcessor::erase_offline_client(const string& room_name,
-											 const string& ip,
-											 const int& port)
+											 const string& ip)
 {
 	sql::DataBase db(db_name, encryption_key, false);
 
 	table data_to_delete;
 	data_to_delete["room_name"] = new sql::Text("'"+room_name+"'");
 	data_to_delete["ip"]		= new sql::Text("'"+ip+"'");
-	data_to_delete["port"]		= new sql::Integer(port);
 
 	auto req = sql::make_delete_request("offline_clients", data_to_delete);
 	db.run_set_request(req); //it can raise error

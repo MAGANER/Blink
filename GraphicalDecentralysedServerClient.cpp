@@ -76,7 +76,7 @@ void GraphicalDecentralysedServerClient::save_offline_clients()
 {
 	for (auto& client : offline_clients)
 	{
-		add_offline_client(room_name, client.first.toString(), PORT);
+		add_offline_client(room_name, client);
 	}
 }
 void GraphicalDecentralysedServerClient::send_text_to_all(const string& text)

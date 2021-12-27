@@ -202,7 +202,7 @@ bool DecentralysedServerClient::run_in_console()
 			//clients
 			for (auto& client : offline_clients)
 			{
-				add_offline_client(room_name, client.first.toString(), client.second);
+				add_offline_client(room_name, client);
 			}
 
 			return true;
@@ -240,15 +240,14 @@ void DecentralysedServerClient::make_client(list<RoomClient*>& clients,
 	clients.push_back(client);
 	client_counter++;
 
-	auto ip_port = make_pair(client->socket->getRemoteAddress().toString(),
-							 to_string(PORT));
+	auto ip = client->socket->getRemoteAddress().toString();
 
 	//save only if it's not saved and port is correct value
-	bool are_saved = !are_ip_port_saved(ip_port, room_name);
+	bool are_saved = !is_ip_saved(ip, room_name);
 	bool is_ip_ok = client->socket->getRemoteAddress().toInteger() != 0;
 	if (are_saved &&  is_ip_ok)
 	{
-		add_connection_info(room_name, ip_port);
+		add_connection_info(room_name, ip);
 	}
 }
 void DecentralysedServerClient::send_clients_info(list<RoomClient*>& clients,
@@ -295,7 +294,6 @@ void DecentralysedServerClient::process_received_clients_info()
 		for (auto& client : received_info->clients)
 		{
 			conn_data.ip = client.first.toString();
-			conn_data.port = to_string(PORT);
 
 			if (ConnectionChecker::can_connect(conn_data))
 			{
@@ -314,15 +312,14 @@ void DecentralysedServerClient::process_received_clients_info()
 			else
 			{
 				//save offline client
-				offline_clients.push_back(client);
+				offline_clients.push_back(client.first.toString());
 			}
 		}
 		//create room
 		if (!does_room_exists(received_info->room_name))
 		{
 			create_new_room(received_info->room_name,
-							received_info->room_password,
-							to_string(PORT));
+							received_info->room_password);
 		}
 
 		received_clients_info = false;
@@ -339,14 +336,13 @@ void DecentralysedServerClient::check_offline_clients()
 	for (size_t i = 0;i<offline_clients.size();++i)
 	{
 		auto& client = offline_clients[i];
-		conn_data.ip = client.first.toString();
-		conn_data.port = to_string(client.second);
+		conn_data.ip = client;
 
 		if (ConnectionChecker::can_connect(conn_data))
 		{
 			TcpSocket* socket = new TcpSocket;
 			socket->setBlocking(false);
-			socket->connect(client.first, client.second);
+			socket->connect(client, PORT);
 
 			//send the key word to say
 			//don't resend client info
@@ -357,7 +353,7 @@ void DecentralysedServerClient::check_offline_clients()
 			make_client(clients, client_counter, socket, PORT);
 			offline_clients.erase(offline_clients.begin() + i);
 			//also erase them from DB
-			erase_offline_client(room_name, client.first.toString(), PORT);
+			erase_offline_client(room_name, client);
 		}
 	}
 }
@@ -380,7 +376,7 @@ void DecentralysedServerClient::connnect_finally()
 
 			if (!does_room_exists(room_name))
 			{
-				create_new_room(room_name, password, to_string(PORT));
+				create_new_room(room_name, password);
 				create_room_connections_info(room_name);
 			}
 

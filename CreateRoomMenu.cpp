@@ -12,13 +12,17 @@ CreateRoomMenu::~CreateRoomMenu()
 
 }
 void CreateRoomMenu::init(tgui::GuiBase* gui, 
-						  Blink::ConfigLoader& loader)
+						  Blink::ConfigLoader& loader,
+						  Label::Ptr no_rooms_ptr)
 {
 	this->gui = gui;
 	create(loader);
+	this->no_rooms_ptr = no_rooms_ptr;
+	no_rooms_ptr->setVisible(false);
 }
 void CreateRoomMenu::clear()
 {
+	no_rooms_ptr->setVisible(true);
 	gui->remove(password_ptr);
 	gui->remove(name_ptr);
 	gui->remove(result_ptr);
@@ -33,6 +37,7 @@ void CreateRoomMenu::create(Blink::ConfigLoader& loader)
 	user_name->setDefaultText("Room name");
 	user_name->setAlignment(EditBox::Alignment((int)loader.get_text_align() - 1));
 	user_name->setMaximumCharacters(Blink::MAX_NAME_LEN);
+	user_name->getSharedRenderer()->setBackgroundColor(loader.get_input_field_background_color());
 	gui->add(user_name);
 	name_ptr = user_name;
 
@@ -60,6 +65,7 @@ void CreateRoomMenu::create(Blink::ConfigLoader& loader)
 	create->onClick([&]() {create_room(); });
 	create_ptr = create;
 	gui->add(create);
+
 }
 void CreateRoomMenu::create_room()
 {
@@ -84,8 +90,8 @@ void CreateRoomMenu::create_room()
 	}
 	else
 	{
-		string port = to_string(NetRandom::get_random_port());
-		create_new_room(name, passw, port);
+		//TODO::fix that shat
+		create_new_room(name, passw);
 		room_name = name;
 		leave = true;
 	}

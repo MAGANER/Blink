@@ -19,7 +19,7 @@ GraphicalMainMenu::~GraphicalMainMenu()
 {
 	delete room_gate_menu;
 	if (conn_menu != nullptr) delete conn_menu;
-	if (client != nullptr)    delete client; 
+	//if (client != nullptr)    delete client; 
 	if (chat_menu != nullptr) delete chat_menu;
 	if (create_room_menu != nullptr) delete create_room_menu;
 }
@@ -31,6 +31,8 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 	//init rooms' list widget
 	auto room_box = ListBox::create();
+	room_box->getSharedRenderer()->setBackgroundColor(loader.get_message_background_color());
+	room_box->getSharedRenderer()->setTextColor(loader.get_input_field_text_color());
 	room_box->setUserData(room_list_id);
 	set_room_box_pos_and_size(room_box);
 	gui->add(room_box);
@@ -54,6 +56,8 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 
 	//set first button to create room
 	auto create_room_button = Button::create("create room");
+	create_room_button->getSharedRenderer()->setBackgroundColor(loader.get_input_field_background_color());
+	create_room_button->getSharedRenderer()->setTextColor(loader.get_input_field_text_color());
 	create_room_button->setUserData(default_id);
 	auto creating_lambda = [&]() {
 		if (curr_sub_menu == ActiveSubMenu::none)
@@ -109,6 +113,11 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		echo_functions.push_back([&](sf::Event::EventType type)
 			{set_no_rooms_label_to_center(type); });
 		
+	}
+	else
+	{
+		auto no_rooms_label = Label::create("");
+		no_rooms_label_ptr = no_rooms_label;
 	}
 	
 
@@ -227,8 +236,10 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 	//create room menu if it's not created yet
 	if (create_room_menu == nullptr)
 	{
+		cout <<"key:"<< get_encr_key() << endl;
 		create_room_menu = new CreateRoomMenu(get_encr_key(), get_db_name());
-		create_room_menu->init(gui, loader);
+		create_room_menu->init(gui, loader,no_rooms_label_ptr);
+		no_rooms_label_ptr->setVisible(false);
 	}
 }
 void GraphicalMainMenu::process_chat()
@@ -244,6 +255,7 @@ void GraphicalMainMenu::process_chat()
 		gui->removeAllWidgets();
 		init_chat = false;
 
+		string _room_name;
 		//check first case if user connects  with link
 		bool can_connect_with_link = false;
 		if (conn_menu != nullptr)
@@ -255,6 +267,7 @@ void GraphicalMainMenu::process_chat()
 		{
 			if (room_gate_menu->is_starting_room())
 			{
+				cout << "start room:" << endl;
 				auto name_passw = room_gate_menu->get_room_name_password();
 				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
 				auto none = command_hash();
@@ -266,15 +279,19 @@ void GraphicalMainMenu::process_chat()
 						true,
 						room_gate_menu->_save_link(),
 						room_gate_menu->get_recepient_name());
+
+				room_gate_menu->stop_starting();
 			}
 			else
 			{
+				
+				cout << "enter room:" << endl;
 				auto name_passw = room_gate_menu->get_room_name_password();
 				NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
 
 				auto none = command_hash();
 				client =
-					new GraphicalDecentralysedServerClient(none, name_passw.second, data, false, false);
+					new GraphicalDecentralysedServerClient(none, name_passw.second, data, "", false, false, "", false);
 			}
 			
 			client->prepare();
@@ -286,13 +303,16 @@ void GraphicalMainMenu::process_chat()
 			auto conn_data = conn_menu->get_connection_data();
 			
 			auto name_passw = room_gate_menu->get_room_name_password();
-			NetBaseData data(user_name, name_passw.first, get_encr_key(), get_db_name());
+			NetBaseData data(user_name, conn_data.room, get_encr_key(), get_db_name());
+			_room_name = conn_data.room;
 			auto none = command_hash();
-
-			client = new GraphicalDecentralysedServerClient(none, name_passw.second, data, true, false);
-			client->set_ip_and_port_to_connect(conn_data.ip,conn_data.port);
+			cout << "i want to get the room name!" <<data.room_name<<" "<< endl;
+			client = new GraphicalDecentralysedServerClient(none, name_passw.second, data,"", false,false,"", false);
+			client->set_ip_and_port_to_connect(conn_data.ip,to_string(PORT));
 			client->is_connecting(true);
+			client->set_room_name(conn_data.room);
 			client->set_key_iv(keys.data);
+
 
 			client->prepare();
 		}
@@ -306,6 +326,8 @@ void GraphicalMainMenu::process_chat()
 		chat_menu->set_link_data(client->get_link_data());
 		chat_menu->set_client_ptr(client);
 
+		if(!_room_name.empty())chat_menu->set_room_name(_room_name);
+
 		//no more sub menu is used
 		curr_sub_menu = ActiveSubMenu::none;
 
@@ -314,7 +336,7 @@ void GraphicalMainMenu::process_chat()
 		//to scroll text
 		process_mouse_wheel = true;
 		echo_mouse_wheel_function = [&](int direction) {chat_menu->process_scroll(direction); };
-		main_echo_function = [&]() {_main_echo_function(); };
+		main_echo_function = [&]() { _main_echo_function(); };
 	}
 }
 void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
@@ -323,7 +345,7 @@ void GraphicalMainMenu::connect_link(Blink::ConfigLoader& loader)
 	if (conn_menu == nullptr)
 	{
 		conn_menu =  new GraphicalConnectingSubMenu();
-		conn_menu->init_menu(gui, loader,init_chat,user_name);
+		conn_menu->init_menu(gui, loader, init_chat, user_name, no_rooms_label_ptr);
 	}
 }
 void GraphicalMainMenu::_main_echo_function()
@@ -342,12 +364,6 @@ void GraphicalMainMenu::_main_echo_function()
 		}
 		client->run_in_window();
 
-
-		//room name is sent by user who invited current user
-		if (!client->get_room_name().empty())
-		{
-			chat_menu->set_room_name(client->get_room_name());
-		}
 
 		if (client->has_message_to_show())
 		{

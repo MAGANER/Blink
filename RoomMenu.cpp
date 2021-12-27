@@ -39,13 +39,11 @@ void RoomMenu::print_state()
 	cout << "room name:" << data["room_name"]<<endl;
 	cout << "room password:" << data["room_password"]<<endl;
 }
-void RoomMenu::set_room_data(const string& port,
-							 const string& ip,
+void RoomMenu::set_room_data(const string& ip,
 							 const string& user_name,
 							 const string& room_name,
 							 const string& room_password)
 {
-	data["port"] = port;
 	data["ip"]   = ip;
 	data["user_name"] = user_name;
 	data["room_name"] = room_name;

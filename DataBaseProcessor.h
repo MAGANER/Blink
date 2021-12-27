@@ -19,8 +19,8 @@ namespace Blink
 	typedef map<string, sql::SQLtype*> table;
 	typedef pair<string, string> spair; //pretty abstract
 	typedef spair message; //first is user name, second is message
-	typedef tuple<string, string, string> str3;
-	typedef tuple<string, string, int> friendly_connection;
+	typedef tuple<string, string> str2;
+	typedef tuple<string, string> friendly_connection;
 	class DataBaseProcessor
 	{
 	private:
@@ -43,24 +43,19 @@ namespace Blink
 					   const string& password);
 
 		void add_connection_info(const string& room_name,
-								 const spair& ip_port);
-		bool are_ip_port_saved(const spair& ip_port,
-							   const string& room_name);
+								 const string& ip);
+		bool is_ip_saved(const string& ip,
+						 const string& room_name);
 		vector<friendly_connection> get_connections_info(const string& room_name);
 		bool does_conn_info_exist(const string& room_name);
 		void create_room_connections_info(const string& room_name);
 
 		void create_offline_clients_table();
 		void add_offline_client(const string& room_name,
-								const string& ip, 
-								const int& port);
-		vector<pair<string, int>> get_offline_clients(const string& room_name);
+								const string& ip);
+		vector<string> get_offline_clients(const string& room_name);
 		void erase_offline_client(const string& room_name,
-								  const string& ip,
-								  const int& port);
-
-		void save_own_port(const string& room_name,int port);
-		int get_own_port(const string& room_name);
+								  const string& ip);
 
 		void save_room_key(const string& room_name,
 						   const spair& key_iv);
@@ -68,13 +63,12 @@ namespace Blink
 		bool are_key_iv_saved(const string& room_name);
 
 		void create_new_room(const string& name,
-							 const string& password,
-							 const string& port);
+							 const string& password);
 		bool does_room_exists(const string& name);
 		bool is_password_correct(const string& room_name,
 								 const string& password);
 
-		vector<str3> get_rooms(const string& password);
+		vector<str2> get_rooms(const string& password);
 		void add_message(const string& room_name,
 						 const string& user_name,
 						 const string& message);
@@ -84,9 +78,5 @@ namespace Blink
 	public:
 		string get_db_name() { return db_name; }
 	};
-
-	extern int get_room_port(const string& room_name,
-							 const string& db_key,
-							 const string& db_name);
 };
 

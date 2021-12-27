@@ -34,8 +34,7 @@ protected:
 
 	list<RoomClient*> clients;
 
-	typedef pair<IpAddress, int> ip_port;
-	vector<ip_port> offline_clients;
+	vector<string> offline_clients;
 
 	vector<IpAddress> allowed;
 

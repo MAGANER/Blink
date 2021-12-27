@@ -40,7 +40,8 @@ public:
 	bool can_leave() { return leave; }
 
 	void init(tgui::GuiBase* gui, 
-			  Blink::ConfigLoader& loader);
+			  Blink::ConfigLoader& loader,
+			  Label::Ptr no_rooms_ptr);
 
 	string get_room_name() { return room_name; }
 };

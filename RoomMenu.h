@@ -34,8 +34,7 @@ namespace Blink
 
         void run(bool connecting_with_file_link, bool starting_room);
         void run(const encr::AES::key_iv& key, bool connecting_with_file_link, bool starting_room);
-        void set_room_data(const string& port,
-                           const string& ip,
+        void set_room_data(const string& ip,
                            const string& user_name,
                            const string& room_name,
                            const string& room_password);
