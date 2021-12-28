@@ -16,6 +16,10 @@ Server::Server(command_hash& commands,
 		});
 
 	if(!inherited)key_iv = encr::AES::get_random_key();
+
+	ConfigLoader* config = new ConfigLoader();
+	get_public_ip = config->get_net_mode();
+	delete config;
 }
 Server::~Server()
 {
@@ -135,7 +139,7 @@ string Server::get_invite_link_str(int port,
 {
 	string key = encr::AES::convert_bytes(key_iv.first);
 	string iv = encr::AES::convert_bytes(key_iv.second);
-	string inv_link = ::create_invite_link(get_ip(),
+	string inv_link = ::create_invite_link(get_ip(get_public_ip),
 		to_string(port),
 		room_name,
 		iv,

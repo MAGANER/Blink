@@ -14,6 +14,7 @@ ConfigLoader::ConfigLoader()
 		height = config["height"];
 		terminal_mode = config["mode"];
 		fullscreen = config["fullscreen"];
+		public_connection = config["net"];
 
 		string theme_path = config["theme"];
 		file.open("data/" + theme_path);
@@ -32,6 +33,11 @@ ConfigLoader::ConfigLoader()
 		load_color(background_win_color, "background_win_color");
 		load_color(enter_menu_label_color, "enter_menu_label_color");
 		load_color(message_background, "message_background_color");
+		load_color(input_field_background_color, "input_background_color");
+		load_color(input_field_hover_color, "input_hover_back_color");
+		load_color(input_field_text_color, "input_field_text_color");
+		load_color(selected_text_color, "selected_text_color");
+		load_color(selection_color, "selection_color");
 		int text_align = theme["default_text_align"];
 		default_text_align = TextAlignment(text_align);
 

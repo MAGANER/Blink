@@ -1,37 +1,16 @@
-/*
-* This solution works for Windows as well, 
-* i don't know what about Unix-like, but i think
-* it can include different implementations with
-* macros as Win32 e.t.c.
-* So we save ipconfig result to file get its 13 line
-* with ipv4 data, save it, delete file and then return data.
-*/
 #ifndef GET_IP_H
 #define GET_IP_H
-#ifndef _WIN32
-#error "getIP modules works for windows only"
-#endif
 #include<fstream>
 #include<string>
 #include<iostream>
+#include"SFML/Network/IpAddress.hpp"
 using namespace std;
 namespace
 {
-	string get_ip()
+	string get_ip(bool net_mode)
 	{
-		system("ipconfig > .ipdata");
-		ifstream file(".ipdata");
-
-		int counter = 0;
-		string line;
-
-		//13 line contains ipv4 data
-		while (getline(file, line) && counter != 13) { counter++; }
-		file.close();
-		system("erase .ipdata");
-
-		//after : there are 2 spaces, don't need it
-		return line.substr(line.find(":") + 2);
+		return net_mode?sf::IpAddress::getPublicAddress().toString():
+						sf::IpAddress::getLocalAddress().toString();
 	}
 };
 #endif //GET_IP_H

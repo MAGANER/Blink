@@ -16,6 +16,7 @@
 #include"InviteLinkCreator.h"
 #include"ConnectionChecker.hpp"
 #include"getIP.h"
+#include"ConfigLoader.h"
 
 namespace Blink
 {
@@ -26,7 +27,9 @@ namespace Blink
 	protected:
 		TcpListener listener;
 		string password, room_name;
-		//int port;
+		
+		bool get_public_ip = true;
+		//TODO:add port
 	public:
 		Server(command_hash& commands,
 			   const string& password,
