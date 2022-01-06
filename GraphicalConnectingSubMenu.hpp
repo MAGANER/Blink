@@ -99,12 +99,12 @@ public:
 		{
 			can_connect_flag = true;
 			init_chat = true;
-			result_label_ptr->setText("link is accepted! will be connected in 2 seconds!");
+			result_label_ptr->setText("link is accepted!");
 		}
 		else
 		{
 			back = true;
-			result_label_ptr->setText("link is denyied! will be leaving in 2 seconds!");
+			result_label_ptr->setText("link is denyied!");
 		}
 	}
 };
