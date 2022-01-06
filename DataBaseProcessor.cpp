@@ -16,6 +16,7 @@ void DataBaseProcessor::create_new_user(const string& name,
 
 		rooms["name"] = new sql::Text("");
 		rooms["password"] = new sql::Text("");
+		rooms["started"] = new sql::Boolean(false);
 
 		chats["room_name"] = new sql::Text("");
 		chats["user_name"] = new sql::Text("");
@@ -176,9 +177,24 @@ void DataBaseProcessor::create_new_room(const string& name,
 	table room;
 	room["name"]	 = new sql::Text(name);
 	room["password"] = new sql::Text(password);
+	room["started"] = new sql::Boolean(false);
 
 	string req = sql::make_insert_request(room, "rooms");
 	db.run_set_request(req);
+}
+bool DataBaseProcessor::is_room_started(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+	auto req = sql::make_select_request("rooms");
+	auto result = db.run_get_request(req);
+	for (auto& chunk : result)
+	{
+		if (sql::type_to_string(chunk["name"]) == room_name)
+		{
+			return sql::type_to_string(chunk["started"]) == "1" ? true : false;
+		}
+	}
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {
@@ -207,10 +223,13 @@ bool DataBaseProcessor::is_password_correct(const string& room_name,
 
 	string req = sql::make_select_request("rooms");
 	auto result = db.run_get_request(req);
+	cout << db.get_error_message() << endl;
 	for (auto chunk : result)
 	{
 		bool eq_name = sql::type_to_string(chunk["name"])     == room_name;
 		bool eq_pass = sql::type_to_string(chunk["password"]) == password;
+		cout << ">" << sql::type_to_string(chunk["name"]) << ":" <<
+			sql::type_to_string(chunk["password"]) << endl;
 		if (eq_name && eq_pass) return true;
 	}
 

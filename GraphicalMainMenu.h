@@ -79,7 +79,6 @@ private:
 	void set_no_rooms_label_to_center(sf::Event::EventType type);
 	void resize_chat_widgets(sf::Event::EventType type);
 	void run_create_room_menu(Blink::ConfigLoader& loader);
-	void create_link();
 	void connect_link(Blink::ConfigLoader& loader);
 	void leave_creating_room_menu();
 	void enter_room();

@@ -128,7 +128,6 @@ void GraphicalMainMenu::create(Blink::ConfigLoader& loader)
 		{resize_chat_widgets(type); });
 	paramless_echo_functions.push_back([&]() {enter_room();   });
 	paramless_echo_functions.push_back([&]() {process_chat(); });
-	paramless_echo_functions.push_back([&]() {create_link();  });
 	paramless_echo_functions.push_back([&]() {leave_creating_room_menu(); });
 	paramless_echo_functions.push_back([&]() {clear_sub_menu(); });
 }
@@ -172,16 +171,6 @@ void GraphicalMainMenu::leave_creating_room_menu()
 			delete create_room_menu;
 			create_room_menu = nullptr;
 		}
-	}
-}
-void GraphicalMainMenu::create_link()
-{
-	//create client and save/send link
-	//callback function for button to create link
-	if (start_room)
-	{
-		room_gate_menu->init_inv_link_creating(init_chat);
-		start_room = false;
 	}
 }
 void GraphicalMainMenu::set_room_box_pos_and_size(ListBox::Ptr ptr)
@@ -244,11 +233,6 @@ void GraphicalMainMenu::run_create_room_menu(Blink::ConfigLoader& loader)
 }
 void GraphicalMainMenu::process_chat()
 {
-	//user can not start room if all fields required to make link are empty
-	//so don't start chat
-	if (room_gate_menu->is_starting_room() && !room_gate_menu->can_make_link())
-		init_chat = false;
-
 	if (init_chat)
 	{
 		//remove everything and don't allow to come here again!
@@ -275,10 +259,10 @@ void GraphicalMainMenu::process_chat()
 					new GraphicalDecentralysedServerClient(none,
 						name_passw.second,
 						data,
-						room_gate_menu->get_link_creator_additional_data(),
+						"",
 						true,
 						room_gate_menu->_save_link(),
-						room_gate_menu->get_recepient_name());
+						"");
 
 				room_gate_menu->stop_starting();
 			}

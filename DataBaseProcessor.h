@@ -67,6 +67,7 @@ namespace Blink
 		bool does_room_exists(const string& name);
 		bool is_password_correct(const string& room_name,
 								 const string& password);
+		bool is_room_started(const string& room_name);
 
 		vector<str2> get_rooms(const string& password);
 		void add_message(const string& room_name,

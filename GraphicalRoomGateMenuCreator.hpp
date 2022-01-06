@@ -23,7 +23,7 @@ class RoomGateMenu:public Blink::DataBaseProcessor
 private:
 	EditBox::Ptr room_passw, recepient_name;
 	Label::Ptr entering_room_label_ptr, result_label_ptr;
-	Button::Ptr enter_room_ptr, start_room_ptr;
+	Button::Ptr enter_room_ptr;
 
 	const int conn_room_id = 5;
 	const int enter_room_id = 4;
@@ -35,10 +35,6 @@ private:
 
 	bool starting_room = false;
 
-	bool first_state = true;//first state means entering/starting menu
-	//so second one is where you save/send link
-
-	bool can_save_send_link = false;
 public:
 	RoomGateMenu(const string& encr_key,
 				 const string& db_name):Blink::DataBaseProcessor(encr_key,db_name)
@@ -88,36 +84,30 @@ public:
 		auto enter_room_button = Button::create("enter");
 		enter_room_button->setUserData(enter_room_id);
 		enter_room_button->setSize({ "18%","5%" });
-		enter_room_button->setPosition({ "30%","48%" });
+		enter_room_button->setPosition({ "40%","48%" });
 		enter_room_button->setVisible(false);
 		enter_room_button->onPress([&]() {can_enter_room(init_chat); });
 		enter_room_ptr = enter_room_button;
 		gui->add(enter_room_ptr);
-
-		auto start_room_button = Button::create("start");
-		start_room_button->setUserData(conn_room_id);
-		start_room_button->setSize({ "18%","5%" });
-		start_room_button->setPosition({ "52%","48%" });
-		start_room_button->setVisible(false);
-		start_room_button->onPress([&]() {can_start_room(init_chat,start); });
-		start_room_ptr = start_room_button;
-		gui->add(start_room_button);
 	}
 	void can_enter_room(bool& init_chat)
 	{
 		bool active_input_box = enter_room_ptr->isVisible();
 		if (active_input_box)
 		{
-			//don't change it fixes bug, when password is link path!
-			if(first_state)
-				room_password = room_passw->getText();
-			//
-
+			room_password = room_passw->getText().toStdString();
+			cout << room_name.toStdString() << ":" << room_password.toStdString() << endl;
 			bool can_enter = is_password_correct(room_name.toStdString(),
 												 room_password.toStdString());
 
 			if (can_enter)
 			{
+				cout << "can enter:"<< is_room_started(room_name.toStdString()) << endl;
+				if (!is_room_started(room_name.toStdString()))
+				{
+					cout << "wtf!" << endl;
+					starting_room = true;
+				}
 				init_chat = true;
 			}
 			else
@@ -125,32 +115,6 @@ public:
 				//show label of disability
 				result_label_ptr->setVisible(true);
 				result_label_ptr->setText(":can not enter room!");
-				room_passw->setText("");
-			}
-		}
-	}
-	void can_start_room(bool& init_chat,bool& start)
-	{
-		bool active_input_box = enter_room_ptr->isVisible();
-		if (active_input_box)
-		{
-			//don't change it fixes bug, when password is link path!
-			if(first_state)
-				room_password = room_passw->getText();
-			//
-
-			bool can_enter = is_password_correct(room_name.toStdString(),
-												 room_password.toStdString());
-
-			if (can_enter)
-			{
-				start = true;
-			}
-			else
-			{
-				//show label of disability
-				result_label_ptr->setVisible(true);
-				result_label_ptr->setText(":can not start room!");
 				room_passw->setText("");
 			}
 		}
@@ -164,44 +128,14 @@ public:
 			entering_room_label_ptr->setText("entering `" + room_name + "` room");
 			entering_room_label_ptr->setVisible(true);
 			enter_room_ptr->setVisible(true);
-			start_room_ptr->setVisible(true);
 
 			rooms_ptr->setSelectedItem("");
 		}
 	}
 
-
-	void init_inv_link_creating(bool& init_chat)
-	{
-		first_state = false;
-		starting_room = true;
-		room_passw->setText("");
-		room_passw->setPasswordCharacter(0);
-		room_passw->setDefaultText("invite link path/recepient");
-		room_passw->setPosition({"30%","30%"});
-		enter_room_ptr->setText("save");
-		enter_room_ptr->setPosition({ "52%","44%" });
-		enter_room_ptr->onPress([&]() {link_callback_fn(true, init_chat); });
-
-		recepient_name->setPosition({ "30%","36%" });
-		recepient_name->setVisible(true);
-		recepient_name->setText("");
-
-		start_room_ptr->setText("send");
-		start_room_ptr->setPosition({ "30%","44%" });
-		start_room_ptr->onPress([&]() {link_callback_fn(false, init_chat); });
-
-		entering_room_label_ptr->setText("save/send invite link:");
-		entering_room_label_ptr->setPosition({ "30%","25%" });
-		result_label_ptr->setText("");
-	}
 	bool _save_link() { return save_link; }
 	bool is_starting_room() { return starting_room; }
-	string get_link_creator_additional_data()
-	{
-		return link_creator_additional_data;
-	}
-	string get_recepient_name() { return recepient_name->getText().toStdString(); }
+	void stop_starting() { starting_room = false; }
 
 	pair<string, string> get_room_name_password()
 	{
@@ -215,22 +149,7 @@ public:
 		entering_room_label_ptr->setVisible(false);
 		result_label_ptr->setVisible(false);
 		enter_room_ptr->setVisible(false);
-		start_room_ptr->setVisible(false);
 
-	}
-	bool can_make_link() { return can_save_send_link; }
-private:
-	void link_callback_fn(bool flag,bool& init_chat)
-	{
-		bool not_empty = !recepient_name->getText().empty() &&
-						 !room_passw->getText().empty();
-		if (not_empty)
-		{
-			save_link = flag;
-			link_creator_additional_data = room_passw->getText().toStdString();
-			init_chat = true;
-			can_save_send_link = true;
-		}
 	}
 };
 };
