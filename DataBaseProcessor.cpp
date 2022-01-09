@@ -180,6 +180,7 @@ void DataBaseProcessor::create_new_room(const string& name,
 	room["started"] = new sql::Boolean(false);
 
 	string req = sql::make_insert_request(room, "rooms");
+	cout << req << endl;
 	db.run_set_request(req);
 }
 bool DataBaseProcessor::is_room_started(const string& room_name)
@@ -195,6 +196,17 @@ bool DataBaseProcessor::is_room_started(const string& room_name)
 			return sql::type_to_string(chunk["started"]) == "1" ? true : false;
 		}
 	}
+}
+void DataBaseProcessor::set_room_started(const string& room_name)
+{
+	sql::DataBase db(db_name, encryption_key, false);
+
+
+	string s = "\"";
+	string req = "UPDATE rooms SET started=1 WHERE name =" + s+room_name+s;
+	auto res = db.run_set_request(req);
+	cout << req << endl;
+	cout << db.get_error_message() << endl;
 }
 bool DataBaseProcessor::does_room_exists(const string& name)
 {

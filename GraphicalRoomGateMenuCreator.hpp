@@ -107,6 +107,7 @@ public:
 				{
 					cout << "wtf!" << endl;
 					starting_room = true;
+					set_room_started(room_name.toStdString());
 				}
 				init_chat = true;
 			}
@@ -135,7 +136,12 @@ public:
 
 	bool _save_link() { return save_link; }
 	bool is_starting_room() { return starting_room; }
-	void stop_starting() { starting_room = false; }
+	void stop_starting() 
+	{ 
+		//if (does_room_exists(room_name.toStdString()))cout << "exists!" << endl;
+		//set_room_started(room_name.toStdString(), room_password.toStdString());
+		starting_room = false; 
+	}
 
 	pair<string, string> get_room_name_password()
 	{
