@@ -232,6 +232,8 @@ void GraphicalChatMenu::load_messages(vector<MessageToShow>& messages)
 	{
 		add_message(msg);
 	}
+	name_background_ptr->moveToFront();
+	room_name_ptr->moveToFront();
 }
 void GraphicalChatMenu::resize(int win_width)
 {

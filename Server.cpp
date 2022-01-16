@@ -114,12 +114,14 @@ void Server::create_invite_link_to_save(int port,
 								const string& additional_data,
 								const string& recepient_name)
 {
+	cout << port << endl;
+	
 	string inv_link = get_invite_link_str(port, 
 								room_name, 
 								room_password, 
 								decentralysed,
 								recepient_name);
-
+	cout << inv_link << endl;
 	auto write_link_to_file = [&](const string& path)
 	{
 		ofstream file;
@@ -146,7 +148,7 @@ string Server::get_invite_link_str(int port,
 		key,
 		room_password,
 		decentralysed);
-	
+	cout << inv_link << endl;
 	inv_link = ::encrypt_invite_link(inv_link, recepient_name);
 	return inv_link;
 }

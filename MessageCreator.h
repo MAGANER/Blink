@@ -21,7 +21,6 @@ namespace
 		Text,
 		ComeInRequest,
 		ClientsInfo,
-		RoomName,
 		ComeInAsFriend,
 	};
 

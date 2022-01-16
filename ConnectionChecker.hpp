@@ -4,8 +4,10 @@
 #include"MessageCreator.h"
 #include"EncryptionData.h"
 #include"StringOperations.hpp"
+#include"InviteLinkCreator.h"
 #include<iostream>
 #include<fstream>
+#define PORT 8189
 namespace Blink
 {
 namespace {
@@ -67,7 +69,7 @@ namespace ConnectionChecker
 	{
 		//connect to server
 		TcpSocket socket;
-		if (socket.connect(IpAddress(data.ip), atoi(data.port.c_str())) != TcpSocket::Done)
+		if (socket.connect(IpAddress(data.ip), PORT) != TcpSocket::Done)
 		{
 			return false;
 		}
@@ -82,7 +84,9 @@ namespace ConnectionChecker
 			return false;
 		}
 		else
-		p.clear();
+		{
+			p.clear();
+		}
 
 		//get the answer
 		socket.receive(p);
@@ -123,45 +127,18 @@ namespace ConnectionChecker
 
 		json jlink = json::parse(link);
 		data.ip	  = jlink["ip"];
-		data.port = jlink["port"];
 		data.room = jlink["room"];
 		data.password = jlink["password"];
-
 	
 		auto new_encr_data = new EncryptionData(jlink["key"], jlink["iv"]);
 		encr_data = *new_encr_data;
 
-		auto curr_time = parse_time(get_curr_time() + " d");
-		int curr_seconds = get_seconds(curr_time[3]);
-
-		string _time = jlink["time"];
-		string time = Functools::slice(_time, 0, _time.size() - 1);
-		auto creation_time = parse_time(time + " d");
-		int creation_seconds = get_seconds(creation_time[3]);
-
-		/*int eq_counter = 0;
-		for (size_t i = 0; i < curr_time.size(); i++)
+		if (ConnectionChecker::can_connect(data))
 		{
-			if (i != 3)
-			{
-				if (curr_time[i] == creation_time[i])eq_counter++;
-			}
+			cout << "link is accepted!" << endl;
+			return true;
 		}
-		bool date_is_correct = eq_counter == 4;
-		bool time_diff_is_correct = abs(curr_seconds - creation_seconds) < (5 * 60);*/
-		//if (date_is_correct && time_diff_is_correct)
-		//{
-			if (ConnectionChecker::can_connect(data))
-			{
-				cout << "link is accepted!" << endl;
-				return true;
-			}
-			else cout << "link is denyied!" << endl;
-		//}
-		//else
-		//{
-		//	cout << "link is denyied!: data is incorrect or time is out!" << endl;
-		//}
+		else cout << "link is denyied!" << endl;
 
 		return false;
 	}

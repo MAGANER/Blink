@@ -9,6 +9,9 @@ namespace
 {
 	string get_ip(bool net_mode)
 	{
+		cout << "hey, man!" << endl;
+		cout << net_mode ? sf::IpAddress::getPublicAddress().toString() :
+			sf::IpAddress::getLocalAddress().toString();
 		return net_mode?sf::IpAddress::getPublicAddress().toString():
 						sf::IpAddress::getLocalAddress().toString();
 	}
