@@ -189,7 +189,9 @@ protected:
 	}
 
 
-	void get_and_save_message(TcpSocket& socket,list<message_store*>& messages)
+	void get_and_save_message(TcpSocket& socket,
+							  list<message_store*>& messages,
+							  bool show=false)
 	{
 		string data = NetBase::get_message(socket);
 		if (data.size() > 0 && can_show)
@@ -199,6 +201,7 @@ protected:
 
 			message_store* msg = new message_store(cut(parsed["name"]), cut(parsed["data"]));
 			messages.push_back(msg);
+			show_message(data);
 		}
 	}
 	void show_message(const string& message)

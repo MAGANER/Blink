@@ -37,6 +37,7 @@ protected:
 	vector<string> offline_clients;
 
 	vector<IpAddress> allowed;
+	list<message_store*> received_messages;
 
 	int client_counter = 0;
 

@@ -138,41 +138,32 @@ bool DecentralysedServerClient::run_in_console()
 		bool should_resend_clients_info = true;
 		if (listener.accept(*entering_socket) == sf::Socket::Done)
 		{
-			auto check1 = [&](vector<IpAddress>& addresses)
+			auto check_addres = [&](vector<IpAddress>& addresses)
 			{
 				return is_addres_allowed(addresses, entering_socket->getRemoteAddress());
 			};
 
-			if (check1(allowed) &&
+			if (check_addres(allowed) &&
 				can_accept_new_connection(client_counter))
 			{
-				// send room name, because room name from file link is hashed
-				//auto data = room_name + "+" + password;
-				//send_message(*entering_socket, data, MessageType::RoomName);
+				//send password because it was hashed
+				Packet pack;
+				pack << password;
+				entering_socket->send(pack);
 
-				//retrieve port, cos it's needed to create clients' info
-				int listner_port = -1;
 				string some_shit = get_raw_message(*entering_socket);
 				if (some_shit == "motherfucker") should_resend_clients_info = false;
-				else listner_port = atoi(some_shit.c_str());
 
 				//don't resend if you connect to user
 				//who already was connected to another one
-				if(should_resend_clients_info)
+				if (should_resend_clients_info)
 					send_clients_info(clients, entering_socket);
 
-				make_client(clients, client_counter, entering_socket,listner_port);
-				
 
-				//clear it, because there is no need to keep this data anymore
-				for (size_t i = 0; i < allowed.size(); i++)
-				{
-					auto curr = allowed[i];
-					if (curr.toString() == entering_socket->getRemoteAddress().toString())
-					{
-						allowed.erase(allowed.begin() + i);
-					}
-				}
+				//save address, because client can log out and came back
+				//so save it, because ip is added to DB, but not to allowed vector
+				allowed.push_back(entering_socket->getRemoteAddress());
+				make_client(clients, client_counter, entering_socket, PORT);
 				entering_socket = new TcpSocket();
 			}
 			else
@@ -183,14 +174,14 @@ bool DecentralysedServerClient::run_in_console()
 
 		//receive message, show it and resend
 		for (auto& client : clients)
-			NetBase::get_and_show_message(*client->socket);
+			NetBase::get_and_save_message(*client->socket, received_messages,true);
 
 		//info about another clients
 		process_received_clients_info();
 
 		if (timer.getElapsedTime().asSeconds() > 10.0f)
 		{
-			check_offline_clients();
+			//check_offline_clients();
 			timer.restart();
 		}
 
@@ -200,10 +191,8 @@ bool DecentralysedServerClient::run_in_console()
 			//save offline clients
 			//because if you don't do that you lost all data  about potential
 			//clients
-			for (auto& client : offline_clients)
-			{
-				add_offline_client(room_name, client);
-			}
+			listener.close();
+			socket->disconnect();
 
 			return true;
 		}
