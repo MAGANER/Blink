@@ -148,7 +148,6 @@ string Server::get_invite_link_str(int port,
 		key,
 		room_password,
 		decentralysed);
-	cout << inv_link << endl;
 	inv_link = ::encrypt_invite_link(inv_link, recepient_name);
 	return inv_link;
 }
