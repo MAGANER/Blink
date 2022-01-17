@@ -24,5 +24,5 @@ be sent via e-mail.<br> To make it able, you should have your port forwarded(def
 So it has 2 interface modes: graphical and console.<br>
 
 # TODO-list
-It is not finished yet. I think it will be not finished at all.<br>
+It is not finished yet. I think it will be not finished at all. :smiling_face_with_tear:<br> 
 - [ ] check how correct is network connection in console mode.
