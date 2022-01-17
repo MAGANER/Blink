@@ -25,5 +25,5 @@ So it has 2 interface modes: graphical and console.<br>
 
 # TODO-list
 It is not finished yet. I think it will be not finished at all. :smiling_face_with_tear:<br> 
-- [ ] check how correct is network connection in console mode.
+- [x] check how correct is network connection in console mode.
 - [ ] write Cmake file.
