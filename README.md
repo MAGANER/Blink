@@ -22,6 +22,7 @@ to communicate through the Blink room. It can be saved on harddrive or it can<br
 be sent via e-mail.<br> To make it able, you should have your port forwarded(default is 8189).
 
 So it has 2 interface modes: graphical and console.<br>
+Also it can work through local and global network.<br>
 
 # TODO-list
 It is not finished yet. I think it will be not finished at all. :smiling_face_with_tear:<br> 
