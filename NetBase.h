@@ -150,6 +150,15 @@ protected:
 			add_message(room_name, user_name, message);
 		}
 	}
+	void send_auto_message(TcpSocket& socket,
+						   const string& message)
+	{
+		//this is special method to send system messages
+		Packet pack;
+		string jmessage = convert_message_to_json(message, "Blinking Wizard", MessageType::Text);
+		pack << encr::AES::encrypt(key_iv, jmessage);
+		socket.send(pack);
+	}
 	virtual void send_message(TcpSocket& socket,
 							  const string& message,
 							  MessageType msg)

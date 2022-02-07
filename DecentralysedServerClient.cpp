@@ -160,6 +160,9 @@ bool DecentralysedServerClient::run_in_console()
 					send_clients_info(clients, entering_socket);
 
 
+				//send password to provide user an ability to come in again later
+				send_auto_message(*entering_socket, "room password:" + password + "\n don't forget it!");
+
 				//save address, because client can log out and came back
 				//so save it, because ip is added to DB, but not to allowed vector
 				allowed.push_back(entering_socket->getRemoteAddress());
