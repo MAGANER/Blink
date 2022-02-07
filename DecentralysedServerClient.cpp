@@ -181,7 +181,7 @@ bool DecentralysedServerClient::run_in_console()
 
 		if (timer.getElapsedTime().asSeconds() > 10.0f)
 		{
-			//check_offline_clients();
+			check_offline_clients();
 			timer.restart();
 		}
 

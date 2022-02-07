@@ -55,7 +55,7 @@ void GraphicalDecentralysedServerClient::run_in_window()
 
 	if (timer.getElapsedTime().asSeconds() > 10.0f)
 	{
-		//check_offline_clients();
+		check_offline_clients();
 		timer.restart();
 	}
 
