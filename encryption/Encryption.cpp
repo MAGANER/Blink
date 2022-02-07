@@ -119,7 +119,7 @@ std::string Encryption::AES::decrypt(const key_iv& key_iv, const string& cipher)
 	catch (const Exception& e)
 	{
 		cout << "AES::decryption:" << e.what();
-		exit(-1);
+		return "-1";
 	}
 }
 std::string Encryption::SHA::sha256(const string& data)

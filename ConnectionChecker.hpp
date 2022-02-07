@@ -124,6 +124,7 @@ namespace ConnectionChecker
 
 
 		link = decrypt_invite_link(link,my_name);
+		if (link == "-1")return false;//probably incorect link, that can not be decrypted
 
 		json jlink = json::parse(link);
 		data.ip	  = jlink["ip"];
