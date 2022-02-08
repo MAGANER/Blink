@@ -75,10 +75,11 @@ void GraphicalChatMenu::add_message(const MessageToShow& msg)
 {	
 	auto box = make_default_message_box();
 
-	auto name = msg.mine ? "you:\n " : msg.name + ":\n";
+	auto name = msg.mine ? "you:" : msg.name + ":";
 	box->setText(split_text_if_required(name + msg.text));
+	box->setSize(text_input_ptr->getSize().x,box->getSize().y+5);
 
-	MsgAlign align = msg.mine ? MsgAlign::Left : MsgAlign::Right;
+	MsgAlign align = MsgAlign::Left;
 
 	auto pos  = text_input_ptr->getPosition();
 	auto size = box->getSize();
